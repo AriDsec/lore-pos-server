@@ -219,6 +219,20 @@ app.get('*', (req, res) => {
 });
 
 // ============ PUERTO ============
+const { execSync } = require('child_process');
+const fs = require('fs');
+
+// Construir frontend si no existe
+if (!fs.existsSync(path.join(__dirname, 'public', 'index.html'))) {
+  console.log('🔨 Construyendo frontend...');
+  try {
+    execSync('cd client && npm install && npm run build', { stdio: 'inherit' });
+    console.log('✅ Frontend construido');
+  } catch (e) {
+    console.error('❌ Error construyendo frontend:', e.message);
+  }
+}
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`\n🚀 Servidor LORE POS corriendo en puerto ${PORT}`);
