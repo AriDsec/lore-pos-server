@@ -589,6 +589,95 @@ function BillModal({ order, onClose, onPay }) {
 }
 
 
+
+// ─────────────────────────────────────────────
+// PINES DE ACCESO
+// ─────────────────────────────────────────────
+const PINES = {
+  'Caja Bar':           { pin: '1970', role: 'caja',   zone: 'bar' },
+  'Caja Restaurante':   { pin: '1969', role: 'caja',   zone: 'restaurante' },
+  'Tablet Restaurante': { pin: '7878', role: 'mesera', zone: 'restaurante' },
+  'Cocina':             { pin: '7878', role: 'cocina', zone: 'restaurante' },
+  'María':              { pin: '5456', role: 'mesera', zone: 'bar' },
+  'Milena':             { pin: '8995', role: 'mesera', zone: 'bar' },
+  'Lin':                { pin: '7777', role: 'mesera', zone: 'bar' },
+  'Admin':              { pin: '3306', role: 'admin',  zone: 'admin' },
+};
+
+// ─────────────────────────────────────────────
+// MODAL DE PIN
+// ─────────────────────────────────────────────
+function PinModal({ userName, onSuccess, onCancel }) {
+  const [pin, setPin] = useState('');
+  const [error, setError] = useState(false);
+
+  const handleDigit = (d) => {
+    if (pin.length >= 4) return;
+    const next = pin + d;
+    setPin(next);
+    setError(false);
+    if (next.length === 4) {
+      setTimeout(() => {
+        if (next === PINES[userName]?.pin) {
+          onSuccess();
+        } else {
+          setError(true);
+          setPin('');
+        }
+      }, 200);
+    }
+  };
+
+  const handleDelete = () => { setPin(p => p.slice(0, -1)); setError(false); };
+
+  return (
+    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-emerald-500/30 p-8 w-full max-w-xs shadow-2xl">
+        <div className="text-center mb-6">
+          <div className="text-3xl mb-2">🔐</div>
+          <h2 className="text-white font-bold text-xl">{userName}</h2>
+          <p className="text-slate-400 text-sm mt-1">Ingresa tu PIN de 4 dígitos</p>
+        </div>
+
+        {/* Dots */}
+        <div className="flex justify-center gap-4 mb-6">
+          {[0,1,2,3].map(i => (
+            <div key={i} className={`w-4 h-4 rounded-full border-2 transition-all ${
+              i < pin.length
+                ? error ? 'bg-red-500 border-red-500' : 'bg-emerald-400 border-emerald-400'
+                : 'border-slate-500'
+            }`} />
+          ))}
+        </div>
+
+        {error && <p className="text-red-400 text-center text-sm mb-4">PIN incorrecto, intenta de nuevo</p>}
+
+        {/* Numpad */}
+        <div className="grid grid-cols-3 gap-3 mb-4">
+          {[1,2,3,4,5,6,7,8,9].map(d => (
+            <button key={d} onClick={() => handleDigit(String(d))}
+              className="bg-slate-700 hover:bg-slate-600 active:bg-emerald-700 text-white font-bold text-xl py-4 rounded-xl transition">
+              {d}
+            </button>
+          ))}
+          <button onClick={handleDelete}
+            className="bg-slate-700 hover:bg-slate-600 text-slate-300 font-bold text-lg py-4 rounded-xl transition">
+            ⌫
+          </button>
+          <button onClick={() => handleDigit('0')}
+            className="bg-slate-700 hover:bg-slate-600 active:bg-emerald-700 text-white font-bold text-xl py-4 rounded-xl transition">
+            0
+          </button>
+          <button onClick={onCancel}
+            className="bg-red-900/50 hover:bg-red-900 text-red-300 font-bold text-sm py-4 rounded-xl transition">
+            ✕
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─────────────────────────────────────────────
 // MESERA SCREEN — Responsive (tabs en móvil)
 // ─────────────────────────────────────────────
@@ -953,11 +1042,21 @@ export default function RestaurantePOS() {
   // ════════════════════════════════════════════
 
   // ── LOGIN ─────────────────────────────────────
+  const [pendingUser, setPendingUser] = useState(null);
+
+  const requestLogin = (name) => setPendingUser(name);
+
+  const confirmPin = async () => {
+    const user = PINES[pendingUser];
+    setPendingUser(null);
+    await handleLogin(pendingUser, user.role, user.zone);
+  };
+
   if (!currentUser) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-emerald-900 via-green-800 to-teal-900 flex items-center justify-center p-4">
         <div className="w-full max-w-md">
-          <div className="text-center mb-12">
+          <div className="text-center mb-8">
             <div className="text-7xl mb-4">🍽️</div>
             <h1 className="text-5xl font-bold text-emerald-100 mb-2">LORE</h1>
             <p className="text-emerald-200 text-lg">Sistema de Pedidos</p>
@@ -970,25 +1069,32 @@ export default function RestaurantePOS() {
           <div className="space-y-4">
             <div className="bg-slate-800/80 backdrop-blur border border-emerald-500/40 rounded-2xl p-6 shadow-2xl">
               <h2 className="text-emerald-300 font-bold text-lg mb-4">🍺 ZONA BAR</h2>
-              <button onClick={() => handleLogin('Caja Bar', 'caja', 'bar')} className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold py-3 rounded-xl transition shadow-lg mb-2">💰 Caja Bar</button>
+              <button onClick={() => requestLogin('Caja Bar')} className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold py-3 rounded-xl transition shadow-lg mb-2">💰 Caja Bar</button>
               <div className="space-y-2">
                 {meseras.map(m => (
-                  <button key={m} onClick={() => handleLogin(m, 'mesera', 'bar')} className="w-full bg-slate-700/60 hover:bg-slate-600 text-emerald-100 py-2 rounded-lg transition font-medium">{m}</button>
+                  <button key={m} onClick={() => requestLogin(m)} className="w-full bg-slate-700/60 hover:bg-slate-600 text-emerald-100 py-2 rounded-lg transition font-medium">{m}</button>
                 ))}
               </div>
             </div>
             <div className="bg-slate-800/80 backdrop-blur border border-emerald-500/40 rounded-2xl p-6 shadow-2xl">
               <h2 className="text-emerald-300 font-bold text-lg mb-4">🍽️ ZONA RESTAURANTE</h2>
-              <button onClick={() => handleLogin('Caja Restaurante', 'caja', 'restaurante')} className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold py-3 rounded-xl transition shadow-lg mb-2">💰 Caja</button>
-              <button onClick={() => handleLogin('Tablet Restaurante', 'mesera', 'restaurante')} className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold py-3 rounded-xl transition shadow-lg mb-2">📱 Tomar Pedidos</button>
-              <button onClick={() => handleLogin('Cocina', 'cocina', 'restaurante')} className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold py-3 rounded-xl transition shadow-lg">👨‍🍳 Cocina</button>
+              <button onClick={() => requestLogin('Caja Restaurante')} className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold py-3 rounded-xl transition shadow-lg mb-2">💰 Caja</button>
+              <button onClick={() => requestLogin('Tablet Restaurante')} className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold py-3 rounded-xl transition shadow-lg mb-2">📱 Tomar Pedidos</button>
+              <button onClick={() => requestLogin('Cocina')} className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold py-3 rounded-xl transition shadow-lg">👨‍🍳 Cocina</button>
             </div>
             <div className="bg-slate-800/80 backdrop-blur border border-emerald-500/40 rounded-2xl p-6 shadow-2xl">
-              <button onClick={() => handleLogin('Admin', 'admin', 'admin')} className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold py-3 rounded-xl transition shadow-lg">📊 Panel Admin</button>
+              <button onClick={() => requestLogin('Admin')} className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold py-3 rounded-xl transition shadow-lg">📊 Panel Admin</button>
             </div>
           </div>
         </div>
         {loading && <Spinner />}
+        {pendingUser && (
+          <PinModal
+            userName={pendingUser}
+            onSuccess={confirmPin}
+            onCancel={() => setPendingUser(null)}
+          />
+        )}
       </div>
     );
   }
