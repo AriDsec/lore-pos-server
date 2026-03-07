@@ -552,9 +552,9 @@ function ItemsModal({ order, onClose }) {
 // MODAL CUENTA (cobrar)
 // ─────────────────────────────────────────────
 const payBadge = (m) => {
-  if (m === 'sinpe')   return <span className="bg-blue-900/50 text-blue-300 border border-blue-600 px-2 py-0.5 rounded text-xs font-bold">📱 Sinpe</span>;
-  if (m === 'tarjeta') return <span className="bg-purple-900/50 text-purple-300 border border-purple-600 px-2 py-0.5 rounded text-xs font-bold">💳 Tarjeta</span>;
-  return <span className="bg-green-900/50 text-green-300 border border-green-600 px-2 py-0.5 rounded text-xs font-bold">💵 Efectivo</span>;
+  if (m === 'sinpe')   return <span style={{whiteSpace:'nowrap'}} className="inline-flex items-center gap-1 bg-blue-900/50 text-blue-300 border border-blue-600 px-2 py-0.5 rounded-full text-xs font-bold">📱 Sinpe</span>;
+  if (m === 'tarjeta') return <span style={{whiteSpace:'nowrap'}} className="inline-flex items-center gap-1 bg-purple-900/50 text-purple-300 border border-purple-600 px-2 py-0.5 rounded-full text-xs font-bold">💳 Tarjeta</span>;
+  return <span style={{whiteSpace:'nowrap'}} className="inline-flex items-center gap-1 bg-green-900/50 text-green-300 border border-green-600 px-2 py-0.5 rounded-full text-xs font-bold">💵 Efectivo</span>;
 };
 
 function BillModal({ order, onClose, onPay }) {
@@ -1075,11 +1075,10 @@ export default function RestaurantePOS() {
           createdAt: new Date(),
         });
       }
-      // Abrir modal de cobro directamente
-      const accToShow = { ...(created || newAcc), total };
-      setBillOrder(accToShow);
+      // Solo confirmar — la caja cobra después
       setCartItems([]); setSelectedTable(null); setSelectedBarra(null);
       setClientName(''); setOrderType(null); setSelectedAccount(null);
+      alert('✅ Pedido registrado. La caja lo cobrará.');
     } catch (err) {
       alert('❌ Error: ' + err.message);
     } finally {
@@ -1221,7 +1220,6 @@ export default function RestaurantePOS() {
           isBar={currentZone === 'bar'}
           onDirectPay={handleDirectPay}
         />
-        {billOrder && <BillModal order={billOrder} onClose={() => setBillOrder(null)} onPay={payAccount} />}
       </>
     );
   }
@@ -1725,10 +1723,11 @@ export default function RestaurantePOS() {
                 {barPaid.map(o => (
                   <div key={o._id || o.id} className="flex justify-between items-center p-3 bg-slate-700/50 rounded-lg gap-2">
                     <div className="min-w-0">
-                      <div className="text-white text-sm font-bold truncate">{o.barra || `Mesa ${o.table}`}{o.clientName ? ` — ${o.clientName}` : ''}</div>
+                      <div className="text-white text-sm font-bold truncate">{o.locationLabel || o.barra || (o.table ? `Mesa ${o.table}` : '-')}{o.clientName ? ` — ${o.clientName}` : ''}</div>
                       <div className="text-slate-400 text-xs">👤 {o.mesera}</div>
                     </div>
-                    <div className="flex items-center gap-2 flex-shrink-0">
+                    <div className="flex flex-col items-end gap-1 flex-shrink-0">
+                      {payBadge(o.paymentMethod)}
                       <span className="text-[#94cb47] font-bold text-sm whitespace-nowrap">₡{o.total.toLocaleString()}</span>
                       <button onClick={() => setViewItemsOrder(o)} className="bg-slate-600 hover:bg-slate-500 text-white px-2 py-1 rounded text-xs">📋</button>
                     </div>
@@ -1744,10 +1743,11 @@ export default function RestaurantePOS() {
                 {restPaid.map(o => (
                   <div key={o._id || o.id} className="flex justify-between items-center p-3 bg-slate-700/50 rounded-lg gap-2">
                     <div className="min-w-0">
-                      <div className="text-white text-sm font-bold truncate">{o.barra || `Mesa ${o.table}`}{o.clientName ? ` — ${o.clientName}` : ''}</div>
+                      <div className="text-white text-sm font-bold truncate">{o.locationLabel || o.barra || (o.table ? `Mesa ${o.table}` : '-')}{o.clientName ? ` — ${o.clientName}` : ''}</div>
                       <div className="text-slate-400 text-xs">👤 {o.mesera}</div>
                     </div>
-                    <div className="flex items-center gap-2 flex-shrink-0">
+                    <div className="flex flex-col items-end gap-1 flex-shrink-0">
+                      {payBadge(o.paymentMethod)}
                       <span className="text-[#94cb47] font-bold text-sm whitespace-nowrap">₡{o.total.toLocaleString()}</span>
                       <button onClick={() => setViewItemsOrder(o)} className="bg-slate-600 hover:bg-slate-500 text-white px-2 py-1 rounded text-xs">📋</button>
                     </div>
