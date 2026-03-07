@@ -633,6 +633,7 @@ const PINES = {
   'María':              { pin: '5456', role: 'mesera', zone: 'bar' },
   'Milena':             { pin: '8995', role: 'mesera', zone: 'bar' },
   'Lin':                { pin: '7777', role: 'mesera', zone: 'bar' },
+  'Temp Bar':           { pin: '1221', role: 'mesera', zone: 'bar' },
   'Admin':              { pin: '3306', role: 'admin',  zone: 'admin' },
 };
 
@@ -1677,7 +1678,19 @@ export default function RestaurantePOS() {
             <StatRow label="Cuentas cobradas" value={barPaid.length} />
             <StatRow label="Comida vendida" value={`₡${barPaid.reduce((s,o)=>s+(o.items||[]).filter(i=>i.category==='food').reduce((a,i)=>a+i.price*i.quantity,0),0).toLocaleString()}`} />
             <StatRow label="Bebidas vendidas" value={`₡${barPaid.reduce((s,o)=>s+(o.items||[]).filter(i=>i.category!=='food').reduce((a,i)=>a+i.price*i.quantity,0),0).toLocaleString()}`} />
-            <div className="bg-gradient-to-r [#94cb47] rounded-xl p-4">
+            <div className="border-t border-slate-700 pt-2 space-y-1">
+              <div className="text-slate-400 text-xs font-bold uppercase tracking-wide mb-1">Forma de pago</div>
+              {['efectivo','sinpe','tarjeta'].map(m => {
+                const total = barPaid.filter(o=>(o.paymentMethod||'efectivo')===m).reduce((s,o)=>s+o.total,0);
+                const count = barPaid.filter(o=>(o.paymentMethod||'efectivo')===m).length;
+                if (count === 0) return null;
+                return <div key={m} className="flex justify-between items-center">
+                  <span className="text-sm">{payBadge(m)}</span>
+                  <span className="text-white text-sm font-bold">₡{total.toLocaleString()} <span className="text-slate-400 font-normal text-xs">({count})</span></span>
+                </div>;
+              })}
+            </div>
+            <div className="bg-black/30 rounded-xl p-4">
               <div className="text-white/80 text-xs">Total Bar</div>
               <div className="text-2xl font-bold text-white">₡{totalBarCobrado.toLocaleString()}</div>
             </div>
@@ -1687,7 +1700,19 @@ export default function RestaurantePOS() {
             <StatRow label="Cuentas cobradas" value={restPaid.length} />
             <StatRow label="Comida vendida" value={`₡${restPaid.reduce((s,o)=>s+(o.items||[]).filter(i=>i.category==='food').reduce((a,i)=>a+i.price*i.quantity,0),0).toLocaleString()}`} />
             <StatRow label="Bebidas vendidas" value={`₡${restPaid.reduce((s,o)=>s+(o.items||[]).filter(i=>i.category!=='food').reduce((a,i)=>a+i.price*i.quantity,0),0).toLocaleString()}`} />
-            <div className="bg-gradient-to-r [#94cb47] rounded-xl p-4">
+            <div className="border-t border-slate-700 pt-2 space-y-1">
+              <div className="text-slate-400 text-xs font-bold uppercase tracking-wide mb-1">Forma de pago</div>
+              {['efectivo','sinpe','tarjeta'].map(m => {
+                const total = restPaid.filter(o=>(o.paymentMethod||'efectivo')===m).reduce((s,o)=>s+o.total,0);
+                const count = restPaid.filter(o=>(o.paymentMethod||'efectivo')===m).length;
+                if (count === 0) return null;
+                return <div key={m} className="flex justify-between items-center">
+                  <span className="text-sm">{payBadge(m)}</span>
+                  <span className="text-white text-sm font-bold">₡{total.toLocaleString()} <span className="text-slate-400 font-normal text-xs">({count})</span></span>
+                </div>;
+              })}
+            </div>
+            <div className="bg-black/30 rounded-xl p-4">
               <div className="text-white/80 text-xs">Total Restaurante</div>
               <div className="text-2xl font-bold text-white">₡{totalRestCobrado.toLocaleString()}</div>
             </div>
