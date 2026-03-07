@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const path = require('path');
 require('dotenv').config();
 
 const app = express();
@@ -9,8 +10,12 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// ── Servir el frontend React en producción ────
+// El build de Vite queda en /public
+app.use(express.static(path.join(__dirname, 'public')));
+
 // Conectar a MongoDB
-mongoose.connect(process.env.MONGODB_URI || 'mongodb+srv://lore:lore123@lore-pos.mongodb.net/lore-pos?retryWrites=true&w=majority', {
+mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
@@ -21,14 +26,14 @@ db.once('open', () => console.log('✅ Connected to MongoDB'));
 
 // ============ SCHEMAS ============
 
-// Schema para Cuentas Abiertas
 const accountSchema = new mongoose.Schema({
   id: String,
-  zone: String, // 'bar' o 'restaurante'
+  zone: String,
   mesera: String,
   clientName: String,
   table: Number,
   barra: String,
+  type: String,
   items: [{
     id: String,
     name: String,
@@ -36,16 +41,21 @@ const accountSchema = new mongoose.Schema({
     quantity: Number,
     category: String,
     notes: String,
-    addedBy: String, // Quién agregó este item
+    addedBy: String,
+  }],
+  foodItems: [{
+    id: String, name: String, price: Number, quantity: Number, category: String, notes: String, addedBy: String,
+  }],
+  drinkItems: [{
+    id: String, name: String, price: Number, quantity: Number, category: String, notes: String, addedBy: String,
   }],
   total: Number,
   createdAt: Date,
   lastUpdated: Date,
-  status: { type: String, default: 'open' }, // 'open' o 'paid'
+  status: { type: String, default: 'open' },
   closedAt: Date,
 });
 
-// Schema para Pedidos en Cocina
 const kitchenOrderSchema = new mongoose.Schema({
   id: String,
   zone: String,
@@ -54,13 +64,9 @@ const kitchenOrderSchema = new mongoose.Schema({
   table: Number,
   barra: String,
   items: [{
-    id: String,
-    name: String,
-    quantity: Number,
-    notes: String,
-    category: String,
+    id: String, name: String, quantity: Number, notes: String, category: String,
   }],
-  status: { type: String, default: 'pending' }, // 'pending', 'ready', 'delivered'
+  status: { type: String, default: 'pending' },
   createdAt: Date,
 });
 
@@ -69,210 +75,147 @@ const KitchenOrder = mongoose.model('KitchenOrder', kitchenOrderSchema);
 
 // ============ RUTAS - CUENTAS ============
 
-// GET: Obtener todas las cuentas abiertas de una zona
 app.get('/api/accounts/:zone/open', async (req, res) => {
   try {
-    const { zone } = req.params;
-    const accounts = await Account.find({ zone, status: 'open' });
+    const accounts = await Account.find({ zone: req.params.zone, status: 'open' });
     res.json(accounts);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+  } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
-// GET: Obtener todas las cuentas pagadas de una zona
 app.get('/api/accounts/:zone/closed', async (req, res) => {
   try {
-    const { zone } = req.params;
-    const accounts = await Account.find({ zone, status: 'paid' });
+    // Solo cuentas pagadas del día actual
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const accounts = await Account.find({
+      zone: req.params.zone,
+      status: 'paid',
+      closedAt: { $gte: today },
+    });
     res.json(accounts);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+  } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
-// GET: Obtener una cuenta específica
-app.get('/api/accounts/:id', async (req, res) => {
-  try {
-    const account = await Account.findOne({ id: req.params.id });
-    if (!account) return res.status(404).json({ error: 'Cuenta no encontrada' });
-    res.json(account);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// POST: Crear nueva cuenta
 app.post('/api/accounts', async (req, res) => {
   try {
-    const { id, zone, mesera, clientName, table, barra, items, total } = req.body;
-    
-    // Agregar mesera a cada item si no la tiene
-    const itemsWithMesera = items.map(item => ({
+    const data = req.body;
+    const itemsWithBy = (data.items || []).map(item => ({
       ...item,
-      addedBy: item.addedBy || mesera,
+      addedBy: item.addedBy || data.mesera,
     }));
-
     const newAccount = new Account({
-      id,
-      zone,
-      mesera,
-      clientName,
-      table,
-      barra,
-      items: itemsWithMesera,
-      total,
+      ...data,
+      items: itemsWithBy,
       createdAt: new Date(),
       lastUpdated: new Date(),
       status: 'open',
     });
-
     await newAccount.save();
     res.status(201).json(newAccount);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+  } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
-// PUT: Editar cuenta (agregar items)
 app.put('/api/accounts/:id', async (req, res) => {
   try {
     const { items, total } = req.body;
-    
     const account = await Account.findOne({ id: req.params.id });
     if (!account) return res.status(404).json({ error: 'Cuenta no encontrada' });
-
-    // Agregar nuevos items
-    account.items.push(...items);
+    account.items = items;
     account.total = total;
+    account.foodItems  = items.filter(i => i.category === 'food');
+    account.drinkItems = items.filter(i => i.category !== 'food');
     account.lastUpdated = new Date();
-
     await account.save();
     res.json(account);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+  } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
-// POST: Cobrar cuenta (cerrar)
 app.post('/api/accounts/:id/close', async (req, res) => {
   try {
     const account = await Account.findOne({ id: req.params.id });
     if (!account) return res.status(404).json({ error: 'Cuenta no encontrada' });
-
     account.status = 'paid';
     account.closedAt = new Date();
     await account.save();
-
     res.json(account);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+  } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
 // ============ RUTAS - COCINA ============
 
-// GET: Obtener pedidos de cocina por zona
 app.get('/api/kitchen/:zone', async (req, res) => {
   try {
-    const { zone } = req.params;
-    const orders = await KitchenOrder.find({ zone });
+    // Solo pedidos de hoy que no estén entregados
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const orders = await KitchenOrder.find({
+      zone: req.params.zone,
+      createdAt: { $gte: today },
+      status: { $ne: 'delivered' },
+    });
     res.json(orders);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+  } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
-// POST: Crear pedido de cocina
 app.post('/api/kitchen', async (req, res) => {
   try {
-    const { id, zone, mesera, clientName, table, barra, items } = req.body;
-
-    const newOrder = new KitchenOrder({
-      id,
-      zone,
-      mesera,
-      clientName,
-      table,
-      barra,
-      items,
-      status: 'pending',
-      createdAt: new Date(),
-    });
-
+    const newOrder = new KitchenOrder({ ...req.body, createdAt: new Date() });
     await newOrder.save();
     res.status(201).json(newOrder);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+  } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
-// PUT: Actualizar estado de pedido (pending -> ready -> delivered)
 app.put('/api/kitchen/:id', async (req, res) => {
   try {
-    const { status } = req.body;
     const order = await KitchenOrder.findOne({ id: req.params.id });
     if (!order) return res.status(404).json({ error: 'Pedido no encontrado' });
-
-    order.status = status;
+    order.status = req.body.status;
     await order.save();
-
     res.json(order);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+  } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
-// DELETE: Eliminar pedido de cocina
 app.delete('/api/kitchen/:id', async (req, res) => {
   try {
-    const result = await KitchenOrder.deleteOne({ id: req.params.id });
-    res.json({ deleted: result.deletedCount > 0 });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+    await KitchenOrder.deleteOne({ id: req.params.id });
+    res.json({ deleted: true });
+  } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
 // ============ RUTAS - REPORTES ============
 
-// GET: Obtener reportes del día
 app.get('/api/reports/:zone', async (req, res) => {
   try {
-    const { zone } = req.params;
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-
     const closedAccounts = await Account.find({
-      zone,
+      zone: req.params.zone,
       status: 'paid',
       closedAt: { $gte: today },
     });
-
     const totalSales = closedAccounts.reduce((sum, acc) => sum + acc.total, 0);
-    const foodTotal = closedAccounts.reduce((sum, acc) => {
-      const food = acc.items
-        .filter(item => item.category === 'food')
-        .reduce((s, item) => s + (item.price * item.quantity), 0);
-      return sum + food;
-    }, 0);
-    const drinksTotal = totalSales - foodTotal;
-
+    const foodTotal  = closedAccounts.reduce((sum, acc) =>
+      sum + acc.items.filter(i => i.category === 'food').reduce((s, i) => s + i.price * i.quantity, 0), 0);
     res.json({
-      zone,
+      zone: req.params.zone,
       totalSales,
       foodTotal,
-      drinksTotal,
+      drinksTotal: totalSales - foodTotal,
       accountsPaid: closedAccounts.length,
       accounts: closedAccounts,
     });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+  } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
 // ============ HEALTH CHECK ============
 app.get('/health', (req, res) => {
-  res.json({ status: 'OK', message: '✅ Servidor funcionando' });
+  res.json({ status: 'OK', message: '✅ Servidor LORE POS funcionando', db: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected' });
+});
+
+// ── Cualquier otra ruta → servir el React app ─
+// Esto es necesario para que el router de React funcione
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // ============ PUERTO ============
