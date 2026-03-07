@@ -6,14 +6,17 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 
-# Instalar y construir el frontend
+# Instalar dependencias del cliente
 COPY client/package*.json ./client/
 RUN cd client && npm install
+
+# Copiar cliente y construir
 COPY client/ ./client/
 RUN cd client && npm run build
 
-# Copiar resto del servidor
-COPY . .
+# Copiar servidor (sin pisar el public ya construido)
+COPY server.js .
+COPY railway.toml .
 
 EXPOSE 8080
 
