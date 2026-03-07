@@ -37,9 +37,11 @@ export const updateAccount = (id, data) =>
     body: JSON.stringify(data),
   }).then(handleResponse);
 
-export const closeAccount = (id) =>
+export const closeAccount = (id, paymentMethod = 'efectivo') =>
   fetch(`${BASE}/accounts/${id}/close`, {
     method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ paymentMethod }),
   }).then(handleResponse);
 
 // ── COCINA ────────────────────────────────────
