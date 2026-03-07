@@ -594,14 +594,14 @@ function BillModal({ order, onClose, onPay }) {
 // PINES DE ACCESO
 // ─────────────────────────────────────────────
 const PINES = {
-  'Caja Bar':           { pin: '1111', role: 'caja',   zone: 'bar' },
-  'Caja Restaurante':   { pin: '2222', role: 'caja',   zone: 'restaurante' },
-  'Tablet Restaurante': { pin: '3333', role: 'mesera', zone: 'restaurante' },
-  'Cocina':             { pin: '4444', role: 'cocina', zone: 'restaurante' },
-  'María':              { pin: '5555', role: 'mesera', zone: 'bar' },
-  'Milena':             { pin: '6666', role: 'mesera', zone: 'bar' },
+  'Caja Bar':           { pin: '1970', role: 'caja',   zone: 'bar' },
+  'Caja Restaurante':   { pin: '1969', role: 'caja',   zone: 'restaurante' },
+  'Tablet Restaurante': { pin: '7878', role: 'mesera', zone: 'restaurante' },
+  'Cocina':             { pin: '7878', role: 'cocina', zone: 'restaurante' },
+  'María':              { pin: '5456', role: 'mesera', zone: 'bar' },
+  'Milena':             { pin: '8995', role: 'mesera', zone: 'bar' },
   'Lin':                { pin: '7777', role: 'mesera', zone: 'bar' },
-  'Admin':              { pin: '0000', role: 'admin',  zone: 'admin' },
+  'Admin':              { pin: '3306', role: 'admin',  zone: 'admin' },
 };
 
 // ─────────────────────────────────────────────
@@ -1058,7 +1058,6 @@ export default function RestaurantePOS() {
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
             <img src="/logo.png" alt="LORE" className="w-36 h-36 mx-auto mb-2 object-contain drop-shadow-lg" />
-            <h1 className="text-5xl font-bold text-[#94cb47] mb-2">LORE</h1>
             <p className="text-[#94cb47]/80 text-lg">Sistema de Pedidos</p>
           </div>
           {syncError && (
