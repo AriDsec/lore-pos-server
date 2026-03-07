@@ -1057,7 +1057,7 @@ export default function RestaurantePOS() {
       <div className="min-h-screen bg-gradient-to-br from-black via-slate-900 to-black flex items-center justify-center p-4">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
-            <div className="text-7xl mb-4">🍽️</div>
+            <img src="/logo.png" alt="LORE" className="w-36 h-36 mx-auto mb-2 object-contain drop-shadow-lg" />
             <h1 className="text-5xl font-bold text-[#94cb47] mb-2">LORE</h1>
             <p className="text-[#94cb47]/80 text-lg">Sistema de Pedidos</p>
           </div>
