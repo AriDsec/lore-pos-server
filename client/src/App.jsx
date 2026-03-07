@@ -834,7 +834,7 @@ export default function RestaurantePOS() {
   const [billOrder, setBillOrder]           = useState(null);
   const [viewItemsOrder, setViewItemsOrder] = useState(null);
 
-  const meseras = ['María', 'Milena', 'Lin'];
+  const meseras = ['María', 'Milena', 'Lin', 'Temp Bar'];
   const barras  = ['Barra 1', 'Barra 2', 'Barra 3', 'Barra Grande'];
 
   // ── Cargar datos del servidor al hacer login ──
