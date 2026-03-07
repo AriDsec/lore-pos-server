@@ -65,9 +65,9 @@ const MENU = {
       { id: 'b_aloe', name: 'Aloe', price: 2000, category: 'soda' },
     ],
     'Arroz con': [
-      { id: 'f_arroz_pollo', name: 'Pollo', price: 3900, category: 'food' },
-      { id: 'f_arroz_carne', name: 'Carne', price: 4000, category: 'food' },
-      { id: 'f_arroz_camarones', name: 'Camarones', price: 4300, category: 'food' },
+      { id: 'f_arroz_pollo', name: 'Arroz con Pollo', price: 3900, category: 'food' },
+      { id: 'f_arroz_carne', name: 'Arroz con Carne', price: 4000, category: 'food' },
+      { id: 'f_arroz_camarones', name: 'Arroz con Camarones', price: 4300, category: 'food' },
     ],
     'Surtido': [
       { id: 'f_surtido_grande', name: 'Grande', price: 10400, category: 'food' },
@@ -186,9 +186,9 @@ const MENU = {
       { id: 'r_aloe', name: 'Aloe', price: 2000, category: 'soda' },
     ],
     'Arroz con': [
-      { id: 'f_arroz_pollo', name: 'Pollo', price: 3900, category: 'food' },
-      { id: 'f_arroz_carne', name: 'Carne', price: 4000, category: 'food' },
-      { id: 'f_arroz_camarones', name: 'Camarones', price: 4300, category: 'food' },
+      { id: 'f_arroz_pollo', name: 'Arroz con Pollo', price: 3900, category: 'food' },
+      { id: 'f_arroz_carne', name: 'Arroz con Carne', price: 4000, category: 'food' },
+      { id: 'f_arroz_camarones', name: 'Arroz con Camarones', price: 4300, category: 'food' },
     ],
     'Surtido': [
       { id: 'f_surtido_grande', name: 'Grande', price: 10400, category: 'food' },
@@ -374,7 +374,7 @@ function ReadyOrdersPanel({ kitchenOrders, mesera }) {
       <div className="p-4 space-y-2">
         {readyOrders.map(order => (
           <div key={order.id} className="bg-slate-800/70 rounded-lg p-3 border border-[#94cb47]/50">
-            <div className="font-bold text-[#94cb47] mb-1">{order.barra ? order.barra : `Mesa ${order.table}`}</div>
+            <div className="font-bold text-[#94cb47] mb-1">{order.locationLabel || (order.barra ? order.barra : (order.table ? `Mesa ${order.table}` : "Sin mesa"))}</div>
             {order.clientName && <div className="text-sm text-[#94cb47]/80 mb-1">👤 {order.clientName}</div>}
             <div className="text-xs text-slate-400">{order.items.map(i => `${i.quantity}x ${i.name}`).join(', ')}</div>
           </div>
@@ -800,8 +800,8 @@ export default function RestaurantePOS() {
   const barras  = ['Barra 1', 'Barra 2', 'Barra 3', 'Barra Grande'];
 
   // ── Cargar datos del servidor al hacer login ──
-  const loadData = useCallback(async (zone, role) => {
-    setLoading(true);
+  const loadData = useCallback(async (zone, role, silent = false) => {
+    if (!silent) setLoading(true);
     setSyncError(null);
     try {
       if (role === 'mesera' || role === 'caja') {
@@ -842,8 +842,8 @@ export default function RestaurantePOS() {
   useEffect(() => {
     if (!currentUser || !userRole) return;
     const interval = setInterval(() => {
-      loadData(currentZone, userRole);
-    }, 8000);
+      loadData(currentZone, userRole, true); // silent=true, no spinner
+    }, 30000);
     return () => clearInterval(interval);
   }, [currentUser, userRole, currentZone, loadData]);
 
@@ -927,9 +927,10 @@ export default function RestaurantePOS() {
             zone: currentZone,
             mesera: currentUser,
             items: newFood,
-            table: selectedTable,
-            barra: selectedBarra,
-            clientName,
+            table: selectedTable || null,
+            barra: selectedBarra || null,
+            clientName: clientName || '',
+            locationLabel: selectedBarra ? selectedBarra : (selectedTable ? `Mesa ${selectedTable}` : 'Sin mesa'),
             status: 'pending',
             createdAt: new Date(),
           };
@@ -962,9 +963,10 @@ export default function RestaurantePOS() {
             zone: currentZone,
             mesera: currentUser,
             items: foodItems,
-            table: selectedTable,
-            barra: selectedBarra,
-            clientName,
+            table: selectedTable || null,
+            barra: selectedBarra || null,
+            clientName: clientName || '',
+            locationLabel: selectedBarra ? selectedBarra : (selectedTable ? `Mesa ${selectedTable}` : 'Sin mesa'),
             status: 'pending',
             createdAt: new Date(),
           };
@@ -1029,11 +1031,9 @@ export default function RestaurantePOS() {
 
   // ── Loading / Error overlay ───────────────────
   const Spinner = () => (
-    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
-      <div className="bg-slate-800 rounded-2xl p-8 flex flex-col items-center gap-4 shadow-2xl border border-[#94cb47]/30">
-        <div className="w-10 h-10 border-4 border-[#94cb47] border-t-transparent rounded-full animate-spin" />
-        <p className="text-[#94cb47] font-bold">Sincronizando...</p>
-      </div>
+    <div className="fixed bottom-4 right-4 bg-slate-800 border border-[#94cb47]/30 rounded-xl px-4 py-2 flex items-center gap-2 shadow-xl z-50">
+      <div className="w-4 h-4 border-2 border-[#94cb47] border-t-transparent rounded-full animate-spin" />
+      <span className="text-[#94cb47] text-xs font-bold">Guardando...</span>
     </div>
   );
 
@@ -1058,6 +1058,7 @@ export default function RestaurantePOS() {
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
             <img src="/logo.png" alt="LORE" className="w-36 h-36 mx-auto mb-2 object-contain drop-shadow-lg" />
+            <h1 className="text-5xl font-bold text-[#94cb47] mb-2">LORE</h1>
             <p className="text-[#94cb47]/80 text-lg">Sistema de Pedidos</p>
           </div>
           {syncError && (
@@ -1131,11 +1132,11 @@ export default function RestaurantePOS() {
         <Header mesera="Cocina" zona="Preparación" onLogout={handleLogout} />
         <div className="p-8 max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {kitchenOrders.map(order => (
+            {kitchenOrders.filter(o => o.zone === 'restaurante').map(order => (
               <div key={order.id} className={`rounded-2xl border-2 p-5 shadow-xl transition-all duration-300 ${order.status === 'ready' ? 'bg-gradient-to-br from-[#94cb47]/40 to-[#7ab035]/40 border-[#94cb47]' : 'bg-gradient-to-br from-orange-900/40 to-orange-800/40 border-orange-500'}`}>
                 <div className="flex justify-between items-start mb-4">
                   <div>
-                    <div className="text-2xl font-bold text-white">{order.barra ? order.barra : `Mesa ${order.table}`}</div>
+                    <div className="text-2xl font-bold text-white">{order.locationLabel || (order.barra ? order.barra : (order.table ? `Mesa ${order.table}` : "Sin mesa"))}</div>
                     <div className="text-xs text-slate-400">👤 {order.mesera}</div>
                     {order.clientName && <div className="text-sm text-[#94cb47] font-semibold">{order.clientName}</div>}
                   </div>
@@ -1160,7 +1161,7 @@ export default function RestaurantePOS() {
               </div>
             ))}
           </div>
-          {kitchenOrders.length === 0 && <div className="text-center py-20"><div className="text-7xl mb-4">😎</div><p className="text-slate-400 text-2xl">Todo está listo</p></div>}
+          {kitchenOrders.filter(o => o.zone === 'restaurante').length === 0 && <div className="text-center py-20"><div className="text-7xl mb-4">😎</div><p className="text-slate-400 text-2xl">Todo está listo</p></div>}
         </div>
       </div>
     );
@@ -1483,6 +1484,19 @@ export default function RestaurantePOS() {
           >
             📄 Descargar Cierre del Día
           </button>
+            <button
+              onClick={() => {
+                if (window.confirm('⚠️ ¿Seguro? Esto borrará todas las cuentas pagadas del día. Descarga el cierre primero.')) {
+                  fetch('/api/admin/clear-day', { method: 'DELETE' })
+                    .then(r => r.json())
+                    .then(() => { setPaidOrders([]); alert('✅ Datos del día eliminados'); })
+                    .catch(e => alert('❌ Error: ' + e.message));
+                }
+              }}
+              className="bg-red-900/40 hover:bg-red-900/70 text-red-300 font-bold px-6 py-3 rounded-xl transition flex items-center gap-2 border border-red-500/40"
+            >
+              🗑️ Limpiar Día
+            </button>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-5 shadow-2xl space-y-3">
