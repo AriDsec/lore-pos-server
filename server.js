@@ -157,6 +157,17 @@ app.get('/api/reports/:zone', async (req, res) => {
   } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
+// ============ ADMIN — LIMPIAR DÍA ============
+app.delete('/api/admin/clear-day', async (req, res) => {
+  try {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const result = await Account.deleteMany({ status: 'paid', closedAt: { $gte: today } });
+    const kitchenResult = await KitchenOrder.deleteMany({ createdAt: { $gte: today } });
+    res.json({ deleted: result.deletedCount, kitchen: kitchenResult.deletedCount });
+  } catch (error) { res.status(500).json({ error: error.message }); }
+});
+
 app.get('/health', (req, res) => {
   const publicExists = fs.existsSync(path.join(__dirname, 'public', 'index.html'));
   res.json({
