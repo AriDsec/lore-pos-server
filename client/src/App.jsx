@@ -251,11 +251,11 @@ const MENU = {
 // ─────────────────────────────────────────────
 function Header({ mesera, zona, onLogout }) {
   return (
-    <div className="bg-gradient-to-r from-slate-800 to-slate-900 border-b border-emerald-500/20 p-5 shadow-xl">
+    <div className="bg-gradient-to-r from-slate-800 to-slate-900 border-b border-[#94cb47]/20 p-5 shadow-xl">
       <div className="max-w-7xl mx-auto flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-emerald-100">LORE</h1>
-          <p className="text-emerald-200/70 text-sm">{zona} • {mesera}</p>
+          <h1 className="text-3xl font-bold text-[#94cb47]">LORE</h1>
+          <p className="text-[#94cb47]/80/70 text-sm">{zona} • {mesera}</p>
         </div>
         <button onClick={onLogout} className="flex items-center gap-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-6 py-3 rounded-lg font-bold transition shadow-lg">
           <LogOut size={18} /> Salir
@@ -272,12 +272,12 @@ function ItemButton({ item, onSelectItem }) {
   return (
     <div className="space-y-1">
       {/* Main item row — name left, price + add button right */}
-      <div className="flex items-center gap-2 bg-gradient-to-r from-slate-700 to-slate-800 border border-emerald-500/20 hover:border-emerald-500/40 rounded-lg p-3 transition-all">
+      <div className="flex items-center gap-2 bg-gradient-to-r from-slate-700 to-slate-800 border border-[#94cb47]/20 hover:border-[#94cb47]/40 rounded-lg p-3 transition-all">
         <span className="flex-1 font-bold text-white text-sm leading-tight">{item.name}</span>
-        <span className="text-emerald-400 font-bold text-sm whitespace-nowrap">₡{item.price.toLocaleString()}</span>
+        <span className="text-[#94cb47] font-bold text-sm whitespace-nowrap">₡{item.price.toLocaleString()}</span>
         <button
           onClick={() => onSelectItem(item, false)}
-          className="bg-emerald-600 hover:bg-emerald-500 text-white rounded-md w-7 h-7 flex items-center justify-center flex-shrink-0 transition"
+          className="bg-[#94cb47] hover:bg-[#94cb47] text-black rounded-md w-7 h-7 flex items-center justify-center flex-shrink-0 transition"
           title="Agregar"
         >
           <Plus size={14} />
@@ -315,8 +315,8 @@ function MenuDropdown({ menu, onSelectItem }) {
   );
 
   return (
-    <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-emerald-500/30 overflow-hidden shadow-2xl">
-      <div className="bg-gradient-to-r from-emerald-600 to-teal-600 p-6">
+    <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 overflow-hidden shadow-2xl">
+      <div className="bg-gradient-to-r [#94cb47] p-6">
         <h2 className="text-white font-bold text-2xl mb-4 flex items-center gap-2"><Utensils size={24} /> Menú</h2>
         <div className="relative">
           <Search size={20} className="absolute left-3 top-3 text-slate-400" />
@@ -325,7 +325,7 @@ function MenuDropdown({ menu, onSelectItem }) {
             placeholder="Buscar plato..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full bg-slate-700 border border-emerald-500/30 text-white rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:border-emerald-500 placeholder-slate-500"
+            className="w-full bg-slate-700 border border-[#94cb47]/30 text-white rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:border-[#94cb47] placeholder-slate-500"
           />
         </div>
       </div>
@@ -342,13 +342,13 @@ function MenuDropdown({ menu, onSelectItem }) {
             <div key={category}>
               <button
                 onClick={() => setExpandedCategory(expandedCategory === category ? null : category)}
-                className="w-full text-left bg-gradient-to-r from-emerald-700/40 to-teal-700/40 hover:from-emerald-700/60 hover:to-teal-700/60 border border-emerald-500/40 rounded-lg p-3 transition-all flex justify-between items-center"
+                className="w-full text-left bg-gradient-to-r from-[#94cb47]/40 to-[#7ab035]/40 hover:from-[#94cb47]/60 hover:to-[#7ab035]/60 border border-[#94cb47]/40 rounded-lg p-3 transition-all flex justify-between items-center"
               >
-                <span className="font-bold text-emerald-100">{category}</span>
-                <ChevronDown size={18} className={`text-emerald-400 transition-transform ${expandedCategory === category ? 'rotate-180' : ''}`} />
+                <span className="font-bold text-[#94cb47]">{category}</span>
+                <ChevronDown size={18} className={`text-[#94cb47] transition-transform ${expandedCategory === category ? 'rotate-180' : ''}`} />
               </button>
               {expandedCategory === category && (
-                <div className="mt-2 ml-2 space-y-2 border-l border-emerald-500/30 pl-2">
+                <div className="mt-2 ml-2 space-y-2 border-l border-[#94cb47]/30 pl-2">
                   {items.map(item => <ItemButton key={item.id} item={item} onSelectItem={onSelectItem} />)}
                 </div>
               )}
@@ -367,15 +367,15 @@ function ReadyOrdersPanel({ kitchenOrders, mesera }) {
   const readyOrders = kitchenOrders.filter(o => o.status === 'ready' && o.mesera === mesera);
   if (readyOrders.length === 0) return null;
   return (
-    <div className="bg-gradient-to-br from-emerald-900/40 to-teal-900/40 rounded-2xl border-2 border-emerald-500 overflow-hidden shadow-2xl">
-      <div className="bg-gradient-to-r from-emerald-600 to-teal-600 p-4">
+    <div className="bg-gradient-to-br from-[#94cb47]/40 to-[#7ab035]/40 rounded-2xl border-2 border-[#94cb47] overflow-hidden shadow-2xl">
+      <div className="bg-gradient-to-r [#94cb47] p-4">
         <h3 className="text-white font-bold text-lg flex items-center gap-2"><Clock size={20} /> ¡PEDIDOS LISTOS! ({readyOrders.length})</h3>
       </div>
       <div className="p-4 space-y-2">
         {readyOrders.map(order => (
-          <div key={order.id} className="bg-slate-800/70 rounded-lg p-3 border border-emerald-500/50">
-            <div className="font-bold text-emerald-300 mb-1">{order.barra ? order.barra : `Mesa ${order.table}`}</div>
-            {order.clientName && <div className="text-sm text-emerald-200 mb-1">👤 {order.clientName}</div>}
+          <div key={order.id} className="bg-slate-800/70 rounded-lg p-3 border border-[#94cb47]/50">
+            <div className="font-bold text-[#94cb47] mb-1">{order.barra ? order.barra : `Mesa ${order.table}`}</div>
+            {order.clientName && <div className="text-sm text-[#94cb47]/80 mb-1">👤 {order.clientName}</div>}
             <div className="text-xs text-slate-400">{order.items.map(i => `${i.quantity}x ${i.name}`).join(', ')}</div>
           </div>
         ))}
@@ -398,13 +398,13 @@ function ShoppingCart({
   const total = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
   // En móvil se oculta si no está activo el tab
-  const baseClass = "bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-emerald-500/30 overflow-hidden flex flex-col shadow-2xl";
+  const baseClass = "bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 overflow-hidden flex flex-col shadow-2xl";
   const desktopClass = "hidden md:flex md:h-[calc(100vh-100px)] md:sticky md:top-6";
   const mobileClass = mobileVisible ? "flex flex-col max-h-[calc(100vh-140px)]" : "hidden";
 
   const inner = (
     <>
-      <div className="bg-gradient-to-r from-emerald-600 to-teal-600 p-4 md:p-6">
+      <div className="bg-gradient-to-r [#94cb47] p-4 md:p-6">
         <h2 className="text-white font-bold text-lg md:text-xl">🛒 Carrito {cartItems.length > 0 && <span className="bg-white/20 text-white text-xs font-bold px-2 py-0.5 rounded-full ml-2">{cartItems.length}</span>}</h2>
       </div>
 
@@ -414,7 +414,7 @@ function ShoppingCart({
         <select
           value={selectedAccount || ''}
           onChange={(e) => onSelectAccount(e.target.value || null)}
-          className="w-full bg-slate-700 border border-emerald-500/30 text-white rounded-lg p-2 text-sm focus:outline-none"
+          className="w-full bg-slate-700 border border-[#94cb47]/30 text-white rounded-lg p-2 text-sm focus:outline-none"
         >
           <option value="">➕ Nueva Cuenta</option>
           {openAccounts.map(acc => (
@@ -433,11 +433,11 @@ function ShoppingCart({
           </div>
         ) : (
           cartItems.map(item => (
-            <div key={item.id} className="bg-gradient-to-br from-slate-700 to-slate-800 rounded-lg p-3 border border-emerald-500/20">
+            <div key={item.id} className="bg-gradient-to-br from-slate-700 to-slate-800 rounded-lg p-3 border border-[#94cb47]/20">
               <div className="flex justify-between items-start mb-2">
                 <div className="flex-1 pr-2">
                   <div className="font-bold text-white text-sm leading-tight">{item.name}</div>
-                  <div className="text-emerald-400 font-bold text-sm">₡{(item.price * item.quantity).toLocaleString()}</div>
+                  <div className="text-[#94cb47] font-bold text-sm">₡{(item.price * item.quantity).toLocaleString()}</div>
                   {item.addedBy && <div className="text-xs text-slate-400">👤 {item.addedBy}</div>}
                 </div>
                 <button onClick={() => removeFromCart(item.id)} className="text-red-400 hover:text-red-600 flex-shrink-0"><Trash2 size={15} /></button>
@@ -452,7 +452,7 @@ function ShoppingCart({
                 placeholder="Notas..."
                 value={item.notes || ''}
                 onChange={(e) => updateNotes(item.id, e.target.value)}
-                className="w-full bg-slate-900/50 border border-emerald-500/20 text-white text-xs rounded p-1.5 focus:outline-none focus:border-emerald-500 placeholder-slate-600"
+                className="w-full bg-slate-900/50 border border-[#94cb47]/20 text-white text-xs rounded p-1.5 focus:outline-none focus:border-[#94cb47] placeholder-slate-600"
               />
             </div>
           ))
@@ -460,10 +460,10 @@ function ShoppingCart({
       </div>
 
       {cartItems.length > 0 && (
-        <div className="border-t border-emerald-500/20 p-4 md:p-6 space-y-3 bg-gradient-to-t from-slate-900 to-transparent overflow-y-auto">
+        <div className="border-t border-[#94cb47]/20 p-4 md:p-6 space-y-3 bg-gradient-to-t from-slate-900 to-transparent overflow-y-auto">
           <div>
             <label className="text-slate-400 text-xs mb-1 block">Tipo</label>
-            <select value={orderType || ''} onChange={(e) => setOrderType(e.target.value)} className="w-full bg-slate-700 border border-emerald-500/30 text-white rounded-lg p-2 text-sm focus:outline-none">
+            <select value={orderType || ''} onChange={(e) => setOrderType(e.target.value)} className="w-full bg-slate-700 border border-[#94cb47]/30 text-white rounded-lg p-2 text-sm focus:outline-none">
               <option value="">Seleccionar...</option>
               <option value="dine-in">Local</option>
               <option value="takeout">Llevar</option>
@@ -473,14 +473,14 @@ function ShoppingCart({
             <div className="grid grid-cols-2 gap-2">
               <div>
                 <label className="text-slate-400 text-xs mb-1 block">Mesa</label>
-                <select value={selectedTable || ''} onChange={(e) => { setSelectedTable(e.target.value); setSelectedBarra(null); }} className="w-full bg-slate-700 border border-emerald-500/30 text-white rounded-lg p-2 text-xs focus:outline-none">
+                <select value={selectedTable || ''} onChange={(e) => { setSelectedTable(e.target.value); setSelectedBarra(null); }} className="w-full bg-slate-700 border border-[#94cb47]/30 text-white rounded-lg p-2 text-xs focus:outline-none">
                   <option value="">—</option>
                   {Array.from({ length: maxTables }, (_, i) => <option key={i + 1} value={i + 1}>Mesa {i + 1}</option>)}
                 </select>
               </div>
               <div>
                 <label className="text-slate-400 text-xs mb-1 block">Barra</label>
-                <select value={selectedBarra || ''} onChange={(e) => { setSelectedBarra(e.target.value); setSelectedTable(null); }} className="w-full bg-slate-700 border border-emerald-500/30 text-white rounded-lg p-2 text-xs focus:outline-none">
+                <select value={selectedBarra || ''} onChange={(e) => { setSelectedBarra(e.target.value); setSelectedTable(null); }} className="w-full bg-slate-700 border border-[#94cb47]/30 text-white rounded-lg p-2 text-xs focus:outline-none">
                   <option value="">—</option>
                   {barras.map(b => <option key={b} value={b}>{b}</option>)}
                 </select>
@@ -489,13 +489,13 @@ function ShoppingCart({
           )}
           <div>
             <label className="text-slate-400 text-xs mb-1 block">Nombre/Seña</label>
-            <input type="text" value={clientName} onChange={(e) => setClientName(e.target.value)} placeholder="Juan, cliente alto..." className="w-full bg-slate-700 border border-emerald-500/30 text-white rounded-lg p-2 text-sm focus:outline-none placeholder-slate-600" />
+            <input type="text" value={clientName} onChange={(e) => setClientName(e.target.value)} placeholder="Juan, cliente alto..." className="w-full bg-slate-700 border border-[#94cb47]/30 text-white rounded-lg p-2 text-sm focus:outline-none placeholder-slate-600" />
           </div>
-          <div className="flex items-center justify-between bg-gradient-to-br from-emerald-600/30 to-teal-600/30 rounded-xl p-3 border border-emerald-500/50">
+          <div className="flex items-center justify-between bg-gradient-to-br from-[#94cb47]/30 to-[#7ab035]/30 rounded-xl p-3 border border-[#94cb47]/50">
             <div className="text-slate-300 text-sm">Total</div>
-            <div className="text-2xl font-bold text-emerald-300">₡{total.toLocaleString()}</div>
+            <div className="text-2xl font-bold text-[#94cb47]">₡{total.toLocaleString()}</div>
           </div>
-          <button onClick={completeOrder} className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold py-3 rounded-xl transition shadow-xl text-base">✓ Completar</button>
+          <button onClick={completeOrder} className="w-full bg-gradient-to-r bg-[#94cb47] hover:bg-[#7ab035] text-white font-bold py-3 rounded-xl transition shadow-xl text-base">✓ Completar</button>
         </div>
       )}
     </>
@@ -518,9 +518,9 @@ function ItemsModal({ order, onClose }) {
   if (!order) return null;
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
-      <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-emerald-500/30 p-8 shadow-2xl max-w-md w-full max-h-[80vh] overflow-y-auto">
+      <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-8 shadow-2xl max-w-md w-full max-h-[80vh] overflow-y-auto">
         <div className="text-center mb-6">
-          <h2 className="text-2xl font-bold text-emerald-300 mb-1">📋 Detalle de Pedido</h2>
+          <h2 className="text-2xl font-bold text-[#94cb47] mb-1">📋 Detalle de Pedido</h2>
           <p className="text-slate-400 text-sm">{order.barra || `Mesa ${order.table}`} {order.clientName ? `— ${order.clientName}` : ''}</p>
         </div>
         <div className="bg-slate-800/50 rounded-xl p-4 mb-4 border border-slate-700 space-y-2">
@@ -528,16 +528,16 @@ function ItemsModal({ order, onClose }) {
             <div key={i} className="py-2 border-b border-slate-700/50 last:border-0">
               <div className="flex justify-between text-white">
                 <span>{item.quantity}x {item.name}</span>
-                <span className="text-emerald-400 font-bold">₡{(item.price * item.quantity).toLocaleString()}</span>
+                <span className="text-[#94cb47] font-bold">₡{(item.price * item.quantity).toLocaleString()}</span>
               </div>
               {item.notes && <div className="text-xs text-yellow-300 mt-1">📝 {item.notes}</div>}
               {item.addedBy && <div className="text-xs text-slate-400 mt-1">👤 {item.addedBy}</div>}
             </div>
           ))}
         </div>
-        <div className="bg-gradient-to-r from-emerald-600/30 to-teal-600/30 rounded-xl p-4 border border-emerald-500/50 mb-4">
+        <div className="bg-gradient-to-r from-[#94cb47]/30 to-[#7ab035]/30 rounded-xl p-4 border border-[#94cb47]/50 mb-4">
           <div className="text-slate-300 text-sm">TOTAL</div>
-          <div className="text-3xl font-bold text-emerald-300">₡{order.total.toLocaleString()}</div>
+          <div className="text-3xl font-bold text-[#94cb47]">₡{order.total.toLocaleString()}</div>
         </div>
         <button onClick={onClose} className="w-full bg-gradient-to-r from-slate-600 to-slate-700 hover:from-slate-700 hover:to-slate-800 text-white font-bold py-3 rounded-lg transition">Cerrar</button>
       </div>
@@ -552,12 +552,12 @@ function BillModal({ order, onClose, onPay }) {
   if (!order) return null;
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
-      <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-emerald-500/30 p-8 shadow-2xl max-w-md w-full max-h-[80vh] overflow-y-auto">
+      <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-8 shadow-2xl max-w-md w-full max-h-[80vh] overflow-y-auto">
         <div className="text-center mb-6">
-          <h2 className="text-3xl font-bold text-emerald-300 mb-2">CUENTA</h2>
+          <h2 className="text-3xl font-bold text-[#94cb47] mb-2">CUENTA</h2>
           <p className="text-slate-400">Restaurante LORE</p>
         </div>
-        <div className="border-b border-emerald-500/30 mb-4 pb-4">
+        <div className="border-b border-[#94cb47]/30 mb-4 pb-4">
           <div className="text-white mb-2"><span className="text-slate-400">Cliente: </span><span className="font-bold">{order.clientName || 'Sin nombre'}</span></div>
           <div className="text-white"><span className="text-slate-400">Mesa: </span><span className="font-bold">{order.barra || `Mesa ${order.table}`}</span></div>
           {order.mesera && <div className="text-white"><span className="text-slate-400">Mesera: </span><span className="font-bold">{order.mesera}</span></div>}
@@ -567,19 +567,19 @@ function BillModal({ order, onClose, onPay }) {
             <div key={i} className="py-2 border-b border-slate-700/50 last:border-0">
               <div className="flex justify-between text-white">
                 <span>{item.quantity}x {item.name}</span>
-                <span className="text-emerald-400 font-bold">₡{(item.price * item.quantity).toLocaleString()}</span>
+                <span className="text-[#94cb47] font-bold">₡{(item.price * item.quantity).toLocaleString()}</span>
               </div>
               {item.notes && <div className="text-xs text-yellow-300 mt-1">📝 {item.notes}</div>}
               {item.addedBy && <div className="text-xs text-slate-400 mt-1">👤 {item.addedBy}</div>}
             </div>
           ))}
         </div>
-        <div className="bg-gradient-to-r from-emerald-600/30 to-teal-600/30 rounded-xl p-4 border border-emerald-500/50 mb-6">
+        <div className="bg-gradient-to-r from-[#94cb47]/30 to-[#7ab035]/30 rounded-xl p-4 border border-[#94cb47]/50 mb-6">
           <div className="text-slate-300 text-sm">TOTAL A PAGAR</div>
-          <div className="text-4xl font-bold text-emerald-300">₡{order.total.toLocaleString()}</div>
+          <div className="text-4xl font-bold text-[#94cb47]">₡{order.total.toLocaleString()}</div>
         </div>
         <div className="flex gap-3">
-          {onPay && <button onClick={() => onPay(order)} className="flex-1 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold py-3 rounded-lg transition">✅ Cobrar</button>}
+          {onPay && <button onClick={() => onPay(order)} className="flex-1 bg-gradient-to-r bg-[#94cb47] hover:bg-[#7ab035] text-white font-bold py-3 rounded-lg transition">✅ Cobrar</button>}
           <button onClick={() => window.print()} className="flex-1 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-bold py-3 rounded-lg transition">🖨️ Imprimir</button>
           <button onClick={onClose} className="flex-1 bg-gradient-to-r from-slate-600 to-slate-700 text-white font-bold py-3 rounded-lg transition">Cerrar</button>
         </div>
@@ -594,14 +594,14 @@ function BillModal({ order, onClose, onPay }) {
 // PINES DE ACCESO
 // ─────────────────────────────────────────────
 const PINES = {
-  'Caja Bar':           { pin: '1970', role: 'caja',   zone: 'bar' },
-  'Caja Restaurante':   { pin: '1969', role: 'caja',   zone: 'restaurante' },
-  'Tablet Restaurante': { pin: '7878', role: 'mesera', zone: 'restaurante' },
-  'Cocina':             { pin: '7878', role: 'cocina', zone: 'restaurante' },
-  'María':              { pin: '5456', role: 'mesera', zone: 'bar' },
-  'Milena':             { pin: '8995', role: 'mesera', zone: 'bar' },
+  'Caja Bar':           { pin: '1111', role: 'caja',   zone: 'bar' },
+  'Caja Restaurante':   { pin: '2222', role: 'caja',   zone: 'restaurante' },
+  'Tablet Restaurante': { pin: '3333', role: 'mesera', zone: 'restaurante' },
+  'Cocina':             { pin: '4444', role: 'cocina', zone: 'restaurante' },
+  'María':              { pin: '5555', role: 'mesera', zone: 'bar' },
+  'Milena':             { pin: '6666', role: 'mesera', zone: 'bar' },
   'Lin':                { pin: '7777', role: 'mesera', zone: 'bar' },
-  'Admin':              { pin: '3306', role: 'admin',  zone: 'admin' },
+  'Admin':              { pin: '0000', role: 'admin',  zone: 'admin' },
 };
 
 // ─────────────────────────────────────────────
@@ -632,7 +632,7 @@ function PinModal({ userName, onSuccess, onCancel }) {
 
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-emerald-500/30 p-8 w-full max-w-xs shadow-2xl">
+      <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-8 w-full max-w-xs shadow-2xl">
         <div className="text-center mb-6">
           <div className="text-3xl mb-2">🔐</div>
           <h2 className="text-white font-bold text-xl">{userName}</h2>
@@ -644,7 +644,7 @@ function PinModal({ userName, onSuccess, onCancel }) {
           {[0,1,2,3].map(i => (
             <div key={i} className={`w-4 h-4 rounded-full border-2 transition-all ${
               i < pin.length
-                ? error ? 'bg-red-500 border-red-500' : 'bg-emerald-400 border-emerald-400'
+                ? error ? 'bg-red-500 border-red-500' : 'bg-[#94cb47] border-[#94cb47]'
                 : 'border-slate-500'
             }`} />
           ))}
@@ -656,7 +656,7 @@ function PinModal({ userName, onSuccess, onCancel }) {
         <div className="grid grid-cols-3 gap-3 mb-4">
           {[1,2,3,4,5,6,7,8,9].map(d => (
             <button key={d} onClick={() => handleDigit(String(d))}
-              className="bg-slate-700 hover:bg-slate-600 active:bg-emerald-700 text-white font-bold text-xl py-4 rounded-xl transition">
+              className="bg-slate-700 hover:bg-slate-600 active:bg-[#94cb47] text-white font-bold text-xl py-4 rounded-xl transition">
               {d}
             </button>
           ))}
@@ -665,7 +665,7 @@ function PinModal({ userName, onSuccess, onCancel }) {
             ⌫
           </button>
           <button onClick={() => handleDigit('0')}
-            className="bg-slate-700 hover:bg-slate-600 active:bg-emerald-700 text-white font-bold text-xl py-4 rounded-xl transition">
+            className="bg-slate-700 hover:bg-slate-600 active:bg-[#94cb47] text-white font-bold text-xl py-4 rounded-xl transition">
             0
           </button>
           <button onClick={onCancel}
@@ -692,7 +692,7 @@ function MeseraScreen({
   const [mobileTab, setMobileTab] = useState('menu'); // 'menu' | 'carrito'
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-black via-slate-900 to-black flex flex-col">
       <Header mesera={currentUser} zona={zona} onLogout={onLogout} />
 
       {/* ── Desktop layout ── */}
@@ -741,20 +741,20 @@ function MeseraScreen({
         </div>
 
         {/* Bottom tab bar */}
-        <div className="flex border-t border-emerald-500/30 bg-slate-900 safe-area-bottom">
+        <div className="flex border-t border-[#94cb47]/30 bg-slate-900 safe-area-bottom">
           <button
             onClick={() => setMobileTab('menu')}
-            className={`flex-1 flex flex-col items-center py-3 gap-1 transition ${mobileTab === 'menu' ? 'text-emerald-400' : 'text-slate-500'}`}
+            className={`flex-1 flex flex-col items-center py-3 gap-1 transition ${mobileTab === 'menu' ? 'text-[#94cb47]' : 'text-slate-500'}`}
           >
             <Utensils size={20} />
             <span className="text-xs font-bold">Menú</span>
           </button>
           <button
             onClick={() => setMobileTab('carrito')}
-            className={`flex-1 flex flex-col items-center py-3 gap-1 transition relative ${mobileTab === 'carrito' ? 'text-emerald-400' : 'text-slate-500'}`}
+            className={`flex-1 flex flex-col items-center py-3 gap-1 transition relative ${mobileTab === 'carrito' ? 'text-[#94cb47]' : 'text-slate-500'}`}
           >
             {cartItems.length > 0 && (
-              <span className="absolute top-2 right-1/4 bg-emerald-500 text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
+              <span className="absolute top-2 right-1/4 bg-[#94cb47] text-black text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
                 {cartItems.length}
               </span>
             )}
@@ -1030,9 +1030,9 @@ export default function RestaurantePOS() {
   // ── Loading / Error overlay ───────────────────
   const Spinner = () => (
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
-      <div className="bg-slate-800 rounded-2xl p-8 flex flex-col items-center gap-4 shadow-2xl border border-emerald-500/30">
-        <div className="w-10 h-10 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" />
-        <p className="text-emerald-300 font-bold">Sincronizando...</p>
+      <div className="bg-slate-800 rounded-2xl p-8 flex flex-col items-center gap-4 shadow-2xl border border-[#94cb47]/30">
+        <div className="w-10 h-10 border-4 border-[#94cb47] border-t-transparent rounded-full animate-spin" />
+        <p className="text-[#94cb47] font-bold">Sincronizando...</p>
       </div>
     </div>
   );
@@ -1054,12 +1054,12 @@ export default function RestaurantePOS() {
 
   if (!currentUser) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-emerald-900 via-green-800 to-teal-900 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-black via-slate-900 to-black flex items-center justify-center p-4">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
             <div className="text-7xl mb-4">🍽️</div>
-            <h1 className="text-5xl font-bold text-emerald-100 mb-2">LORE</h1>
-            <p className="text-emerald-200 text-lg">Sistema de Pedidos</p>
+            <h1 className="text-5xl font-bold text-[#94cb47] mb-2">LORE</h1>
+            <p className="text-[#94cb47]/80 text-lg">Sistema de Pedidos</p>
           </div>
           {syncError && (
             <div className="bg-red-900/60 border border-red-500 rounded-xl p-4 mb-4 text-red-200 text-sm text-center">
@@ -1067,23 +1067,23 @@ export default function RestaurantePOS() {
             </div>
           )}
           <div className="space-y-4">
-            <div className="bg-slate-800/80 backdrop-blur border border-emerald-500/40 rounded-2xl p-6 shadow-2xl">
-              <h2 className="text-emerald-300 font-bold text-lg mb-4">🍺 ZONA BAR</h2>
-              <button onClick={() => requestLogin('Caja Bar')} className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold py-3 rounded-xl transition shadow-lg mb-2">💰 Caja Bar</button>
+            <div className="bg-slate-800/80 backdrop-blur border border-[#94cb47]/40 rounded-2xl p-6 shadow-2xl">
+              <h2 className="text-[#94cb47] font-bold text-lg mb-4">🍺 ZONA BAR</h2>
+              <button onClick={() => requestLogin('Caja Bar')} className="w-full bg-gradient-to-r bg-[#94cb47] hover:bg-[#7ab035] text-white font-bold py-3 rounded-xl transition shadow-lg mb-2">💰 Caja Bar</button>
               <div className="space-y-2">
                 {meseras.map(m => (
-                  <button key={m} onClick={() => requestLogin(m)} className="w-full bg-slate-700/60 hover:bg-slate-600 text-emerald-100 py-2 rounded-lg transition font-medium">{m}</button>
+                  <button key={m} onClick={() => requestLogin(m)} className="w-full bg-slate-700/60 hover:bg-slate-600 text-[#94cb47] py-2 rounded-lg transition font-medium">{m}</button>
                 ))}
               </div>
             </div>
-            <div className="bg-slate-800/80 backdrop-blur border border-emerald-500/40 rounded-2xl p-6 shadow-2xl">
-              <h2 className="text-emerald-300 font-bold text-lg mb-4">🍽️ ZONA RESTAURANTE</h2>
-              <button onClick={() => requestLogin('Caja Restaurante')} className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold py-3 rounded-xl transition shadow-lg mb-2">💰 Caja</button>
-              <button onClick={() => requestLogin('Tablet Restaurante')} className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold py-3 rounded-xl transition shadow-lg mb-2">📱 Tomar Pedidos</button>
-              <button onClick={() => requestLogin('Cocina')} className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold py-3 rounded-xl transition shadow-lg">👨‍🍳 Cocina</button>
+            <div className="bg-slate-800/80 backdrop-blur border border-[#94cb47]/40 rounded-2xl p-6 shadow-2xl">
+              <h2 className="text-[#94cb47] font-bold text-lg mb-4">🍽️ ZONA RESTAURANTE</h2>
+              <button onClick={() => requestLogin('Caja Restaurante')} className="w-full bg-gradient-to-r bg-[#94cb47] hover:bg-[#7ab035] text-white font-bold py-3 rounded-xl transition shadow-lg mb-2">💰 Caja</button>
+              <button onClick={() => requestLogin('Tablet Restaurante')} className="w-full bg-gradient-to-r bg-[#94cb47]/90 hover:bg-[#7ab035] text-white font-bold py-3 rounded-xl transition shadow-lg mb-2">📱 Tomar Pedidos</button>
+              <button onClick={() => requestLogin('Cocina')} className="w-full bg-gradient-to-r bg-[#94cb47]/90 hover:bg-[#7ab035] text-white font-bold py-3 rounded-xl transition shadow-lg">👨‍🍳 Cocina</button>
             </div>
-            <div className="bg-slate-800/80 backdrop-blur border border-emerald-500/40 rounded-2xl p-6 shadow-2xl">
-              <button onClick={() => requestLogin('Admin')} className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold py-3 rounded-xl transition shadow-lg">📊 Panel Admin</button>
+            <div className="bg-slate-800/80 backdrop-blur border border-[#94cb47]/40 rounded-2xl p-6 shadow-2xl">
+              <button onClick={() => requestLogin('Admin')} className="w-full bg-gradient-to-r bg-[#94cb47]/90 hover:bg-[#7ab035] text-white font-bold py-3 rounded-xl transition shadow-lg">📊 Panel Admin</button>
             </div>
           </div>
         </div>
@@ -1127,32 +1127,32 @@ export default function RestaurantePOS() {
   // ── COCINA ────────────────────────────────────
   if (userRole === 'cocina') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800">
+      <div className="min-h-screen bg-gradient-to-br from-black to-slate-900">
         {loading && <Spinner />}
         <Header mesera="Cocina" zona="Preparación" onLogout={handleLogout} />
         <div className="p-8 max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {kitchenOrders.map(order => (
-              <div key={order.id} className={`rounded-2xl border-2 p-5 shadow-xl transition-all duration-300 ${order.status === 'ready' ? 'bg-gradient-to-br from-emerald-900/40 to-teal-800/40 border-emerald-500' : 'bg-gradient-to-br from-orange-900/40 to-orange-800/40 border-orange-500'}`}>
+              <div key={order.id} className={`rounded-2xl border-2 p-5 shadow-xl transition-all duration-300 ${order.status === 'ready' ? 'bg-gradient-to-br from-[#94cb47]/40 to-[#7ab035]/40 border-[#94cb47]' : 'bg-gradient-to-br from-orange-900/40 to-orange-800/40 border-orange-500'}`}>
                 <div className="flex justify-between items-start mb-4">
                   <div>
                     <div className="text-2xl font-bold text-white">{order.barra ? order.barra : `Mesa ${order.table}`}</div>
                     <div className="text-xs text-slate-400">👤 {order.mesera}</div>
-                    {order.clientName && <div className="text-sm text-emerald-300 font-semibold">{order.clientName}</div>}
+                    {order.clientName && <div className="text-sm text-[#94cb47] font-semibold">{order.clientName}</div>}
                   </div>
-                  <span className={`px-4 py-2 rounded-full text-sm font-bold ${order.status === 'ready' ? 'bg-emerald-500 text-white' : 'bg-orange-500 text-white'}`}>{order.status === 'ready' ? '✓ LISTO' : '⏳ PREP'}</span>
+                  <span className={`px-4 py-2 rounded-full text-sm font-bold ${order.status === 'ready' ? 'bg-[#94cb47] text-black' : 'bg-orange-500 text-white'}`}>{order.status === 'ready' ? '✓ LISTO' : '⏳ PREP'}</span>
                 </div>
                 <div className="bg-slate-800/50 rounded-xl p-4 mb-4 border border-slate-700">
                   {order.items.map((item, i) => (
                     <div key={i} className="text-white/90 text-sm py-2 border-b border-slate-700/50 last:border-0">
                       <div className="flex justify-between"><span className="font-medium">{item.quantity}x</span><span className="flex-1 mx-2">{item.name}</span></div>
-                      {item.notes && <div className="text-emerald-300 text-xs mt-1">📝 {item.notes}</div>}
+                      {item.notes && <div className="text-[#94cb47] text-xs mt-1">📝 {item.notes}</div>}
                     </div>
                   ))}
                 </div>
                 <div className="flex gap-2">
                   {order.status === 'pending' && (
-                    <button onClick={() => markOrderReady(order.id)} className="flex-1 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold py-3 rounded-lg transition shadow-lg">✓ Listo</button>
+                    <button onClick={() => markOrderReady(order.id)} className="flex-1 bg-gradient-to-r bg-[#94cb47]/90 hover:bg-[#7ab035] text-white font-bold py-3 rounded-lg transition shadow-lg">✓ Listo</button>
                   )}
                   {order.status === 'ready' && (
                     <button onClick={() => markOrderDelivered(order.id)} className="flex-1 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-bold py-3 rounded-lg transition shadow-lg">✓ Entregado</button>
@@ -1173,30 +1173,30 @@ export default function RestaurantePOS() {
     const foodCobrado  = barPaid.reduce((s, o) => s + (o.foodItems || o.items?.filter(i=>i.category==='food') || []).reduce((a, i) => a + i.price * i.quantity, 0), 0);
     const drinkCobrado = barPaid.reduce((s, o) => s + (o.drinkItems || o.items?.filter(i=>i.category!=='food') || []).reduce((a, i) => a + i.price * i.quantity, 0), 0);
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+      <div className="min-h-screen bg-gradient-to-br from-black via-slate-900 to-black">
         {loading && <Spinner />}
         <Header mesera="Caja Bar" zona="Caja" onLogout={handleLogout} />
         <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-5">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-emerald-500/30 p-5 shadow-2xl">
+            <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-5 shadow-2xl">
               <div className="text-slate-400 text-sm">Cuentas Pagadas</div>
               <div className="text-3xl font-bold text-white mt-2">{barPaid.length}</div>
             </div>
-            <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-emerald-500/30 p-5 shadow-2xl">
+            <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-5 shadow-2xl">
               <div className="text-slate-400 text-sm">Total Comida</div>
-              <div className="text-2xl font-bold text-emerald-400 mt-2">₡{foodCobrado.toLocaleString()}</div>
+              <div className="text-2xl font-bold text-[#94cb47] mt-2">₡{foodCobrado.toLocaleString()}</div>
             </div>
-            <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-emerald-500/30 p-5 shadow-2xl">
+            <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-5 shadow-2xl">
               <div className="text-slate-400 text-sm">Total Bebidas</div>
-              <div className="text-2xl font-bold text-emerald-400 mt-2">₡{drinkCobrado.toLocaleString()}</div>
+              <div className="text-2xl font-bold text-[#94cb47] mt-2">₡{drinkCobrado.toLocaleString()}</div>
             </div>
           </div>
-          <div className="bg-gradient-to-r from-emerald-600 to-teal-600 rounded-2xl p-6 shadow-2xl">
+          <div className="bg-gradient-to-r [#94cb47] rounded-2xl p-6 shadow-2xl">
             <div className="text-white/80 text-base">💰 Total Cobrado Hoy — Bar</div>
             <div className="text-4xl font-bold text-white">₡{totalCobrado.toLocaleString()}</div>
           </div>
-          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-emerald-500/30 p-5 shadow-2xl">
-            <h3 className="text-emerald-400 font-bold text-lg mb-4">📂 Cuentas Abiertas ({barAccounts.length})</h3>
+          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-5 shadow-2xl">
+            <h3 className="text-[#94cb47] font-bold text-lg mb-4">📂 Cuentas Abiertas ({barAccounts.length})</h3>
             {barAccounts.length === 0
               ? <p className="text-slate-500 text-sm">No hay cuentas abiertas</p>
               : <div className="space-y-3">
@@ -1207,17 +1207,17 @@ export default function RestaurantePOS() {
                       <div className="text-slate-400 text-xs">👤 {acc.mesera} · {acc.items.length} items</div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-emerald-400 font-bold">₡{acc.total.toLocaleString()}</span>
+                      <span className="text-[#94cb47] font-bold">₡{acc.total.toLocaleString()}</span>
                       <button onClick={() => setViewItemsOrder(acc)} className="bg-slate-600 hover:bg-slate-500 text-white px-3 py-1 rounded text-xs font-bold">📋 Items</button>
-                      <button onClick={() => setBillOrder(acc)} className="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 rounded text-xs font-bold">💳 Cobrar</button>
+                      <button onClick={() => setBillOrder(acc)} className="bg-[#94cb47] hover:bg-[#94cb47] text-white px-3 py-1 rounded text-xs font-bold">💳 Cobrar</button>
                     </div>
                   </div>
                 ))}
               </div>
             }
           </div>
-          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-emerald-500/30 p-5 shadow-2xl overflow-x-auto">
-            <h3 className="text-emerald-400 font-bold text-lg mb-4">✅ Historial Pagadas</h3>
+          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-5 shadow-2xl overflow-x-auto">
+            <h3 className="text-[#94cb47] font-bold text-lg mb-4">✅ Historial Pagadas</h3>
             {barPaid.length === 0 ? <p className="text-slate-500 text-sm">Sin pagos aún</p> :
               <table className="w-full text-sm"><thead><tr className="border-b border-slate-700">
                 <th className="text-left py-2 px-3 text-slate-400">Mesera</th>
@@ -1231,7 +1231,7 @@ export default function RestaurantePOS() {
                     <td className="py-3 px-3 text-white">{o.mesera}</td>
                     <td className="py-3 px-3 text-white">{o.barra || `Mesa ${o.table}`}</td>
                     <td className="py-3 px-3 text-white">{o.clientName || '-'}</td>
-                    <td className="text-right py-3 px-3 text-emerald-400 font-bold">₡{o.total.toLocaleString()}</td>
+                    <td className="text-right py-3 px-3 text-[#94cb47] font-bold">₡{o.total.toLocaleString()}</td>
                     <td className="text-center py-3 px-3"><button onClick={() => setViewItemsOrder(o)} className="bg-slate-600 hover:bg-slate-500 text-white px-3 py-1 rounded text-xs font-bold">📋 Ver</button></td>
                   </tr>
                 ))}
@@ -1251,30 +1251,30 @@ export default function RestaurantePOS() {
     const foodCobrado  = restPaid.reduce((s, o) => s + (o.foodItems || o.items?.filter(i=>i.category==='food') || []).reduce((a, i) => a + i.price * i.quantity, 0), 0);
     const drinkCobrado = restPaid.reduce((s, o) => s + (o.drinkItems || o.items?.filter(i=>i.category!=='food') || []).reduce((a, i) => a + i.price * i.quantity, 0), 0);
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+      <div className="min-h-screen bg-gradient-to-br from-black via-slate-900 to-black">
         {loading && <Spinner />}
         <Header mesera="Caja Restaurante" zona="Caja" onLogout={handleLogout} />
         <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-5">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-emerald-500/30 p-5 shadow-2xl">
+            <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-5 shadow-2xl">
               <div className="text-slate-400 text-sm">Cuentas Pagadas</div>
               <div className="text-3xl font-bold text-white mt-2">{restPaid.length}</div>
             </div>
-            <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-emerald-500/30 p-5 shadow-2xl">
+            <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-5 shadow-2xl">
               <div className="text-slate-400 text-sm">Total Comida</div>
-              <div className="text-2xl font-bold text-emerald-400 mt-2">₡{foodCobrado.toLocaleString()}</div>
+              <div className="text-2xl font-bold text-[#94cb47] mt-2">₡{foodCobrado.toLocaleString()}</div>
             </div>
-            <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-emerald-500/30 p-5 shadow-2xl">
+            <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-5 shadow-2xl">
               <div className="text-slate-400 text-sm">Total Bebidas</div>
-              <div className="text-2xl font-bold text-emerald-400 mt-2">₡{drinkCobrado.toLocaleString()}</div>
+              <div className="text-2xl font-bold text-[#94cb47] mt-2">₡{drinkCobrado.toLocaleString()}</div>
             </div>
           </div>
-          <div className="bg-gradient-to-r from-emerald-600 to-teal-600 rounded-2xl p-6 shadow-2xl">
+          <div className="bg-gradient-to-r [#94cb47] rounded-2xl p-6 shadow-2xl">
             <div className="text-white/80 text-base">💰 Total Cobrado Hoy — Restaurante</div>
             <div className="text-4xl font-bold text-white">₡{totalCobrado.toLocaleString()}</div>
           </div>
-          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-emerald-500/30 p-5 shadow-2xl">
-            <h3 className="text-emerald-400 font-bold text-lg mb-4">📂 Cuentas Abiertas ({restAccounts.length})</h3>
+          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-5 shadow-2xl">
+            <h3 className="text-[#94cb47] font-bold text-lg mb-4">📂 Cuentas Abiertas ({restAccounts.length})</h3>
             {restAccounts.length === 0
               ? <p className="text-slate-500 text-sm">No hay cuentas abiertas</p>
               : <div className="space-y-3">
@@ -1285,17 +1285,17 @@ export default function RestaurantePOS() {
                       <div className="text-slate-400 text-xs">👤 {acc.mesera} · {acc.items.length} items</div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-emerald-400 font-bold">₡{acc.total.toLocaleString()}</span>
+                      <span className="text-[#94cb47] font-bold">₡{acc.total.toLocaleString()}</span>
                       <button onClick={() => setViewItemsOrder(acc)} className="bg-slate-600 hover:bg-slate-500 text-white px-3 py-1 rounded text-xs font-bold">📋 Items</button>
-                      <button onClick={() => setBillOrder(acc)} className="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 rounded text-xs font-bold">💳 Cobrar</button>
+                      <button onClick={() => setBillOrder(acc)} className="bg-[#94cb47] hover:bg-[#94cb47] text-white px-3 py-1 rounded text-xs font-bold">💳 Cobrar</button>
                     </div>
                   </div>
                 ))}
               </div>
             }
           </div>
-          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-emerald-500/30 p-5 shadow-2xl overflow-x-auto">
-            <h3 className="text-emerald-400 font-bold text-lg mb-4">✅ Historial Pagadas</h3>
+          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-5 shadow-2xl overflow-x-auto">
+            <h3 className="text-[#94cb47] font-bold text-lg mb-4">✅ Historial Pagadas</h3>
             {restPaid.length === 0 ? <p className="text-slate-500 text-sm">Sin pagos aún</p> :
               <table className="w-full text-sm"><thead><tr className="border-b border-slate-700">
                 <th className="text-left py-2 px-3 text-slate-400">Mesera</th>
@@ -1309,7 +1309,7 @@ export default function RestaurantePOS() {
                     <td className="py-3 px-3 text-white">{o.mesera}</td>
                     <td className="py-3 px-3 text-white">{o.barra || `Mesa ${o.table}`}</td>
                     <td className="py-3 px-3 text-white">{o.clientName || '-'}</td>
-                    <td className="text-right py-3 px-3 text-emerald-400 font-bold">₡{o.total.toLocaleString()}</td>
+                    <td className="text-right py-3 px-3 text-[#94cb47] font-bold">₡{o.total.toLocaleString()}</td>
                     <td className="text-center py-3 px-3"><button onClick={() => setViewItemsOrder(o)} className="bg-slate-600 hover:bg-slate-500 text-white px-3 py-1 rounded text-xs font-bold">📋 Ver</button></td>
                   </tr>
                 ))}
@@ -1339,32 +1339,169 @@ export default function RestaurantePOS() {
     </div>
   );
 
+  const descargarCierrePDF = () => {
+    const now = new Date();
+    const fecha = now.toLocaleDateString('es-CR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    const hora  = now.toLocaleTimeString('es-CR', { hour: '2-digit', minute: '2-digit' });
+
+    const barFoodTotal2  = barPaid.reduce((s,o)=>s+(o.items||[]).filter(i=>i.category==='food').reduce((a,i)=>a+i.price*i.quantity,0),0);
+    const barDrinkTotal  = barPaid.reduce((s,o)=>s+(o.items||[]).filter(i=>i.category!=='food').reduce((a,i)=>a+i.price*i.quantity,0),0);
+    const restFoodTotal  = restPaid.reduce((s,o)=>s+(o.items||[]).filter(i=>i.category==='food').reduce((a,i)=>a+i.price*i.quantity,0),0);
+    const restDrinkTotal = restPaid.reduce((s,o)=>s+(o.items||[]).filter(i=>i.category!=='food').reduce((a,i)=>a+i.price*i.quantity,0),0);
+
+    const cuentasBarHTML = barPaid.map(o => `
+      <tr>
+        <td>${o.mesera}</td>
+        <td>${o.barra || 'Mesa ' + o.table}${o.clientName ? ' — ' + o.clientName : ''}</td>
+        <td style="text-align:right">₡${o.total.toLocaleString()}</td>
+      </tr>`).join('');
+
+    const cuentasRestHTML = restPaid.map(o => `
+      <tr>
+        <td>${o.mesera}</td>
+        <td>${o.barra || 'Mesa ' + o.table}${o.clientName ? ' — ' + o.clientName : ''}</td>
+        <td style="text-align:right">₡${o.total.toLocaleString()}</td>
+      </tr>`).join('');
+
+    const html = `<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Cierre de Caja — LORE ${fecha}</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; font-size: 13px; color: #1a1a1a; padding: 30px; }
+    .header { text-align: center; border-bottom: 3px solid #059669; padding-bottom: 16px; margin-bottom: 24px; }
+    .header h1 { font-size: 28px; color: #94cb47; letter-spacing: 4px; }
+    .header p { color: #666; margin-top: 4px; }
+    .fecha { font-size: 15px; font-weight: bold; color: #333; }
+    .total-box { background: #94cb47; color: white; border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 24px; }
+    .total-box .label { font-size: 14px; opacity: 0.85; }
+    .total-box .monto { font-size: 36px; font-weight: bold; margin-top: 4px; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+    .card { border: 1px solid #ddd; border-radius: 10px; padding: 16px; }
+    .card h2 { font-size: 16px; color: #94cb47; margin-bottom: 12px; border-bottom: 1px solid #eee; padding-bottom: 8px; }
+    .row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #f0f0f0; }
+    .row:last-child { border: none; }
+    .row .label { color: #666; }
+    .row .val { font-weight: bold; }
+    .total-row { display: flex; justify-content: space-between; background: #f0fde8; padding: 10px 12px; border-radius: 8px; margin-top: 10px; }
+    .total-row .val { color: #94cb47; font-weight: bold; font-size: 16px; }
+    .liquidacion { border: 2px solid #f59e0b; border-radius: 10px; padding: 16px; margin-bottom: 24px; background: #fffbeb; }
+    .liquidacion h2 { color: #d97706; font-size: 16px; margin-bottom: 12px; }
+    .saldo-final { background: ${deudaBar >= 0 ? '#fff7ed' : '#f0fdf4'}; border: 2px solid ${deudaBar >= 0 ? '#f59e0b' : '#059669'}; border-radius: 8px; padding: 12px; margin-top: 12px; display: flex; justify-content: space-between; align-items: center; }
+    .saldo-monto { font-size: 22px; font-weight: bold; color: ${deudaBar >= 0 ? '#d97706' : '#059669'}; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    th { background: #f1f5f9; text-align: left; padding: 8px; }
+    td { padding: 6px 8px; border-bottom: 1px solid #f0f0f0; }
+    tr:last-child td { border: none; }
+    .section-title { font-size: 15px; font-weight: bold; color: #333; margin: 20px 0 10px; }
+    .footer { text-align: center; color: #999; font-size: 11px; margin-top: 30px; border-top: 1px solid #eee; padding-top: 16px; }
+    @media print { body { padding: 15px; } }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>🍽️ LORE</h1>
+    <p class="fecha">${fecha}</p>
+    <p style="color:#999; font-size:12px">Generado a las ${hora}</p>
+  </div>
+
+  <div class="total-box">
+    <div class="label">💰 Total del Día</div>
+    <div class="monto">₡${grandTotal.toLocaleString()}</div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h2>🍺 Bar</h2>
+      <div class="row"><span class="label">Cuentas cobradas</span><span class="val">${barPaid.length}</span></div>
+      <div class="row"><span class="label">Comida</span><span class="val">₡${barFoodTotal2.toLocaleString()}</span></div>
+      <div class="row"><span class="label">Bebidas</span><span class="val">₡${barDrinkTotal.toLocaleString()}</span></div>
+      <div class="total-row"><span>Total Bar</span><span class="val">₡${totalBarCobrado.toLocaleString()}</span></div>
+    </div>
+    <div class="card">
+      <h2>🍽️ Restaurante</h2>
+      <div class="row"><span class="label">Cuentas cobradas</span><span class="val">${restPaid.length}</span></div>
+      <div class="row"><span class="label">Comida</span><span class="val">₡${restFoodTotal.toLocaleString()}</span></div>
+      <div class="row"><span class="label">Bebidas</span><span class="val">₡${restDrinkTotal.toLocaleString()}</span></div>
+      <div class="total-row"><span>Total Restaurante</span><span class="val">₡${totalRestCobrado.toLocaleString()}</span></div>
+    </div>
+  </div>
+
+  <div class="liquidacion">
+    <h2>🍺 Liquidación con Bar</h2>
+    <div class="row"><span class="label">Comida que pidió Bar (Bar nos debe)</span><span class="val">₡${barFoodTotal.toLocaleString()}</span></div>
+    <div class="row"><span class="label">Refrescos cobrados por Bar (les debemos)</span><span class="val">₡${barSodaTotal.toLocaleString()}</span></div>
+    <div class="saldo-final">
+      <div>
+        <div style="font-weight:bold">SALDO FINAL</div>
+        <div style="font-size:11px;color:#666">${deudaBar >= 0 ? '📤 Bar nos paga' : '📥 Nosotros le pagamos al Bar'}</div>
+      </div>
+      <div class="saldo-monto">₡${Math.abs(deudaBar).toLocaleString()}</div>
+    </div>
+  </div>
+
+  ${barPaid.length > 0 ? `
+  <div class="section-title">📋 Detalle Cuentas — Bar (${barPaid.length})</div>
+  <table>
+    <thead><tr><th>Mesera</th><th>Mesa / Barra</th><th style="text-align:right">Total</th></tr></thead>
+    <tbody>${cuentasBarHTML}</tbody>
+  </table>` : ''}
+
+  ${restPaid.length > 0 ? `
+  <div class="section-title">📋 Detalle Cuentas — Restaurante (${restPaid.length})</div>
+  <table>
+    <thead><tr><th>Mesera</th><th>Mesa / Barra</th><th style="text-align:right">Total</th></tr></thead>
+    <tbody>${cuentasRestHTML}</tbody>
+  </table>` : ''}
+
+  <div class="footer">
+    LORE POS — Cierre de Caja ${fecha}
+  </div>
+</body>
+</html>`;
+
+    const blob = new Blob([html], { type: 'text/html' });
+    const url  = URL.createObjectURL(blob);
+    const win  = window.open(url, '_blank');
+    setTimeout(() => { win?.print(); URL.revokeObjectURL(url); }, 800);
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+    <div className="min-h-screen bg-gradient-to-br from-black via-slate-900 to-black">
       {loading && <Spinner />}
       <Header mesera="Admin" zona="Control" onLogout={handleLogout} />
       <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-5">
-        <div className="bg-gradient-to-r from-emerald-600 to-teal-700 rounded-2xl p-6 shadow-2xl">
-          <div className="text-white/80 text-base">💰 Total del Día</div>
-          <div className="text-4xl md:text-6xl font-bold text-white mt-1">₡{grandTotal.toLocaleString()}</div>
+        <div className="bg-gradient-to-r [#94cb47] rounded-2xl p-6 shadow-2xl flex flex-wrap justify-between items-center gap-4">
+          <div>
+            <div className="text-white/80 text-base">💰 Total del Día</div>
+            <div className="text-4xl md:text-6xl font-bold text-white mt-1">₡{grandTotal.toLocaleString()}</div>
+          </div>
+          <button
+            onClick={descargarCierrePDF}
+            className="bg-white/20 hover:bg-white/30 text-white font-bold px-6 py-3 rounded-xl transition flex items-center gap-2 border border-white/30"
+          >
+            📄 Descargar Cierre del Día
+          </button>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-emerald-500/30 p-5 shadow-2xl space-y-3">
+          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-5 shadow-2xl space-y-3">
             <h3 className="text-white font-bold text-xl">🍺 Bar</h3>
             <StatRow label="Cuentas cobradas" value={barPaid.length} />
             <StatRow label="Comida vendida" value={`₡${barPaid.reduce((s,o)=>s+(o.items||[]).filter(i=>i.category==='food').reduce((a,i)=>a+i.price*i.quantity,0),0).toLocaleString()}`} />
             <StatRow label="Bebidas vendidas" value={`₡${barPaid.reduce((s,o)=>s+(o.items||[]).filter(i=>i.category!=='food').reduce((a,i)=>a+i.price*i.quantity,0),0).toLocaleString()}`} />
-            <div className="bg-gradient-to-r from-emerald-600 to-teal-600 rounded-xl p-4">
+            <div className="bg-gradient-to-r [#94cb47] rounded-xl p-4">
               <div className="text-white/80 text-xs">Total Bar</div>
               <div className="text-2xl font-bold text-white">₡{totalBarCobrado.toLocaleString()}</div>
             </div>
           </div>
-          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-emerald-500/30 p-5 shadow-2xl space-y-3">
+          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-5 shadow-2xl space-y-3">
             <h3 className="text-white font-bold text-xl">🍽️ Restaurante</h3>
             <StatRow label="Cuentas cobradas" value={restPaid.length} />
             <StatRow label="Comida vendida" value={`₡${restPaid.reduce((s,o)=>s+(o.items||[]).filter(i=>i.category==='food').reduce((a,i)=>a+i.price*i.quantity,0),0).toLocaleString()}`} />
             <StatRow label="Bebidas vendidas" value={`₡${restPaid.reduce((s,o)=>s+(o.items||[]).filter(i=>i.category!=='food').reduce((a,i)=>a+i.price*i.quantity,0),0).toLocaleString()}`} />
-            <div className="bg-gradient-to-r from-emerald-600 to-teal-600 rounded-xl p-4">
+            <div className="bg-gradient-to-r [#94cb47] rounded-xl p-4">
               <div className="text-white/80 text-xs">Total Restaurante</div>
               <div className="text-2xl font-bold text-white">₡{totalRestCobrado.toLocaleString()}</div>
             </div>
@@ -1379,22 +1516,22 @@ export default function RestaurantePOS() {
             </div>
             <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700 flex justify-between items-center gap-3">
               <div><div className="text-slate-400 text-sm">Refrescos cobrados por Bar</div><div className="text-xs text-slate-500">Nosotros les debemos esto</div></div>
-              <div className="text-xl font-bold text-emerald-300 whitespace-nowrap">₡{barSodaTotal.toLocaleString()}</div>
+              <div className="text-xl font-bold text-[#94cb47] whitespace-nowrap">₡{barSodaTotal.toLocaleString()}</div>
             </div>
-            <div className={`rounded-xl p-4 border flex justify-between items-center gap-3 ${deudaBar >= 0 ? 'bg-orange-900/40 border-orange-500' : 'bg-emerald-900/40 border-emerald-500'}`}>
+            <div className={`rounded-xl p-4 border flex justify-between items-center gap-3 ${deudaBar >= 0 ? 'bg-orange-900/40 border-orange-500' : 'bg-[#94cb47]/40 border-[#94cb47]'}`}>
               <div><div className="text-slate-300 text-sm font-bold">SALDO FINAL</div><div className="text-xs text-slate-400">{deudaBar >= 0 ? '📤 Bar nos paga esto' : '📥 Nosotros le pagamos al Bar'}</div></div>
-              <div className={`text-2xl font-bold whitespace-nowrap ${deudaBar >= 0 ? 'text-orange-300' : 'text-emerald-300'}`}>₡{Math.abs(deudaBar).toLocaleString()}</div>
+              <div className={`text-2xl font-bold whitespace-nowrap ${deudaBar >= 0 ? 'text-orange-300' : 'text-[#94cb47]'}`}>₡{Math.abs(deudaBar).toLocaleString()}</div>
             </div>
           </div>
           {restSodaTotal > 0 && (
             <div className="bg-slate-800/40 rounded-xl p-3 border border-slate-600 text-xs text-slate-400">
-              Refrescos vendidos en Restaurante: <span className="text-emerald-300 font-bold">₡{restSodaTotal.toLocaleString()}</span> (no afectan deuda)
+              Refrescos vendidos en Restaurante: <span className="text-[#94cb47] font-bold">₡{restSodaTotal.toLocaleString()}</span> (no afectan deuda)
             </div>
           )}
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-emerald-500/30 p-5 shadow-2xl">
-            <h3 className="text-emerald-400 font-bold text-lg mb-4">📋 Pagadas Bar</h3>
+          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-5 shadow-2xl">
+            <h3 className="text-[#94cb47] font-bold text-lg mb-4">📋 Pagadas Bar</h3>
             {barPaid.length === 0 ? <p className="text-slate-500 text-sm">Sin pagos</p> :
               <div className="space-y-2 max-h-60 overflow-y-auto">
                 {barPaid.map(o => (
@@ -1404,7 +1541,7 @@ export default function RestaurantePOS() {
                       <div className="text-slate-400 text-xs">👤 {o.mesera}</div>
                     </div>
                     <div className="flex items-center gap-2 flex-shrink-0">
-                      <span className="text-emerald-400 font-bold text-sm whitespace-nowrap">₡{o.total.toLocaleString()}</span>
+                      <span className="text-[#94cb47] font-bold text-sm whitespace-nowrap">₡{o.total.toLocaleString()}</span>
                       <button onClick={() => setViewItemsOrder(o)} className="bg-slate-600 hover:bg-slate-500 text-white px-2 py-1 rounded text-xs">📋</button>
                     </div>
                   </div>
@@ -1412,8 +1549,8 @@ export default function RestaurantePOS() {
               </div>
             }
           </div>
-          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-emerald-500/30 p-5 shadow-2xl">
-            <h3 className="text-emerald-400 font-bold text-lg mb-4">📋 Pagadas Restaurante</h3>
+          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-5 shadow-2xl">
+            <h3 className="text-[#94cb47] font-bold text-lg mb-4">📋 Pagadas Restaurante</h3>
             {restPaid.length === 0 ? <p className="text-slate-500 text-sm">Sin pagos</p> :
               <div className="space-y-2 max-h-60 overflow-y-auto">
                 {restPaid.map(o => (
@@ -1423,7 +1560,7 @@ export default function RestaurantePOS() {
                       <div className="text-slate-400 text-xs">👤 {o.mesera}</div>
                     </div>
                     <div className="flex items-center gap-2 flex-shrink-0">
-                      <span className="text-emerald-400 font-bold text-sm whitespace-nowrap">₡{o.total.toLocaleString()}</span>
+                      <span className="text-[#94cb47] font-bold text-sm whitespace-nowrap">₡{o.total.toLocaleString()}</span>
                       <button onClick={() => setViewItemsOrder(o)} className="bg-slate-600 hover:bg-slate-500 text-white px-2 py-1 rounded text-xs">📋</button>
                     </div>
                   </div>
