@@ -47,6 +47,8 @@ const accountSchema = new mongoose.Schema({
   lastUpdated: Date,
   status: { type: String, default: 'open' },
   closedAt: Date,
+  paymentMethod: { type: String, default: 'efectivo' },
+  locationLabel: String,
 });
 
 const kitchenOrderSchema = new mongoose.Schema({
@@ -108,6 +110,7 @@ app.post('/api/accounts/:id/close', async (req, res) => {
     if (!account) return res.status(404).json({ error: 'Cuenta no encontrada' });
     account.status = 'paid';
     account.closedAt = new Date();
+    account.paymentMethod = req.body.paymentMethod || 'efectivo';
     await account.save();
     res.json(account);
   } catch (error) { res.status(500).json({ error: error.message }); }
