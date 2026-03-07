@@ -393,7 +393,7 @@ function ShoppingCart({
   selectedBarra, setSelectedBarra, clientName, setClientName,
   barras, maxTables,
   openAccounts, selectedAccount, onSelectAccount,
-  mobileVisible,
+  mobileVisible, onDirectPay, isBar,
 }) {
   const total = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
@@ -495,7 +495,10 @@ function ShoppingCart({
             <div className="text-slate-300 text-sm">Total</div>
             <div className="text-2xl font-bold text-[#94cb47]">₡{total.toLocaleString()}</div>
           </div>
-          <button onClick={completeOrder} className="w-full bg-gradient-to-r bg-[#94cb47] hover:bg-[#7ab035] text-white font-bold py-3 rounded-xl transition shadow-xl text-base">✓ Completar</button>
+          <button onClick={completeOrder} className="w-full bg-[#94cb47] hover:bg-[#7ab035] text-black font-bold py-3 rounded-xl transition shadow-xl text-base">✓ Guardar Cuenta</button>
+          {isBar && onDirectPay && (
+            <button onClick={onDirectPay} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition shadow-xl text-base">💵 Cobro Directo</button>
+          )}
         </div>
       )}
     </>
@@ -548,40 +551,69 @@ function ItemsModal({ order, onClose }) {
 // ─────────────────────────────────────────────
 // MODAL CUENTA (cobrar)
 // ─────────────────────────────────────────────
+const payBadge = (m) => {
+  if (m === 'sinpe')   return <span className="bg-blue-900/50 text-blue-300 border border-blue-600 px-2 py-0.5 rounded text-xs font-bold">📱 Sinpe</span>;
+  if (m === 'tarjeta') return <span className="bg-purple-900/50 text-purple-300 border border-purple-600 px-2 py-0.5 rounded text-xs font-bold">💳 Tarjeta</span>;
+  return <span className="bg-green-900/50 text-green-300 border border-green-600 px-2 py-0.5 rounded text-xs font-bold">💵 Efectivo</span>;
+};
+
 function BillModal({ order, onClose, onPay }) {
+  const [payMethod, setPayMethod] = useState(null);
   if (!order) return null;
+  const methods = [
+    { id: 'efectivo', label: '💵 Efectivo', color: 'border-green-500 bg-green-900/30 text-green-300' },
+    { id: 'sinpe',    label: '📱 Sinpe',    color: 'border-blue-500 bg-blue-900/30 text-blue-300' },
+    { id: 'tarjeta',  label: '💳 Tarjeta',  color: 'border-purple-500 bg-purple-900/30 text-purple-300' },
+  ];
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
-      <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-8 shadow-2xl max-w-md w-full max-h-[80vh] overflow-y-auto">
-        <div className="text-center mb-6">
-          <h2 className="text-3xl font-bold text-[#94cb47] mb-2">CUENTA</h2>
-          <p className="text-slate-400">Restaurante LORE</p>
+      <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-6 shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+        <div className="text-center mb-4">
+          <h2 className="text-3xl font-bold text-[#94cb47] mb-1">CUENTA</h2>
+          <p className="text-slate-400 text-sm">Restaurante LORE</p>
         </div>
-        <div className="border-b border-[#94cb47]/30 mb-4 pb-4">
-          <div className="text-white mb-2"><span className="text-slate-400">Cliente: </span><span className="font-bold">{order.clientName || 'Sin nombre'}</span></div>
-          <div className="text-white"><span className="text-slate-400">Mesa: </span><span className="font-bold">{order.barra || `Mesa ${order.table}`}</span></div>
-          {order.mesera && <div className="text-white"><span className="text-slate-400">Mesera: </span><span className="font-bold">{order.mesera}</span></div>}
+        <div className="border-b border-[#94cb47]/30 mb-4 pb-3 space-y-1">
+          <div className="text-white text-sm"><span className="text-slate-400">Cliente: </span><span className="font-bold">{order.clientName || 'Sin nombre'}</span></div>
+          <div className="text-white text-sm"><span className="text-slate-400">Mesa: </span><span className="font-bold">{order.locationLabel || order.barra || (order.table ? `Mesa ${order.table}` : '-')}</span></div>
+          {order.mesera && <div className="text-white text-sm"><span className="text-slate-400">Mesera: </span><span className="font-bold">{order.mesera}</span></div>}
         </div>
-        <div className="bg-slate-800/50 rounded-xl p-4 mb-4 border border-slate-700 space-y-2">
+        <div className="bg-slate-800/50 rounded-xl p-3 mb-4 border border-slate-700 space-y-1 max-h-48 overflow-y-auto">
           {order.items.map((item, i) => (
-            <div key={i} className="py-2 border-b border-slate-700/50 last:border-0">
-              <div className="flex justify-between text-white">
+            <div key={i} className="py-1.5 border-b border-slate-700/50 last:border-0">
+              <div className="flex justify-between text-white text-sm">
                 <span>{item.quantity}x {item.name}</span>
                 <span className="text-[#94cb47] font-bold">₡{(item.price * item.quantity).toLocaleString()}</span>
               </div>
-              {item.notes && <div className="text-xs text-yellow-300 mt-1">📝 {item.notes}</div>}
-              {item.addedBy && <div className="text-xs text-slate-400 mt-1">👤 {item.addedBy}</div>}
+              {item.notes && <div className="text-xs text-yellow-300 mt-0.5">📝 {item.notes}</div>}
             </div>
           ))}
         </div>
-        <div className="bg-gradient-to-r from-[#94cb47]/30 to-[#7ab035]/30 rounded-xl p-4 border border-[#94cb47]/50 mb-6">
+        <div className="bg-gradient-to-r from-[#94cb47]/30 to-[#7ab035]/30 rounded-xl p-4 border border-[#94cb47]/50 mb-4">
           <div className="text-slate-300 text-sm">TOTAL A PAGAR</div>
           <div className="text-4xl font-bold text-[#94cb47]">₡{order.total.toLocaleString()}</div>
         </div>
-        <div className="flex gap-3">
-          {onPay && <button onClick={() => onPay(order)} className="flex-1 bg-gradient-to-r bg-[#94cb47] hover:bg-[#7ab035] text-white font-bold py-3 rounded-lg transition">✅ Cobrar</button>}
-          <button onClick={() => window.print()} className="flex-1 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-bold py-3 rounded-lg transition">🖨️ Imprimir</button>
-          <button onClick={onClose} className="flex-1 bg-gradient-to-r from-slate-600 to-slate-700 text-white font-bold py-3 rounded-lg transition">Cerrar</button>
+        {/* Método de pago */}
+        <div className="mb-4">
+          <p className="text-slate-400 text-xs mb-2 font-bold uppercase tracking-wide">Método de pago</p>
+          <div className="grid grid-cols-3 gap-2">
+            {methods.map(m => (
+              <button key={m.id} onClick={() => setPayMethod(m.id)}
+                className={`border-2 rounded-xl py-3 font-bold text-sm transition ${payMethod === m.id ? m.color : 'border-slate-600 text-slate-400 hover:border-slate-500'}`}>
+                {m.label}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="flex gap-2">
+          {onPay && (
+            <button
+              onClick={() => payMethod ? onPay(order, payMethod) : alert('Selecciona el método de pago')}
+              className={`flex-1 font-bold py-3 rounded-lg transition ${payMethod ? 'bg-[#94cb47] hover:bg-[#7ab035] text-black' : 'bg-slate-700 text-slate-500 cursor-not-allowed'}`}>
+              ✅ Cobrar
+            </button>
+          )}
+          <button onClick={() => window.print()} className="bg-blue-700 hover:bg-blue-800 text-white font-bold px-4 py-3 rounded-lg transition">🖨️</button>
+          <button onClick={onClose} className="bg-slate-700 hover:bg-slate-600 text-white font-bold px-4 py-3 rounded-lg transition">✕</button>
         </div>
       </div>
     </div>
@@ -688,6 +720,7 @@ function MeseraScreen({
   selectedTable, setSelectedTable, selectedBarra, setSelectedBarra,
   clientName, setClientName, barras, kitchenOrders,
   openAccounts, selectedAccount, onSelectAccount,
+  onDirectPay, isBar,
 }) {
   const [mobileTab, setMobileTab] = useState('menu'); // 'menu' | 'carrito'
 
@@ -712,6 +745,8 @@ function MeseraScreen({
           openAccounts={openAccounts} selectedAccount={selectedAccount}
           onSelectAccount={onSelectAccount}
           mobileVisible={false}
+          isBar={isBar}
+          onDirectPay={onDirectPay}
         />
       </div>
 
@@ -736,6 +771,8 @@ function MeseraScreen({
               openAccounts={openAccounts} selectedAccount={selectedAccount}
               onSelectAccount={onSelectAccount}
               mobileVisible={true}
+              isBar={isBar}
+              onDirectPay={onDirectPay}
             />
           )}
         </div>
@@ -996,12 +1033,66 @@ export default function RestaurantePOS() {
     }
   };
 
+  // ── Cobro Directo (Bar) — cuenta que se paga de inmediato ──────
+  const handleDirectPay = async () => {
+    if (cartItems.length === 0) { alert('El carrito está vacío'); return; }
+    const total = cartItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
+    const foodItems  = cartItems.filter(i => i.category === 'food');
+    const drinkItems = cartItems.filter(i => ['alcoholic','beverage','soda'].includes(i.category));
+    const location   = selectedBarra ? selectedBarra : (selectedTable ? `Mesa ${selectedTable}` : 'Cobro directo');
+    setLoading(true);
+    try {
+      // Crear y cerrar la cuenta de inmediato (sin método de pago todavía — se elige en el modal)
+      const newAcc = {
+        id: `acc-direct-${Date.now()}`,
+        zone: currentZone,
+        mesera: currentUser,
+        items: [...cartItems],
+        total,
+        type: 'direct',
+        table: selectedTable || null,
+        barra: selectedBarra || null,
+        locationLabel: location,
+        clientName: clientName || '',
+        foodItems,
+        drinkItems,
+        status: 'open',
+        createdAt: new Date(),
+      };
+      const created = await api.createAccount(newAcc);
+      // Mandar comida a cocina si hay
+      if (foodItems.length > 0) {
+        await api.createKitchenOrder({
+          id: `k-direct-${Date.now()}`,
+          zone: currentZone,
+          mesera: currentUser,
+          items: foodItems,
+          locationLabel: location,
+          table: selectedTable || null,
+          barra: selectedBarra || null,
+          clientName: clientName || '',
+          status: 'pending',
+          createdAt: new Date(),
+        });
+      }
+      // Abrir modal de cobro directamente
+      const accToShow = { ...(created || newAcc), total };
+      setBillOrder(accToShow);
+      setCartItems([]); setSelectedTable(null); setSelectedBarra(null);
+      setClientName(''); setOrderType(null); setSelectedAccount(null);
+    } catch (err) {
+      alert('❌ Error: ' + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // ── Cobrar cuenta (caja) ─────────────────────
-  const payAccount = async (account) => {
+  const payAccount = async (account, paymentMethod = 'efectivo') => {
     setLoading(true);
     try {
       const accId = account.id || account._id;
-      await api.closeAccount(accId);
+      await api.closeAccount(accId, paymentMethod);
       const [open, paid] = await Promise.all([
         api.getOpenAccounts(currentZone),
         api.getPaidAccounts(currentZone),
@@ -1127,7 +1218,10 @@ export default function RestaurantePOS() {
           barras={barras} kitchenOrders={kitchenOrders.filter(o => o.mesera === currentUser)}
           openAccounts={zoneOpenAccounts} selectedAccount={selectedAccount}
           onSelectAccount={handleSelectAccount}
+          isBar={currentZone === 'bar'}
+          onDirectPay={handleDirectPay}
         />
+        {billOrder && <BillModal order={billOrder} onClose={() => setBillOrder(null)} onPay={payAccount} />}
       </>
     );
   }
@@ -1279,14 +1373,16 @@ export default function RestaurantePOS() {
                 <th className="text-left py-2 px-3 text-slate-400">Mesera</th>
                 <th className="text-left py-2 px-3 text-slate-400">Mesa/Barra</th>
                 <th className="text-left py-2 px-3 text-slate-400">Cliente</th>
+                <th className="text-center py-2 px-3 text-slate-400">Pago</th>
                 <th className="text-right py-2 px-3 text-slate-400">Total</th>
                 <th className="text-center py-2 px-3 text-slate-400">Items</th>
               </tr></thead><tbody>
                 {barPaid.map(o => (
                   <tr key={o._id || o.id} className="border-b border-slate-700 hover:bg-slate-700/30">
                     <td className="py-3 px-3 text-white">{o.mesera}</td>
-                    <td className="py-3 px-3 text-white">{o.barra || `Mesa ${o.table}`}</td>
+                    <td className="py-3 px-3 text-white">{o.locationLabel || o.barra || (o.table ? `Mesa ${o.table}` : '-')}</td>
                     <td className="py-3 px-3 text-white">{o.clientName || '-'}</td>
+                    <td className="text-center py-3 px-3">{payBadge(o.paymentMethod)}</td>
                     <td className="text-right py-3 px-3 text-[#94cb47] font-bold">₡{o.total.toLocaleString()}</td>
                     <td className="text-center py-3 px-3"><button onClick={() => setViewItemsOrder(o)} className="bg-slate-600 hover:bg-slate-500 text-white px-3 py-1 rounded text-xs font-bold">📋 Ver</button></td>
                   </tr>
@@ -1357,14 +1453,16 @@ export default function RestaurantePOS() {
                 <th className="text-left py-2 px-3 text-slate-400">Mesera</th>
                 <th className="text-left py-2 px-3 text-slate-400">Mesa/Barra</th>
                 <th className="text-left py-2 px-3 text-slate-400">Cliente</th>
+                <th className="text-center py-2 px-3 text-slate-400">Pago</th>
                 <th className="text-right py-2 px-3 text-slate-400">Total</th>
                 <th className="text-center py-2 px-3 text-slate-400">Items</th>
               </tr></thead><tbody>
                 {restPaid.map(o => (
                   <tr key={o._id || o.id} className="border-b border-slate-700 hover:bg-slate-700/30">
                     <td className="py-3 px-3 text-white">{o.mesera}</td>
-                    <td className="py-3 px-3 text-white">{o.barra || `Mesa ${o.table}`}</td>
+                    <td className="py-3 px-3 text-white">{o.locationLabel || o.barra || (o.table ? `Mesa ${o.table}` : '-')}</td>
                     <td className="py-3 px-3 text-white">{o.clientName || '-'}</td>
+                    <td className="text-center py-3 px-3">{payBadge(o.paymentMethod)}</td>
                     <td className="text-right py-3 px-3 text-[#94cb47] font-bold">₡{o.total.toLocaleString()}</td>
                     <td className="text-center py-3 px-3"><button onClick={() => setViewItemsOrder(o)} className="bg-slate-600 hover:bg-slate-500 text-white px-3 py-1 rounded text-xs font-bold">📋 Ver</button></td>
                   </tr>
@@ -1383,10 +1481,13 @@ export default function RestaurantePOS() {
   const totalBarCobrado  = barPaid.reduce((s, o) => s + o.total, 0);
   const totalRestCobrado = restPaid.reduce((s, o) => s + o.total, 0);
   const grandTotal = totalBarCobrado + totalRestCobrado;
-  const barFoodTotal  = barPaid.reduce((s, o) => s + (o.items||[]).filter(i=>i.category==='food').reduce((a,i)=>a+i.price*i.quantity,0), 0);
-  const barSodaTotal  = barPaid.reduce((s, o) => s + (o.items||[]).filter(i=>i.category==='soda').reduce((a,i)=>a+i.price*i.quantity,0), 0);
-  const restSodaTotal = restPaid.reduce((s, o) => s + (o.items||[]).filter(i=>i.category==='soda').reduce((a,i)=>a+i.price*i.quantity,0), 0);
-  const deudaBar = barFoodTotal - barSodaTotal;
+  const barFoodTotal    = barPaid.reduce((s, o) => s + (o.items||[]).filter(i=>i.category==='food').reduce((a,i)=>a+i.price*i.quantity,0), 0);
+  // Todas las bebidas que pidió restaurante (nos las sirvió bar → les debemos)
+  const restDrinksTotal = restPaid.reduce((s, o) => s + (o.items||[]).filter(i=>['alcoholic','beverage','soda'].includes(i.category)).reduce((a,i)=>a+i.price*i.quantity,0), 0);
+  // Compatibilidad con variable vieja para el PDF
+  const barSodaTotal  = restDrinksTotal;
+  const restSodaTotal = restDrinksTotal;
+  const deudaBar = barFoodTotal - restDrinksTotal;
 
   const StatRow = ({ label, value }) => (
     <div className="flex justify-between items-center p-3 bg-slate-700/50 rounded-lg gap-2">
@@ -1405,17 +1506,25 @@ export default function RestaurantePOS() {
     const restFoodTotal  = restPaid.reduce((s,o)=>s+(o.items||[]).filter(i=>i.category==='food').reduce((a,i)=>a+i.price*i.quantity,0),0);
     const restDrinkTotal = restPaid.reduce((s,o)=>s+(o.items||[]).filter(i=>i.category!=='food').reduce((a,i)=>a+i.price*i.quantity,0),0);
 
+    const methodLabel = (m) => m === 'sinpe' ? '📱 Sinpe' : m === 'tarjeta' ? '💳 Tarjeta' : '💵 Efectivo';
+
+    // Totales por método de pago
+    const countMethod = (arr, m) => arr.filter(o => (o.paymentMethod || 'efectivo') === m).length;
+    const sumMethod   = (arr, m) => arr.filter(o => (o.paymentMethod || 'efectivo') === m).reduce((s,o)=>s+o.total,0);
+
     const cuentasBarHTML = barPaid.map(o => `
       <tr>
         <td>${o.mesera}</td>
-        <td>${o.barra || 'Mesa ' + o.table}${o.clientName ? ' — ' + o.clientName : ''}</td>
+        <td>${o.locationLabel || o.barra || 'Mesa ' + o.table}${o.clientName ? ' — ' + o.clientName : ''}</td>
+        <td style="text-align:center">${methodLabel(o.paymentMethod)}</td>
         <td style="text-align:right">₡${o.total.toLocaleString()}</td>
       </tr>`).join('');
 
     const cuentasRestHTML = restPaid.map(o => `
       <tr>
         <td>${o.mesera}</td>
-        <td>${o.barra || 'Mesa ' + o.table}${o.clientName ? ' — ' + o.clientName : ''}</td>
+        <td>${o.locationLabel || o.barra || 'Mesa ' + o.table}${o.clientName ? ' — ' + o.clientName : ''}</td>
+        <td style="text-align:center">${methodLabel(o.paymentMethod)}</td>
         <td style="text-align:right">₡${o.total.toLocaleString()}</td>
       </tr>`).join('');
 
@@ -1500,15 +1609,25 @@ export default function RestaurantePOS() {
 
   ${barPaid.length > 0 ? `
   <div class="section-title">📋 Detalle Cuentas — Bar (${barPaid.length})</div>
+  <div style="display:flex;gap:12px;margin-bottom:8px;font-size:12px">
+    <span style="background:#14532d;color:#86efac;padding:3px 10px;border-radius:20px">💵 Efectivo: ${countMethod(barPaid,'efectivo')} — ₡${sumMethod(barPaid,'efectivo').toLocaleString()}</span>
+    <span style="background:#1e3a5f;color:#93c5fd;padding:3px 10px;border-radius:20px">📱 Sinpe: ${countMethod(barPaid,'sinpe')} — ₡${sumMethod(barPaid,'sinpe').toLocaleString()}</span>
+    <span style="background:#3b1f6e;color:#d8b4fe;padding:3px 10px;border-radius:20px">💳 Tarjeta: ${countMethod(barPaid,'tarjeta')} — ₡${sumMethod(barPaid,'tarjeta').toLocaleString()}</span>
+  </div>
   <table>
-    <thead><tr><th>Mesera</th><th>Mesa / Barra</th><th style="text-align:right">Total</th></tr></thead>
+    <thead><tr><th>Mesera</th><th>Mesa / Barra</th><th style="text-align:center">Pago</th><th style="text-align:right">Total</th></tr></thead>
     <tbody>${cuentasBarHTML}</tbody>
   </table>` : ''}
 
   ${restPaid.length > 0 ? `
   <div class="section-title">📋 Detalle Cuentas — Restaurante (${restPaid.length})</div>
+  <div style="display:flex;gap:12px;margin-bottom:8px;font-size:12px">
+    <span style="background:#14532d;color:#86efac;padding:3px 10px;border-radius:20px">💵 Efectivo: ${countMethod(restPaid,'efectivo')} — ₡${sumMethod(restPaid,'efectivo').toLocaleString()}</span>
+    <span style="background:#1e3a5f;color:#93c5fd;padding:3px 10px;border-radius:20px">📱 Sinpe: ${countMethod(restPaid,'sinpe')} — ₡${sumMethod(restPaid,'sinpe').toLocaleString()}</span>
+    <span style="background:#3b1f6e;color:#d8b4fe;padding:3px 10px;border-radius:20px">💳 Tarjeta: ${countMethod(restPaid,'tarjeta')} — ₡${sumMethod(restPaid,'tarjeta').toLocaleString()}</span>
+  </div>
   <table>
-    <thead><tr><th>Mesera</th><th>Mesa / Barra</th><th style="text-align:right">Total</th></tr></thead>
+    <thead><tr><th>Mesera</th><th>Mesa / Barra</th><th style="text-align:center">Pago</th><th style="text-align:right">Total</th></tr></thead>
     <tbody>${cuentasRestHTML}</tbody>
   </table>` : ''}
 
@@ -1584,7 +1703,7 @@ export default function RestaurantePOS() {
               <div className="text-xl font-bold text-orange-300 whitespace-nowrap">₡{barFoodTotal.toLocaleString()}</div>
             </div>
             <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700 flex justify-between items-center gap-3">
-              <div><div className="text-slate-400 text-sm">Refrescos cobrados por Bar</div><div className="text-xs text-slate-500">Nosotros les debemos esto</div></div>
+              <div><div className="text-slate-400 text-sm">Bebidas cobradas por Bar al Restaurante</div><div className="text-xs text-slate-500">Nosotros les debemos esto</div></div>
               <div className="text-xl font-bold text-[#94cb47] whitespace-nowrap">₡{barSodaTotal.toLocaleString()}</div>
             </div>
             <div className={`rounded-xl p-4 border flex justify-between items-center gap-3 ${deudaBar >= 0 ? 'bg-orange-900/40 border-orange-500' : 'bg-[#94cb47]/40 border-[#94cb47]'}`}>
