@@ -1,2 +1,0 @@
-MONGODB_URI=mongodb+srv://lore:lore123@lore-pos.mongodb.net/lore-pos?retryWrites=true&w=majority
-PORT=5000
