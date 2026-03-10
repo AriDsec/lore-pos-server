@@ -399,7 +399,7 @@ function ShoppingCart({
 
   // En móvil se oculta si no está activo el tab
   const baseClass = "bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 overflow-hidden flex flex-col shadow-2xl";
-  const desktopClass = "hidden md:flex md:h-[calc(100vh-100px)] md:sticky md:top-6";
+  // En landscape se muestra desde el padre; en portrait depende del tab activo
   const mobileClass = mobileVisible ? "flex flex-col max-h-[calc(100vh-140px)]" : "hidden";
 
   const inner = (
@@ -504,13 +504,12 @@ function ShoppingCart({
     </>
   );
 
+  // En landscape el padre lo renderiza directamente (sin wrapper de visibilidad)
+  if (mobileVisible === 'landscape') {
+    return <div className={`${baseClass} h-[calc(100vh-80px)] sticky top-4`}>{inner}</div>;
+  }
   return (
-    <>
-      {/* Desktop */}
-      <div className={`${baseClass} ${desktopClass}`}>{inner}</div>
-      {/* Mobile */}
-      <div className={`${baseClass} ${mobileClass}`}>{inner}</div>
-    </>
+    <div className={`${baseClass} ${mobileClass}`}>{inner}</div>
   );
 }
 
@@ -723,14 +722,23 @@ function MeseraScreen({
   openAccounts, selectedAccount, onSelectAccount,
   onDirectPay, isBar,
 }) {
-  const [mobileTab, setMobileTab] = useState('menu'); // 'menu' | 'carrito'
+  const [mobileTab, setMobileTab] = useState('menu');
+  const [isLandscape, setIsLandscape] = useState(
+    () => window.matchMedia('(orientation: landscape)').matches
+  );
+  useEffect(() => {
+    const mq = window.matchMedia('(orientation: landscape)');
+    const handler = (e) => setIsLandscape(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-slate-900 to-black flex flex-col">
       <Header mesera={currentUser} zona={zona} onLogout={onLogout} />
 
-      {/* ── Desktop layout ── */}
-      <div className="hidden md:grid md:grid-cols-3 md:gap-6 md:p-6 md:max-w-7xl md:mx-auto md:w-full flex-1">
+      {/* ── Desktop layout (landscape) ── */}
+      <div className={`${isLandscape ? "grid" : "hidden"} grid-cols-3 gap-4 p-4 max-w-7xl mx-auto w-full flex-1`}>
         <div className="col-span-2 space-y-6">
           <MenuDropdown menu={menu} onSelectItem={addToCart} />
           <ReadyOrdersPanel kitchenOrders={kitchenOrders} mesera={currentUser} />
@@ -745,14 +753,14 @@ function MeseraScreen({
           barras={barras} maxTables={maxTables}
           openAccounts={openAccounts} selectedAccount={selectedAccount}
           onSelectAccount={onSelectAccount}
-          mobileVisible={false}
+          mobileVisible='landscape'
           isBar={isBar}
           onDirectPay={onDirectPay}
         />
       </div>
 
-      {/* ── Mobile layout ── */}
-      <div className="flex md:hidden flex-col flex-1 overflow-hidden">
+      {/* ── Mobile layout (portrait) ── */}
+      <div className={`${isLandscape ? "hidden" : "flex"} flex-col flex-1 overflow-hidden`}>
         {/* Tab content */}
         <div className="flex-1 overflow-y-auto p-3">
           {mobileTab === 'menu' ? (
@@ -1154,7 +1162,7 @@ export default function RestaurantePOS() {
 
   if (!currentUser) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-black via-slate-900 to-black flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-black via-slate-900 to-black flex items-start sm:items-center justify-center p-4 pt-6 sm:pt-4 overflow-y-auto">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
             <img src="/logo.png" alt="LORE" className="w-36 h-36 mx-auto mb-2 object-contain drop-shadow-lg" />
@@ -1292,7 +1300,7 @@ export default function RestaurantePOS() {
                 <h2 className="text-blue-400 font-bold text-xl">🍺 Bar</h2>
                 <span className="bg-blue-500 text-white text-xs font-bold px-3 py-1 rounded-full">{ordersBar.length}</span>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
                 {ordersBar.map(order => <KitchenCard key={order.id} order={order} colorScheme="bar" />)}
               </div>
             </div>
@@ -1305,7 +1313,7 @@ export default function RestaurantePOS() {
                 <h2 className="text-[#94cb47] font-bold text-xl">🍽️ Restaurante</h2>
                 <span className="bg-[#94cb47] text-black text-xs font-bold px-3 py-1 rounded-full">{ordersRest.length}</span>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
                 {ordersRest.map(order => <KitchenCard key={order.id} order={order} colorScheme="rest" />)}
               </div>
             </div>
@@ -1672,7 +1680,7 @@ export default function RestaurantePOS() {
               🗑️ Limpiar Día
             </button>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-4">
           <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-5 shadow-2xl space-y-3">
             <h3 className="text-white font-bold text-xl">🍺 Bar</h3>
             <StatRow label="Cuentas cobradas" value={barPaid.length} />
@@ -1740,7 +1748,7 @@ export default function RestaurantePOS() {
             </div>
           )}
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-4">
           <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-5 shadow-2xl">
             <h3 className="text-[#94cb47] font-bold text-lg mb-4">📋 Pagadas Bar</h3>
             {barPaid.length === 0 ? <p className="text-slate-500 text-sm">Sin pagos</p> :
