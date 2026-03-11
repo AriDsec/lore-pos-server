@@ -30,6 +30,17 @@ export default function RestaurantePOS() {
   const [viewItemsOrder, setViewItemsOrder] = useState(null);
   const [splitOrder, setSplitOrder]         = useState(null);
 
+  const [isLandscape, setIsLandscape] = useState(
+    () => window.matchMedia('(orientation: landscape)').matches
+  );
+  useEffect(() => {
+    const check = () => setIsLandscape(window.matchMedia('(orientation: landscape)').matches);
+    const mq = window.matchMedia('(orientation: landscape)');
+    mq.addEventListener('change', check);
+    window.addEventListener('resize', check);
+    return () => { mq.removeEventListener('change', check); window.removeEventListener('resize', check); };
+  }, []);
+
   const loadData = useCallback(async (zone, role, silent = false) => {
     if (!silent) setLoading(true);
     setSyncError(null);
@@ -272,7 +283,6 @@ export default function RestaurantePOS() {
 
   // ── LOGIN ─────────────────────────────────────
   if (!currentUser) {
-    const isLandscape = typeof window !== 'undefined' && window.matchMedia('(orientation: landscape)').matches;
     return (
       <div className="min-h-screen bg-gradient-to-br from-black via-slate-900 to-black flex flex-col items-center justify-center p-4 overflow-y-auto">
 
