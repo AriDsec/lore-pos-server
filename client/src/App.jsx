@@ -278,28 +278,18 @@ export default function RestaurantePOS() {
 
         {/* ── Header: landscape = logo izq + texto der / portrait = centrado ── */}
         {isLandscape ? (
-          <div className="flex items-center gap-6 mb-6 w-full max-w-3xl">
+          <div className="flex items-center gap-5 mb-6 w-full max-w-3xl">
             <img src="/logo.png" alt="LORE" className="w-28 h-28 object-contain drop-shadow-2xl flex-shrink-0" />
-            <div>
-              <div style={{ fontFamily: "'Cinzel', serif", letterSpacing: '0.18em' }}
-                className="text-[#94cb47] text-4xl font-semibold leading-tight drop-shadow-lg">
-                LORE
-              </div>
-              <div style={{ fontFamily: "'Cinzel', serif", letterSpacing: '0.12em' }}
-                className="text-white/70 text-lg font-normal mt-1">
-                Sistema de Pedidos
-              </div>
+            <div style={{ fontFamily: "'Cinzel', serif", letterSpacing: '0.14em' }}
+              className="text-white/75 text-2xl font-normal drop-shadow-lg">
+              Sistema de Pedidos
             </div>
           </div>
         ) : (
           <div className="flex flex-col items-center mb-6">
             <img src="/logo.png" alt="LORE" className="w-40 h-40 object-contain drop-shadow-2xl mb-3" />
-            <div style={{ fontFamily: "'Cinzel', serif", letterSpacing: '0.18em' }}
-              className="text-[#94cb47] text-3xl font-semibold drop-shadow-lg">
-              LORE
-            </div>
-            <div style={{ fontFamily: "'Cinzel', serif", letterSpacing: '0.1em' }}
-              className="text-white/60 text-base font-normal mt-1">
+            <div style={{ fontFamily: "'Cinzel', serif", letterSpacing: '0.12em' }}
+              className="text-white/70 text-xl font-normal mt-1">
               Sistema de Pedidos
             </div>
           </div>
