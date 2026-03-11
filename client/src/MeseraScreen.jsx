@@ -10,7 +10,7 @@ export function MeseraScreen({
   selectedTable, setSelectedTable, selectedBarra, setSelectedBarra,
   clientName, setClientName, barras, kitchenOrders,
   openAccounts, selectedAccount, onSelectAccount,
-  onDirectPay, isBar,
+  onDirectPay, isBar, tables,
 }) {
   const [mobileTab, setMobileTab] = useState('menu');
   const [isLandscape, setIsLandscape] = useState(
@@ -35,6 +35,7 @@ export function MeseraScreen({
     onSelectAccount,
     isBar,
     onDirectPay,
+    tables,
   };
 
   // Panel central en landscape: Menú + Licores + Otros con tabs
