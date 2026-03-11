@@ -28,6 +28,7 @@ export default function RestaurantePOS() {
 
   const [billOrder, setBillOrder]           = useState(null);
   const [viewItemsOrder, setViewItemsOrder] = useState(null);
+  const [splitOrder, setSplitOrder]         = useState(null);
 
   const loadData = useCallback(async (zone, role, silent = false) => {
     if (!silent) setLoading(true);
@@ -210,7 +211,43 @@ export default function RestaurantePOS() {
     }
   };
 
-  const markOrderReady = async (orderId) => {
+  const handleSplitAccount = async (account, newItems, remaining) => {
+    setLoading(true);
+    try {
+      const accId = account.id || account._id;
+      const remainTotal = remaining.reduce((s, i) => s + i.price * i.quantity, 0);
+      const newTotal    = newItems.reduce((s, i) => s + i.price * i.quantity, 0);
+      // Actualizar cuenta original con los items restantes
+      await api.updateAccount(accId, { items: remaining, total: remainTotal });
+      // Crear cuenta nueva con los items separados (mismos datos de ubicación y nombre)
+      await api.createAccount({
+        id: `acc-split-${Date.now()}`,
+        zone: account.zone,
+        mesera: account.mesera,
+        items: newItems,
+        total: newTotal,
+        type: account.type || 'dine-in',
+        table: account.table || null,
+        barra: account.barra || null,
+        locationLabel: account.locationLabel || null,
+        clientName: account.clientName || '',
+        foodItems: newItems.filter(i => i.category === 'food'),
+        drinkItems: newItems.filter(i => ['alcoholic','beverage','soda'].includes(i.category)),
+        status: 'open',
+        createdAt: new Date(),
+      });
+      const [open, paid] = await Promise.all([api.getOpenAccounts(currentZone), api.getPaidAccounts(currentZone)]);
+      setOpenAccounts(open); setPaidOrders(paid);
+      setSplitOrder(null);
+      alert('✅ Cuenta separada correctamente');
+    } catch (err) {
+      alert('❌ Error al separar: ' + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
     try {
       await api.updateKitchenOrder(orderId, 'ready');
       setKitchenOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: 'ready' } : o));
@@ -295,6 +332,7 @@ export default function RestaurantePOS() {
           openAccounts={zoneOpenAccounts} selectedAccount={selectedAccount}
           onSelectAccount={handleSelectAccount}
           isBar={currentZone === 'bar'} onDirectPay={handleDirectPay}
+          splitOrder={splitOrder} setSplitOrder={setSplitOrder} onSplit={handleSplitAccount}
         />
       </>
     );
@@ -305,11 +343,11 @@ export default function RestaurantePOS() {
   }
 
   if (userRole === 'caja' && currentZone === 'bar') {
-    return <CajaScreen zona="bar" zonaNombre="Bar" accounts={barAccounts} paid={barPaid} loading={loading} billOrder={billOrder} setBillOrder={setBillOrder} viewItemsOrder={viewItemsOrder} setViewItemsOrder={setViewItemsOrder} onLogout={handleLogout} onPay={payAccount} />;
+    return <CajaScreen zona="bar" zonaNombre="Bar" accounts={barAccounts} paid={barPaid} loading={loading} billOrder={billOrder} setBillOrder={setBillOrder} viewItemsOrder={viewItemsOrder} setViewItemsOrder={setViewItemsOrder} splitOrder={splitOrder} setSplitOrder={setSplitOrder} onSplit={handleSplitAccount} onLogout={handleLogout} onPay={payAccount} />;
   }
 
   if (userRole === 'caja' && currentZone === 'restaurante') {
-    return <CajaScreen zona="restaurante" zonaNombre="Restaurante" accounts={restAccounts} paid={restPaid} loading={loading} billOrder={billOrder} setBillOrder={setBillOrder} viewItemsOrder={viewItemsOrder} setViewItemsOrder={setViewItemsOrder} onLogout={handleLogout} onPay={payAccount} />;
+    return <CajaScreen zona="restaurante" zonaNombre="Restaurante" accounts={restAccounts} paid={restPaid} loading={loading} billOrder={billOrder} setBillOrder={setBillOrder} viewItemsOrder={viewItemsOrder} setViewItemsOrder={setViewItemsOrder} splitOrder={splitOrder} setSplitOrder={setSplitOrder} onSplit={handleSplitAccount} onLogout={handleLogout} onPay={payAccount} />;
   }
 
   return <AdminScreen barPaid={barPaid} restPaid={restPaid} loading={loading} onLogout={handleLogout} setPaidOrders={setPaidOrders} />;
