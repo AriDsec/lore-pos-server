@@ -157,9 +157,9 @@ ${restPaid.length > 0 ? `<div class="section-title">📋 Detalle — Restaurante
           </button>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {[['🍺 Bar', barPaid, totalBarCobrado], ['🍽️ Restaurante', restPaid, totalRestCobrado]].map(([titulo, paid, total]) => (
-            <div key={titulo} className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-5 shadow-2xl space-y-3">
+            <div key={titulo} className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-4 shadow-2xl space-y-3">
               <h3 className="text-white font-bold text-xl">{titulo}</h3>
               <StatRow label="Cuentas cobradas" value={paid.length} />
               <StatRow label="Comida vendida" value={`₡${paid.reduce((s,o)=>s+(o.items||[]).filter(i=>i.category==='food').reduce((a,i)=>a+i.price*i.quantity,0),0).toLocaleString()}`} />
@@ -189,14 +189,14 @@ ${restPaid.length > 0 ? `<div class="section-title">📋 Detalle — Restaurante
         <div className="bg-gradient-to-br from-orange-900/40 to-red-900/40 rounded-2xl border-2 border-orange-500/60 p-5 shadow-2xl">
           <h3 className="text-orange-300 font-bold text-xl mb-4">🍺 Liquidación con Bar</h3>
           <div className="space-y-3 mb-4">
-            <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700 flex justify-between items-center gap-3">
+            <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700 flex flex-wrap justify-between items-center gap-2">
               <div>
                 <div className="text-slate-400 text-sm">Comida vendida por Bar</div>
                 <div className="text-xs text-slate-500">Cocinada por Restaurante → Bar nos debe esto</div>
               </div>
               <div className="text-xl font-bold text-orange-300 whitespace-nowrap">₡{barFoodTotal.toLocaleString()}</div>
             </div>
-            <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700 flex justify-between items-center gap-3">
+            <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700 flex flex-wrap justify-between items-center gap-2">
               <div>
                 <div className="text-slate-400 text-sm">Licores y cervezas vendidos por Restaurante</div>
                 <div className="text-xs text-slate-500">Del inventario del Bar → Nosotros le debemos esto (excluye batidos y sin alcohol)</div>
@@ -215,9 +215,9 @@ ${restPaid.length > 0 ? `<div class="section-title">📋 Detalle — Restaurante
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {[['📋 Pagadas Bar', barPaid], ['📋 Pagadas Restaurante', restPaid]].map(([titulo, paid]) => (
-            <div key={titulo} className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-5 shadow-2xl">
+            <div key={titulo} className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-4 shadow-2xl">
               <h3 className="text-[#94cb47] font-bold text-lg mb-4">{titulo}</h3>
               {paid.length === 0 ? <p className="text-slate-500 text-sm">Sin pagos</p> : (
                 <div className="space-y-2 max-h-60 overflow-y-auto">
