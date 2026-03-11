@@ -4,7 +4,7 @@ export function ShoppingCart({
   cartItems, updateQuantity, removeFromCart, updateNotes, completeOrder,
   orderType, setOrderType, selectedTable, setSelectedTable,
   selectedBarra, setSelectedBarra, clientName, setClientName,
-  barras, maxTables,
+  barras, maxTables, tables,
   openAccounts, selectedAccount, onSelectAccount,
   mobileVisible, onDirectPay, isBar,
 }) {
@@ -95,7 +95,7 @@ export function ShoppingCart({
                 <label className="text-slate-400 text-xs mb-1 block">Mesa</label>
                 <select value={selectedTable || ''} onChange={(e) => { setSelectedTable(e.target.value); setSelectedBarra(null); }} className="w-full bg-slate-700 border border-[#94cb47]/30 text-white rounded-lg p-2 text-xs focus:outline-none">
                   <option value="">—</option>
-                  {Array.from({ length: maxTables }, (_, i) => <option key={i + 1} value={i + 1}>Mesa {i + 1}</option>)}
+                  {(tables || Array.from({ length: maxTables }, (_, i) => i + 1)).map(n => <option key={n} value={n}>Mesa {n}</option>)}
                 </select>
               </div>
               <div>
