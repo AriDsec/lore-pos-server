@@ -17,11 +17,19 @@ export function AdminScreen({ barPaid, restPaid, loading, onLogout, setPaidOrder
   const totalRestCobrado = restPaid.reduce((s, o) => s + o.total, 0);
   const grandTotal = totalBarCobrado + totalRestCobrado;
 
-  const barFoodTotal    = barPaid.reduce((s, o) => s + (o.items||[]).filter(i => i.category === 'food').reduce((a, i) => a + i.price * i.quantity, 0), 0);
-  const restDrinksTotal = restPaid.reduce((s, o) => s + (o.items||[]).filter(i => ['alcoholic','beverage','soda'].includes(i.category)).reduce((a, i) => a + i.price * i.quantity, 0), 0);
-  const barSodaTotal    = restDrinksTotal;
-  const restSodaTotal   = restDrinksTotal;
-  const deudaBar        = barFoodTotal - restDrinksTotal;
+  // Comida que el Bar vendió → el Restaurante la cocinó → Bar le debe al Restaurante
+  const barFoodTotal = barPaid.reduce((s, o) =>
+    s + (o.items||[]).filter(i => i.category === 'food')
+      .reduce((a, i) => a + i.price * i.quantity, 0), 0);
+
+  // Bebidas alcohólicas y cervezas que el Restaurante vendió → son del inventario del Bar → Restaurante le debe al Bar
+  // Excluye soda (batidos, refrescos, sin alcohol) porque esos son del Restaurante
+  const restAlcoholTotal = restPaid.reduce((s, o) =>
+    s + (o.items||[]).filter(i => ['alcoholic', 'beverage'].includes(i.category))
+      .reduce((a, i) => a + i.price * i.quantity, 0), 0);
+
+  // Saldo: positivo = Bar le paga al Restaurante, negativo = Restaurante le paga al Bar
+  const deudaBar = barFoodTotal - restAlcoholTotal;
 
   const countMethod = (arr, m) => arr.filter(o => (o.paymentMethod || 'efectivo') === m).length;
   const sumMethod   = (arr, m) => arr.filter(o => (o.paymentMethod || 'efectivo') === m).reduce((s, o) => s + o.total, 0);
@@ -93,8 +101,8 @@ td { padding:6px 8px;border-bottom:1px solid #f0f0f0; }
   </div>
 </div>
 <div class="liquidacion"><h2>🍺 Liquidación con Bar</h2>
-  <div class="row"><span class="label">Comida que pidió Bar</span><span class="val">₡${barFoodTotal.toLocaleString()}</span></div>
-  <div class="row"><span class="label">Bebidas cobradas por Bar al Restaurante</span><span class="val">₡${barSodaTotal.toLocaleString()}</span></div>
+  <div class="row"><span class="label">Comida vendida por Bar (cocinada por Restaurante)</span><span class="val">₡${barFoodTotal.toLocaleString()}</span></div>
+  <div class="row"><span class="label">Licores y cervezas vendidos por Restaurante (inventario Bar)</span><span class="val">₡${restAlcoholTotal.toLocaleString()}</span></div>
   <div class="saldo-final"><div><div style="font-weight:bold">SALDO FINAL</div><div style="font-size:11px;color:#666">${deudaBar >= 0 ? '📤 Bar nos paga' : '📥 Nosotros le pagamos al Bar'}</div></div><div class="saldo-monto">₡${Math.abs(deudaBar).toLocaleString()}</div></div>
 </div>
 ${barPaid.length > 0 ? `<div class="section-title">📋 Detalle — Bar (${barPaid.length})</div>
@@ -182,12 +190,18 @@ ${restPaid.length > 0 ? `<div class="section-title">📋 Detalle — Restaurante
           <h3 className="text-orange-300 font-bold text-xl mb-4">🍺 Liquidación con Bar</h3>
           <div className="space-y-3 mb-4">
             <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700 flex justify-between items-center gap-3">
-              <div><div className="text-slate-400 text-sm">Comida que pidió Bar</div><div className="text-xs text-slate-500">Bar nos debe esto</div></div>
+              <div>
+                <div className="text-slate-400 text-sm">Comida vendida por Bar</div>
+                <div className="text-xs text-slate-500">Cocinada por Restaurante → Bar nos debe esto</div>
+              </div>
               <div className="text-xl font-bold text-orange-300 whitespace-nowrap">₡{barFoodTotal.toLocaleString()}</div>
             </div>
             <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700 flex justify-between items-center gap-3">
-              <div><div className="text-slate-400 text-sm">Bebidas cobradas por Bar al Restaurante</div><div className="text-xs text-slate-500">Nosotros les debemos esto</div></div>
-              <div className="text-xl font-bold text-[#94cb47] whitespace-nowrap">₡{barSodaTotal.toLocaleString()}</div>
+              <div>
+                <div className="text-slate-400 text-sm">Licores y cervezas vendidos por Restaurante</div>
+                <div className="text-xs text-slate-500">Del inventario del Bar → Nosotros le debemos esto (excluye batidos y sin alcohol)</div>
+              </div>
+              <div className="text-xl font-bold text-[#94cb47] whitespace-nowrap">₡{restAlcoholTotal.toLocaleString()}</div>
             </div>
             <div className={`rounded-xl p-4 border flex justify-between items-center gap-3 ${deudaBar >= 0 ? 'bg-orange-900/40 border-orange-500' : 'bg-[#94cb47]/40 border-[#94cb47]'}`}>
               <div>
@@ -199,11 +213,6 @@ ${restPaid.length > 0 ? `<div class="section-title">📋 Detalle — Restaurante
               </div>
             </div>
           </div>
-          {restSodaTotal > 0 && (
-            <div className="bg-slate-800/40 rounded-xl p-3 border border-slate-600 text-xs text-slate-400">
-              Refrescos vendidos en Restaurante: <span className="text-[#94cb47] font-bold">₡{restSodaTotal.toLocaleString()}</span> (no afectan deuda)
-            </div>
-          )}
         </div>
 
         <div className="grid grid-cols-2 gap-4">
