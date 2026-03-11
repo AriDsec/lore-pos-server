@@ -169,19 +169,17 @@ export default function RestaurantePOS() {
     const total = cartItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
     const foodItems = cartItems.filter(i => i.category === 'food');
     const location = selectedBarra ? selectedBarra : (selectedTable ? `Mesa ${selectedTable}` : 'Barra');
-    const accId = `acc-direct-${Date.now()}`;
     setLoading(true);
     try {
-      // Crear cuenta y cerrarla de inmediato — no aparece como abierta para nadie
+      // Crear cuenta abierta tipo 'direct' — la caja la verá y cobrará con método de pago
       await api.createAccount({
-        id: accId, zone: currentZone, mesera: currentUser,
+        id: `acc-direct-${Date.now()}`, zone: currentZone, mesera: currentUser,
         items: [...cartItems], total, type: 'direct',
         table: selectedTable || null, barra: selectedBarra || null,
         locationLabel: location, clientName: 'Cliente General',
         foodItems, drinkItems: cartItems.filter(i => ['alcoholic','beverage','soda'].includes(i.category)),
         status: 'open', createdAt: new Date(),
       });
-      await api.closeAccount(accId, 'efectivo');
       if (foodItems.length > 0) {
         await api.createKitchenOrder({
           id: `k-direct-${Date.now()}`, zone: currentZone, mesera: currentUser,
@@ -191,7 +189,7 @@ export default function RestaurantePOS() {
         });
       }
       setCartItems([]); setSelectedTable(null); setSelectedBarra(null); setClientName(''); setOrderType(null); setSelectedAccount(null);
-      alert('✅ Cobrado. Pedido enviado a cocina.');
+      alert('✅ Pedido enviado. La caja lo cobra.');
     } catch (err) {
       alert('❌ Error: ' + err.message);
     } finally {
@@ -230,7 +228,9 @@ export default function RestaurantePOS() {
   const restAccounts     = openAccounts.filter(a => a.zone === 'restaurante');
   const barPaid          = paidOrders.filter(a => a.zone === 'bar');
   const restPaid         = paidOrders.filter(a => a.zone === 'restaurante');
-  const zoneOpenAccounts = currentZone === 'bar' ? barAccounts : restAccounts;
+  // Meseras solo ven sus propias cuentas normales (no cobros directos de otras)
+  const zoneOpenAccounts = (currentZone === 'bar' ? barAccounts : restAccounts)
+    .filter(a => a.type !== 'direct' && a.mesera === currentUser);
 
   // ── LOGIN ─────────────────────────────────────
   if (!currentUser) {
