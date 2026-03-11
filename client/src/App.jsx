@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import * as api from "./api.js";
-import { MENU, PINES, meseras, barras } from './constants.js';
+import { MENU, LICORES, PINES, meseras, barras } from './constants.js';
 import { Spinner, PinModal } from './components.jsx';
 import { MeseraScreen } from './MeseraScreen.jsx';
 import { KitchenScreen } from './KitchenScreen.jsx';
@@ -281,6 +281,7 @@ export default function RestaurantePOS() {
         <MeseraScreen
           currentUser={currentUser} zona={currentZone === 'bar' ? 'Bar' : 'Restaurante'}
           menu={currentZone === 'bar' ? MENU.bar : MENU.restaurante}
+          licores={LICORES}
           maxTables={currentZone === 'bar' ? 10 : 5}
           onLogout={handleLogout} addToCart={addToCart}
           cartItems={cartItems} updateQuantity={updateQuantity}
