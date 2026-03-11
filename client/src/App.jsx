@@ -1,873 +1,48 @@
-import { useState, useMemo, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import * as api from "./api.js";
-import { Plus, Minus, Trash2, LogOut, Utensils, ChevronDown, Search, Clock } from 'lucide-react';
+import { MENU, PINES, meseras, barras } from './constants.js';
+import { Spinner, PinModal } from './components.jsx';
+import { MeseraScreen } from './MeseraScreen.jsx';
+import { KitchenScreen } from './KitchenScreen.jsx';
+import { CajaScreen } from './CajaScreen.jsx';
+import { AdminScreen } from './AdminScreen.jsx';
 
-// ─────────────────────────────────────────────
-// MENÚ COMPLETO
-// ─────────────────────────────────────────────
-const MENU = {
-  bar: {
-    'Licores': [
-      { id: 'b_añejo_1800', name: '1800 Añejo', price: 3000, category: 'alcoholic' },
-      { id: 'b_blanco_1800', name: '1800 Blanco', price: 2500, category: 'alcoholic' },
-      { id: 'b_reposado_1800', name: '1800 Reposado', price: 2500, category: 'alcoholic' },
-      { id: 'b_absolut', name: 'Absolut', price: 2000, category: 'alcoholic' },
-      { id: 'b_amarula', name: 'Amarula', price: 2000, category: 'alcoholic' },
-      { id: 'b_antioq_azul', name: 'Antioqueño Azul', price: 2000, category: 'alcoholic' },
-      { id: 'b_antioq_rojo', name: 'Antioqueño Rojo', price: 2000, category: 'alcoholic' },
-      { id: 'b_antioq_verde', name: 'Antioqueño Verde', price: 2000, category: 'alcoholic' },
-      { id: 'b_anis_imperial', name: 'Anís Imperial', price: 1500, category: 'alcoholic' },
-      { id: 'b_bacardi', name: 'Bacardi', price: 1500, category: 'alcoholic' },
-      { id: 'b_ballantines', name: 'Ballantines', price: 2000, category: 'alcoholic' },
-      { id: 'b_baileys', name: 'Baileys', price: 2000, category: 'alcoholic' },
-      { id: 'b_black_white', name: 'Black & White', price: 1500, category: 'alcoholic' },
-      { id: 'b_buchanans', name: "Buchanan's", price: 3000, category: 'alcoholic' },
-      { id: 'b_cacique', name: 'Cacique', price: 1000, category: 'alcoholic' },
-      { id: 'b_campari', name: 'Campari', price: 2000, category: 'alcoholic' },
-      { id: 'b_captain_morgan', name: 'Captain Morgan', price: 1500, category: 'alcoholic' },
-      { id: 'b_centenario', name: 'Centenario', price: 1500, category: 'alcoholic' },
-      { id: 'b_chivas_regal', name: 'Chivas Regal', price: 2200, category: 'alcoholic' },
-      { id: 'b_don_julio', name: 'Don Julio', price: 5000, category: 'alcoholic' },
-    ],
-    'Cervezas Nacionales': [
-      { id: 'b_imperial', name: 'Imperial', price: 1500, category: 'beverage' },
-      { id: 'b_pilsen', name: 'Pilsen', price: 1500, category: 'beverage' },
-      { id: 'b_silver', name: 'Silver', price: 1500, category: 'beverage' },
-      { id: 'b_light', name: 'Light', price: 1500, category: 'beverage' },
-      { id: 'b_ultra', name: 'Ultra', price: 1500, category: 'beverage' },
-      { id: 'b_rock_ice', name: 'Rock Ice', price: 1700, category: 'beverage' },
-    ],
-    'Preparados': [
-      { id: 'b_michelada', name: 'Michelada', price: 1700, category: 'beverage' },
-      { id: 'b_adan_eva', name: 'Adán y Eva', price: 2000, category: 'beverage' },
-      { id: 'b_smirnoff_ice', name: 'Smirnoff Ice', price: 2000, category: 'beverage' },
-      { id: 'b_cuba_libre', name: 'Cuba Libre', price: 2000, category: 'beverage' },
-      { id: 'b_bamboo', name: 'Bamboo', price: 2000, category: 'beverage' },
-    ],
-    'Cervezas Importadas': [
-      { id: 'b_bavaria', name: 'Bavaria', price: 2000, category: 'beverage' },
-      { id: 'b_sol', name: 'Sol', price: 2000, category: 'beverage' },
-      { id: 'b_budweiser', name: 'Budweiser', price: 2000, category: 'beverage' },
-      { id: 'b_corona', name: 'Corona', price: 2000, category: 'beverage' },
-      { id: 'b_corona_cero', name: 'Corona Cero', price: 2000, category: 'beverage' },
-      { id: 'b_bud_light', name: 'Bud Light', price: 2000, category: 'beverage' },
-      { id: 'b_modelo', name: 'Modelo', price: 2000, category: 'beverage' },
-      { id: 'b_heineken', name: 'Heineken', price: 2000, category: 'beverage' },
-      { id: 'b_heineken_cero', name: 'Heineken Cero', price: 2000, category: 'beverage' },
-      { id: 'b_stella', name: 'Stella', price: 2000, category: 'beverage' },
-      { id: 'b_toña', name: 'Toña', price: 2000, category: 'beverage' },
-    ],
-    'Sin Alcohol': [
-      { id: 'b_refrescos', name: 'Refrescos', price: 1500, category: 'soda' },
-      { id: 'b_jugos', name: 'Jugos', price: 1500, category: 'soda' },
-      { id: 'b_jugo_tomate', name: 'Jugo de Tomate', price: 1500, category: 'soda' },
-      { id: 'b_tropicales', name: 'Tropicales', price: 1500, category: 'soda' },
-      { id: 'b_aloe', name: 'Aloe', price: 2000, category: 'soda' },
-    ],
-    'Arroz con': [
-      { id: 'f_arroz_pollo', name: 'Arroz con Pollo', price: 3900, category: 'food' },
-      { id: 'f_arroz_carne', name: 'Arroz con Carne', price: 4000, category: 'food' },
-      { id: 'f_arroz_camarones', name: 'Arroz con Camarones', price: 4300, category: 'food' },
-    ],
-    'Surtido': [
-      { id: 'f_surtido_grande', name: 'Grande', price: 10400, category: 'food' },
-      { id: 'f_surtido_pequeno', name: 'Pequeño', price: 8400, category: 'food' },
-    ],
-    'Bocas': [
-      { id: 'f_carne_salsa', name: 'Carne en salsa', price: 3000, category: 'food' },
-      { id: 'f_frijoles_pezuna', name: 'Frijoles con pezuña', price: 2200, category: 'food' },
-      { id: 'f_chifrijo', name: 'Chifrijo', price: 3200, category: 'food' },
-      { id: 'f_ceviche', name: 'Ceviche', price: 3000, category: 'food' },
-    ],
-    'Comida rápida': [
-      { id: 'f_burritos_carne', name: 'Burritos de carne', price: 4000, category: 'food', canHavePapas: true },
-      { id: 'f_burrito_pollo', name: 'Burrito de pollo', price: 3900, category: 'food', canHavePapas: true },
-      { id: 'f_burrito_mixto', name: 'Burrito mixto', price: 4300, category: 'food', canHavePapas: true },
-      { id: 'f_alitas', name: 'Alitas (6)', price: 3900, category: 'food', canHavePapas: true },
-      { id: 'f_filet_pescado', name: 'Filet de pescado', price: 3300, category: 'food', canHavePapas: true },
-      { id: 'f_hamb_pollo', name: 'Hamburguesa de pollo', price: 2500, category: 'food' },
-      { id: 'f_hamb_pollo_papas', name: 'Hamburguesa de pollo con papas', price: 3000, category: 'food' },
-      { id: 'f_hamb_lore', name: 'Hamburguesa Lore', price: 3000, category: 'food' },
-      { id: 'f_hamb_lore_papas', name: 'Hamburguesa Lore y papas', price: 3500, category: 'food' },
-      { id: 'f_costilla_bbq', name: 'Costilla BBQ', price: 4500, category: 'food', canHavePapas: true },
-      { id: 'f_chalupas_carne', name: 'Chalupas de carne', price: 3000, category: 'food', canHavePapas: true },
-      { id: 'f_chalupas_pollo', name: 'Chalupas de pollo', price: 2800, category: 'food', canHavePapas: true },
-      { id: 'f_chalupas_mixtas', name: 'Chalupas mixtas', price: 3300, category: 'food', canHavePapas: true },
-      { id: 'f_pechuga', name: 'Pechuga frita', price: 3900, category: 'food', canHavePapas: true },
-      { id: 'f_hamburguesa', name: 'Hamburguesa', price: 1500, category: 'food' },
-      { id: 'f_hamburguesa_papas', name: 'Hamburguesa con papas', price: 2300, category: 'food' },
-      { id: 'f_nachos_carne', name: 'Nachos de carne', price: 4000, category: 'food' },
-      { id: 'f_nachos_pollo', name: 'Nachos de pollo', price: 3900, category: 'food' },
-      { id: 'f_nachos_mixtos', name: 'Nachos mixtos', price: 4300, category: 'food' },
-      { id: 'f_papas_carne', name: 'Papas supremas carne', price: 4000, category: 'food' },
-      { id: 'f_papas_pollo', name: 'Papas supremas pollo', price: 3900, category: 'food' },
-      { id: 'f_papas_mixtas', name: 'Papas supremas mixtas', price: 4300, category: 'food' },
-      { id: 'f_papas_grandes', name: 'Papas grandes', price: 2000, category: 'food' },
-      { id: 'f_tacos', name: 'Orden de tacos', price: 1500, category: 'food' },
-      { id: 'f_salchipapas', name: 'Salchipapas', price: 2800, category: 'food' },
-      { id: 'f_costilla_frita', name: 'Costilla frita', price: 3900, category: 'food', canHavePapas: true },
-      { id: 'f_fajitas_pollo', name: 'Fajitas de pollo', price: 3900, category: 'food', canHavePapas: true },
-      { id: 'f_fajitas_emp', name: 'Fajitas empanizadas', price: 3900, category: 'food', canHavePapas: true },
-      { id: 'f_fajitas_res', name: 'Fajitas de res', price: 4000, category: 'food', canHavePapas: true },
-      { id: 'f_quesadilla_carne', name: 'Quesadilla de carne', price: 4000, category: 'food', canHavePapas: true },
-      { id: 'f_quesadilla_pollo', name: 'Quesadilla de pollo', price: 3900, category: 'food', canHavePapas: true },
-      { id: 'f_quesadilla_mixta', name: 'Quesadilla mixta', price: 4300, category: 'food', canHavePapas: true },
-      { id: 'f_patacon_carne', name: 'Patacón supremo carne', price: 4000, category: 'food' },
-      { id: 'f_patacon_pollo', name: 'Patacón supremo pollo', price: 3900, category: 'food' },
-      { id: 'f_patacon_mixto', name: 'Patacón supremo mixto', price: 4300, category: 'food' },
-    ],
-    'Menú de niños': [
-      { id: 'f_deditos_pollo', name: 'Deditos de pollo', price: 2300, category: 'food' },
-      { id: 'f_deditos_pescado', name: 'Deditos de pescado', price: 2300, category: 'food' },
-      { id: 'f_papas_pequenas', name: 'Papas pequeñas', price: 1000, category: 'food' },
-      { id: 'f_nino_nachos', name: 'Niño nachos', price: 2300, category: 'food' },
-    ],
-  },
-  restaurante: {
-    'Licores': [
-      { id: 'r_añejo_1800', name: '1800 Añejo', price: 3000, category: 'alcoholic' },
-      { id: 'r_blanco_1800', name: '1800 Blanco', price: 2500, category: 'alcoholic' },
-      { id: 'r_reposado_1800', name: '1800 Reposado', price: 2500, category: 'alcoholic' },
-      { id: 'r_absolut', name: 'Absolut', price: 2000, category: 'alcoholic' },
-      { id: 'r_amarula', name: 'Amarula', price: 2000, category: 'alcoholic' },
-      { id: 'r_antioq_azul', name: 'Antioqueño Azul', price: 2000, category: 'alcoholic' },
-      { id: 'r_antioq_rojo', name: 'Antioqueño Rojo', price: 2000, category: 'alcoholic' },
-      { id: 'r_antioq_verde', name: 'Antioqueño Verde', price: 2000, category: 'alcoholic' },
-      { id: 'r_anis_imperial', name: 'Anís Imperial', price: 1500, category: 'alcoholic' },
-      { id: 'r_bacardi', name: 'Bacardi', price: 1500, category: 'alcoholic' },
-      { id: 'r_ballantines', name: 'Ballantines', price: 2000, category: 'alcoholic' },
-      { id: 'r_baileys', name: 'Baileys', price: 2000, category: 'alcoholic' },
-      { id: 'r_black_white', name: 'Black & White', price: 1500, category: 'alcoholic' },
-      { id: 'r_buchanans', name: "Buchanan's", price: 3000, category: 'alcoholic' },
-      { id: 'r_cacique', name: 'Cacique', price: 1000, category: 'alcoholic' },
-      { id: 'r_campari', name: 'Campari', price: 2000, category: 'alcoholic' },
-      { id: 'r_captain_morgan', name: 'Captain Morgan', price: 1500, category: 'alcoholic' },
-      { id: 'r_centenario', name: 'Centenario', price: 1500, category: 'alcoholic' },
-      { id: 'r_chivas_regal', name: 'Chivas Regal', price: 2200, category: 'alcoholic' },
-      { id: 'r_don_julio', name: 'Don Julio', price: 5000, category: 'alcoholic' },
-    ],
-    'Cervezas Nacionales': [
-      { id: 'r_imperial', name: 'Imperial', price: 1500, category: 'beverage' },
-      { id: 'r_pilsen', name: 'Pilsen', price: 1500, category: 'beverage' },
-      { id: 'r_silver', name: 'Silver', price: 1500, category: 'beverage' },
-      { id: 'r_light', name: 'Light', price: 1500, category: 'beverage' },
-      { id: 'r_ultra', name: 'Ultra', price: 1500, category: 'beverage' },
-      { id: 'r_rock_ice', name: 'Rock Ice', price: 1700, category: 'beverage' },
-    ],
-    'Preparados': [
-      { id: 'r_michelada', name: 'Michelada', price: 1700, category: 'beverage' },
-      { id: 'r_adan_eva', name: 'Adán y Eva', price: 2000, category: 'beverage' },
-      { id: 'r_smirnoff_ice', name: 'Smirnoff Ice', price: 2000, category: 'beverage' },
-      { id: 'r_cuba_libre', name: 'Cuba Libre', price: 2000, category: 'beverage' },
-      { id: 'r_bamboo', name: 'Bamboo', price: 2000, category: 'beverage' },
-    ],
-    'Cervezas Importadas': [
-      { id: 'r_bavaria', name: 'Bavaria', price: 2000, category: 'beverage' },
-      { id: 'r_sol', name: 'Sol', price: 2000, category: 'beverage' },
-      { id: 'r_budweiser', name: 'Budweiser', price: 2000, category: 'beverage' },
-      { id: 'r_corona', name: 'Corona', price: 2000, category: 'beverage' },
-      { id: 'r_corona_cero', name: 'Corona Cero', price: 2000, category: 'beverage' },
-      { id: 'r_bud_light', name: 'Bud Light', price: 2000, category: 'beverage' },
-      { id: 'r_modelo', name: 'Modelo', price: 2000, category: 'beverage' },
-      { id: 'r_heineken', name: 'Heineken', price: 2000, category: 'beverage' },
-      { id: 'r_heineken_cero', name: 'Heineken Cero', price: 2000, category: 'beverage' },
-      { id: 'r_stella', name: 'Stella', price: 2000, category: 'beverage' },
-      { id: 'r_toña', name: 'Toña', price: 2000, category: 'beverage' },
-    ],
-    'Sin Alcohol': [
-      { id: 'r_gaseosa_vidrio', name: 'Gaseosa Vidrio', price: 1000, category: 'soda' },
-      { id: 'r_gaseosa_600', name: 'Gaseosa 600ml', price: 1500, category: 'soda' },
-      { id: 'r_gaseosa_345', name: 'Gaseosa 345ml', price: 700, category: 'soda' },
-      { id: 'r_gaseosa_1500', name: 'Gaseosa 1.5L', price: 2000, category: 'soda' },
-      { id: 'r_tropical_vidrio', name: 'Tropical Vidrio', price: 1000, category: 'soda' },
-      { id: 'r_refrescos', name: 'Refrescos', price: 1500, category: 'soda' },
-      { id: 'r_jugos', name: 'Jugos', price: 1500, category: 'soda' },
-      { id: 'r_jugo_tomate', name: 'Jugo de Tomate', price: 1500, category: 'soda' },
-      { id: 'r_aloe', name: 'Aloe', price: 2000, category: 'soda' },
-    ],
-    'Arroz con': [
-      { id: 'f_arroz_pollo', name: 'Arroz con Pollo', price: 3900, category: 'food' },
-      { id: 'f_arroz_carne', name: 'Arroz con Carne', price: 4000, category: 'food' },
-      { id: 'f_arroz_camarones', name: 'Arroz con Camarones', price: 4300, category: 'food' },
-    ],
-    'Surtido': [
-      { id: 'f_surtido_grande', name: 'Grande', price: 10400, category: 'food' },
-      { id: 'f_surtido_pequeno', name: 'Pequeño', price: 8400, category: 'food' },
-    ],
-    'Bocas': [
-      { id: 'f_carne_salsa', name: 'Carne en salsa', price: 3000, category: 'food' },
-      { id: 'f_frijoles_pezuna', name: 'Frijoles con pezuña', price: 2200, category: 'food' },
-      { id: 'f_chifrijo', name: 'Chifrijo', price: 3200, category: 'food' },
-      { id: 'f_ceviche', name: 'Ceviche', price: 3000, category: 'food' },
-    ],
-    'Comida rápida': [
-      { id: 'f_burritos_carne', name: 'Burritos de carne', price: 4000, category: 'food', canHavePapas: true },
-      { id: 'f_burrito_pollo', name: 'Burrito de pollo', price: 3900, category: 'food', canHavePapas: true },
-      { id: 'f_burrito_mixto', name: 'Burrito mixto', price: 4300, category: 'food', canHavePapas: true },
-      { id: 'f_alitas', name: 'Alitas (6)', price: 3900, category: 'food', canHavePapas: true },
-      { id: 'f_filet_pescado', name: 'Filet de pescado', price: 3300, category: 'food', canHavePapas: true },
-      { id: 'f_hamb_pollo', name: 'Hamburguesa de pollo', price: 2500, category: 'food' },
-      { id: 'f_hamb_pollo_papas', name: 'Hamburguesa de pollo con papas', price: 3000, category: 'food' },
-      { id: 'f_hamb_lore', name: 'Hamburguesa Lore', price: 3000, category: 'food' },
-      { id: 'f_hamb_lore_papas', name: 'Hamburguesa Lore y papas', price: 3500, category: 'food' },
-      { id: 'f_costilla_bbq', name: 'Costilla BBQ', price: 4500, category: 'food', canHavePapas: true },
-      { id: 'f_chalupas_carne', name: 'Chalupas de carne', price: 3000, category: 'food', canHavePapas: true },
-      { id: 'f_chalupas_pollo', name: 'Chalupas de pollo', price: 2800, category: 'food', canHavePapas: true },
-      { id: 'f_chalupas_mixtas', name: 'Chalupas mixtas', price: 3300, category: 'food', canHavePapas: true },
-      { id: 'f_pechuga', name: 'Pechuga frita', price: 3900, category: 'food', canHavePapas: true },
-      { id: 'f_hamburguesa', name: 'Hamburguesa', price: 1500, category: 'food' },
-      { id: 'f_hamburguesa_papas', name: 'Hamburguesa con papas', price: 2300, category: 'food' },
-      { id: 'f_nachos_carne', name: 'Nachos de carne', price: 4000, category: 'food' },
-      { id: 'f_nachos_pollo', name: 'Nachos de pollo', price: 3900, category: 'food' },
-      { id: 'f_nachos_mixtos', name: 'Nachos mixtos', price: 4300, category: 'food' },
-      { id: 'f_papas_carne', name: 'Papas supremas carne', price: 4000, category: 'food' },
-      { id: 'f_papas_pollo', name: 'Papas supremas pollo', price: 3900, category: 'food' },
-      { id: 'f_papas_mixtas', name: 'Papas supremas mixtas', price: 4300, category: 'food' },
-      { id: 'f_papas_grandes', name: 'Papas grandes', price: 2000, category: 'food' },
-      { id: 'f_tacos', name: 'Orden de tacos', price: 1500, category: 'food' },
-      { id: 'f_salchipapas', name: 'Salchipapas', price: 2800, category: 'food' },
-      { id: 'f_costilla_frita', name: 'Costilla frita', price: 3900, category: 'food', canHavePapas: true },
-      { id: 'f_fajitas_pollo', name: 'Fajitas de pollo', price: 3900, category: 'food', canHavePapas: true },
-      { id: 'f_fajitas_emp', name: 'Fajitas empanizadas', price: 3900, category: 'food', canHavePapas: true },
-      { id: 'f_fajitas_res', name: 'Fajitas de res', price: 4000, category: 'food', canHavePapas: true },
-      { id: 'f_quesadilla_carne', name: 'Quesadilla de carne', price: 4000, category: 'food', canHavePapas: true },
-      { id: 'f_quesadilla_pollo', name: 'Quesadilla de pollo', price: 3900, category: 'food', canHavePapas: true },
-      { id: 'f_quesadilla_mixta', name: 'Quesadilla mixta', price: 4300, category: 'food', canHavePapas: true },
-      { id: 'f_patacon_carne', name: 'Patacón supremo carne', price: 4000, category: 'food' },
-      { id: 'f_patacon_pollo', name: 'Patacón supremo pollo', price: 3900, category: 'food' },
-      { id: 'f_patacon_mixto', name: 'Patacón supremo mixto', price: 4300, category: 'food' },
-    ],
-    'Menú de niños': [
-      { id: 'f_deditos_pollo', name: 'Deditos de pollo', price: 2300, category: 'food' },
-      { id: 'f_deditos_pescado', name: 'Deditos de pescado', price: 2300, category: 'food' },
-      { id: 'f_papas_pequenas', name: 'Papas pequeñas', price: 1000, category: 'food' },
-      { id: 'f_nino_nachos', name: 'Niño nachos', price: 2300, category: 'food' },
-    ],
-  },
-};
-
-// ─────────────────────────────────────────────
-// HEADER
-// ─────────────────────────────────────────────
-function Header({ mesera, zona, onLogout }) {
-  return (
-    <div className="bg-gradient-to-r from-slate-800 to-slate-900 border-b border-[#94cb47]/20 p-5 shadow-xl">
-      <div className="max-w-7xl mx-auto flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold text-[#94cb47]">LORE</h1>
-          <p className="text-[#94cb47]/80/70 text-sm">{zona} • {mesera}</p>
-        </div>
-        <button onClick={onLogout} className="flex items-center gap-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-6 py-3 rounded-lg font-bold transition shadow-lg">
-          <LogOut size={18} /> Salir
-        </button>
-      </div>
-    </div>
-  );
-}
-
-// ─────────────────────────────────────────────
-// ITEM BUTTON (menú)
-// ─────────────────────────────────────────────
-function ItemButton({ item, onSelectItem }) {
-  return (
-    <div className="space-y-1">
-      {/* Main item row — name left, price + add button right */}
-      <div className="flex items-center gap-2 bg-gradient-to-r from-slate-700 to-slate-800 border border-[#94cb47]/20 hover:border-[#94cb47]/40 rounded-lg p-3 transition-all">
-        <span className="flex-1 font-bold text-white text-sm leading-tight">{item.name}</span>
-        <span className="text-[#94cb47] font-bold text-sm whitespace-nowrap">₡{item.price.toLocaleString()}</span>
-        <button
-          onClick={() => onSelectItem(item, false)}
-          className="bg-[#94cb47] hover:bg-[#94cb47] text-black rounded-md w-7 h-7 flex items-center justify-center flex-shrink-0 transition"
-          title="Agregar"
-        >
-          <Plus size={14} />
-        </button>
-      </div>
-      {/* Con papas modifier — only for canHavePapas items */}
-      {item.canHavePapas && (
-        <div className="flex items-center gap-2 bg-slate-700/50 border border-amber-500/20 hover:border-amber-500/50 rounded-lg px-3 py-2 ml-3 transition-all">
-          <span className="flex-1 text-amber-200/80 text-xs">↳ con Papas</span>
-          <span className="text-amber-300 font-bold text-xs whitespace-nowrap">₡{(item.price + 500).toLocaleString()}</span>
-          <button
-            onClick={() => onSelectItem(item, true)}
-            className="bg-amber-600 hover:bg-amber-500 text-white rounded-md w-6 h-6 flex items-center justify-center flex-shrink-0 transition"
-            title="Agregar con papas"
-          >
-            <Plus size={12} />
-          </button>
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ─────────────────────────────────────────────
-// MENÚ DROPDOWN
-// ─────────────────────────────────────────────
-function MenuDropdown({ menu, onSelectItem }) {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [expandedCategory, setExpandedCategory] = useState(null);
-
-  const allItems = useMemo(() => Object.values(menu).flat(), [menu]);
-  const filteredItems = useMemo(() =>
-    allItems.filter(item => item.name.toLowerCase().includes(searchTerm.toLowerCase())),
-    [allItems, searchTerm]
-  );
-
-  return (
-    <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 overflow-hidden shadow-2xl">
-      <div className="bg-gradient-to-r [#94cb47] p-6">
-        <h2 className="text-white font-bold text-2xl mb-4 flex items-center gap-2"><Utensils size={24} /> Menú</h2>
-        <div className="relative">
-          <Search size={20} className="absolute left-3 top-3 text-slate-400" />
-          <input
-            type="text"
-            placeholder="Buscar plato..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full bg-slate-700 border border-[#94cb47]/30 text-white rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:border-[#94cb47] placeholder-slate-500"
-          />
-        </div>
-      </div>
-      <div className="p-6 max-h-96 overflow-y-auto space-y-2">
-        {searchTerm ? (
-          <div className="space-y-2">
-            {filteredItems.length === 0
-              ? <div className="text-slate-400 text-center py-8">No hay resultados</div>
-              : filteredItems.map(item => <ItemButton key={item.id} item={item} onSelectItem={onSelectItem} />)
-            }
-          </div>
-        ) : (
-          Object.entries(menu).map(([category, items]) => (
-            <div key={category}>
-              <button
-                onClick={() => setExpandedCategory(expandedCategory === category ? null : category)}
-                className="w-full text-left bg-gradient-to-r from-[#94cb47]/40 to-[#7ab035]/40 hover:from-[#94cb47]/60 hover:to-[#7ab035]/60 border border-[#94cb47]/40 rounded-lg p-3 transition-all flex justify-between items-center"
-              >
-                <span className="font-bold text-[#94cb47]">{category}</span>
-                <ChevronDown size={18} className={`text-[#94cb47] transition-transform ${expandedCategory === category ? 'rotate-180' : ''}`} />
-              </button>
-              {expandedCategory === category && (
-                <div className="mt-2 ml-2 space-y-2 border-l border-[#94cb47]/30 pl-2">
-                  {items.map(item => <ItemButton key={item.id} item={item} onSelectItem={onSelectItem} />)}
-                </div>
-              )}
-            </div>
-          ))
-        )}
-      </div>
-    </div>
-  );
-}
-
-// ─────────────────────────────────────────────
-// PEDIDOS LISTOS (solo muestra si hay)
-// ─────────────────────────────────────────────
-function ReadyOrdersPanel({ kitchenOrders, mesera }) {
-  const readyOrders = kitchenOrders.filter(o => o.status === 'ready' && o.mesera === mesera);
-  if (readyOrders.length === 0) return null;
-  return (
-    <div className="bg-gradient-to-br from-[#94cb47]/40 to-[#7ab035]/40 rounded-2xl border-2 border-[#94cb47] overflow-hidden shadow-2xl">
-      <div className="bg-gradient-to-r [#94cb47] p-4">
-        <h3 className="text-white font-bold text-lg flex items-center gap-2"><Clock size={20} /> ¡PEDIDOS LISTOS! ({readyOrders.length})</h3>
-      </div>
-      <div className="p-4 space-y-2">
-        {readyOrders.map(order => (
-          <div key={order.id} className="bg-slate-800/70 rounded-lg p-3 border border-[#94cb47]/50">
-            <div className="font-bold text-[#94cb47] mb-1">{order.locationLabel || (order.barra ? order.barra : (order.table ? `Mesa ${order.table}` : "Sin mesa"))}</div>
-            {order.clientName && <div className="text-sm text-[#94cb47]/80 mb-1">👤 {order.clientName}</div>}
-            <div className="text-xs text-slate-400">{order.items.map(i => `${i.quantity}x ${i.name}`).join(', ')}</div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-// ─────────────────────────────────────────────
-// CARRITO (mesera) — responsive
-// ─────────────────────────────────────────────
-function ShoppingCart({
-  cartItems, updateQuantity, removeFromCart, updateNotes, completeOrder,
-  orderType, setOrderType, selectedTable, setSelectedTable,
-  selectedBarra, setSelectedBarra, clientName, setClientName,
-  barras, maxTables,
-  openAccounts, selectedAccount, onSelectAccount,
-  mobileVisible, onDirectPay, isBar,
-}) {
-  const total = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-
-  // En móvil se oculta si no está activo el tab
-  const baseClass = "bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 overflow-hidden flex flex-col shadow-2xl";
-  // En landscape se muestra desde el padre; en portrait depende del tab activo
-  const mobileClass = mobileVisible ? "flex flex-col max-h-[calc(100vh-140px)]" : "hidden";
-
-  const inner = (
-    <>
-      <div className="bg-gradient-to-r [#94cb47] p-4 md:p-6">
-        <h2 className="text-white font-bold text-lg md:text-xl">🛒 Carrito {cartItems.length > 0 && <span className="bg-white/20 text-white text-xs font-bold px-2 py-0.5 rounded-full ml-2">{cartItems.length}</span>}</h2>
-      </div>
-
-      {/* Selector de cuentas abiertas */}
-      <div className="px-4 md:px-6 pt-3">
-        <label className="text-slate-400 text-xs mb-1 block">Cuenta abierta</label>
-        <select
-          value={selectedAccount || ''}
-          onChange={(e) => onSelectAccount(e.target.value || null)}
-          className="w-full bg-slate-700 border border-[#94cb47]/30 text-white rounded-lg p-2 text-sm focus:outline-none"
-        >
-          <option value="">➕ Nueva Cuenta</option>
-          {openAccounts.map(acc => (
-            <option key={acc.id} value={acc.id}>
-              {acc.barra ? acc.barra : `Mesa ${acc.table}`}{acc.clientName ? ` — ${acc.clientName}` : ''}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-3">
-        {cartItems.length === 0 ? (
-          <div className="text-center py-8 text-slate-500">
-            <Utensils size={36} className="mx-auto mb-3 opacity-50" />
-            <p className="text-sm">Carrito vacío</p>
-          </div>
-        ) : (
-          cartItems.map(item => (
-            <div key={item.id} className="bg-gradient-to-br from-slate-700 to-slate-800 rounded-lg p-3 border border-[#94cb47]/20">
-              <div className="flex justify-between items-start mb-2">
-                <div className="flex-1 pr-2">
-                  <div className="font-bold text-white text-sm leading-tight">{item.name}</div>
-                  <div className="text-[#94cb47] font-bold text-sm">₡{(item.price * item.quantity).toLocaleString()}</div>
-                  {item.addedBy && <div className="text-xs text-slate-400">👤 {item.addedBy}</div>}
-                </div>
-                <button onClick={() => removeFromCart(item.id)} className="text-red-400 hover:text-red-600 flex-shrink-0"><Trash2 size={15} /></button>
-              </div>
-              <div className="flex items-center gap-2 bg-slate-900/50 rounded-lg p-1 mb-2">
-                <button onClick={() => updateQuantity(item.id, item.quantity - 1)} className="p-1.5 hover:bg-slate-700 rounded"><Minus size={13} className="text-slate-400" /></button>
-                <span className="flex-1 text-center text-white font-bold text-sm">{item.quantity}</span>
-                <button onClick={() => updateQuantity(item.id, item.quantity + 1)} className="p-1.5 hover:bg-slate-700 rounded"><Plus size={13} className="text-slate-400" /></button>
-              </div>
-              <input
-                type="text"
-                placeholder="Notas..."
-                value={item.notes || ''}
-                onChange={(e) => updateNotes(item.id, e.target.value)}
-                className="w-full bg-slate-900/50 border border-[#94cb47]/20 text-white text-xs rounded p-1.5 focus:outline-none focus:border-[#94cb47] placeholder-slate-600"
-              />
-            </div>
-          ))
-        )}
-      </div>
-
-      {cartItems.length > 0 && (
-        <div className="border-t border-[#94cb47]/20 p-4 md:p-6 space-y-3 bg-gradient-to-t from-slate-900 to-transparent overflow-y-auto">
-          <div>
-            <label className="text-slate-400 text-xs mb-1 block">Tipo</label>
-            <select value={orderType || ''} onChange={(e) => setOrderType(e.target.value)} className="w-full bg-slate-700 border border-[#94cb47]/30 text-white rounded-lg p-2 text-sm focus:outline-none">
-              <option value="">Seleccionar...</option>
-              <option value="dine-in">Local</option>
-              <option value="takeout">Llevar</option>
-            </select>
-          </div>
-          {orderType === 'dine-in' && (
-            <div className="grid grid-cols-2 gap-2">
-              <div>
-                <label className="text-slate-400 text-xs mb-1 block">Mesa</label>
-                <select value={selectedTable || ''} onChange={(e) => { setSelectedTable(e.target.value); setSelectedBarra(null); }} className="w-full bg-slate-700 border border-[#94cb47]/30 text-white rounded-lg p-2 text-xs focus:outline-none">
-                  <option value="">—</option>
-                  {Array.from({ length: maxTables }, (_, i) => <option key={i + 1} value={i + 1}>Mesa {i + 1}</option>)}
-                </select>
-              </div>
-              <div>
-                <label className="text-slate-400 text-xs mb-1 block">Barra</label>
-                <select value={selectedBarra || ''} onChange={(e) => { setSelectedBarra(e.target.value); setSelectedTable(null); }} className="w-full bg-slate-700 border border-[#94cb47]/30 text-white rounded-lg p-2 text-xs focus:outline-none">
-                  <option value="">—</option>
-                  {barras.map(b => <option key={b} value={b}>{b}</option>)}
-                </select>
-              </div>
-            </div>
-          )}
-          <div>
-            <label className="text-slate-400 text-xs mb-1 block">Nombre/Seña</label>
-            <input type="text" value={clientName} onChange={(e) => setClientName(e.target.value)} placeholder="Juan, cliente alto..." className="w-full bg-slate-700 border border-[#94cb47]/30 text-white rounded-lg p-2 text-sm focus:outline-none placeholder-slate-600" />
-          </div>
-          <div className="flex items-center justify-between bg-gradient-to-br from-[#94cb47]/30 to-[#7ab035]/30 rounded-xl p-3 border border-[#94cb47]/50">
-            <div className="text-slate-300 text-sm">Total</div>
-            <div className="text-2xl font-bold text-[#94cb47]">₡{total.toLocaleString()}</div>
-          </div>
-          <button onClick={completeOrder} className="w-full bg-[#94cb47] hover:bg-[#7ab035] text-black font-bold py-3 rounded-xl transition shadow-xl text-base">✓ Guardar Cuenta</button>
-          {isBar && onDirectPay && (
-            <button onClick={onDirectPay} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition shadow-xl text-base">💵 Cobro Directo</button>
-          )}
-        </div>
-      )}
-    </>
-  );
-
-  // En landscape el padre lo renderiza directamente (sin wrapper de visibilidad)
-  if (mobileVisible === 'landscape') {
-    return <div className={`${baseClass} h-[calc(100vh-80px)] sticky top-4`}>{inner}</div>;
-  }
-  return (
-    <div className={`${baseClass} ${mobileClass}`}>{inner}</div>
-  );
-}
-
-// ─────────────────────────────────────────────
-// MODAL VER ITEMS (historial)
-// ─────────────────────────────────────────────
-function ItemsModal({ order, onClose }) {
-  if (!order) return null;
-  return (
-    <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
-      <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-8 shadow-2xl max-w-md w-full max-h-[80vh] overflow-y-auto">
-        <div className="text-center mb-6">
-          <h2 className="text-2xl font-bold text-[#94cb47] mb-1">📋 Detalle de Pedido</h2>
-          <p className="text-slate-400 text-sm">{order.barra || `Mesa ${order.table}`} {order.clientName ? `— ${order.clientName}` : ''}</p>
-        </div>
-        <div className="bg-slate-800/50 rounded-xl p-4 mb-4 border border-slate-700 space-y-2">
-          {order.items.map((item, i) => (
-            <div key={i} className="py-2 border-b border-slate-700/50 last:border-0">
-              <div className="flex justify-between text-white">
-                <span>{item.quantity}x {item.name}</span>
-                <span className="text-[#94cb47] font-bold">₡{(item.price * item.quantity).toLocaleString()}</span>
-              </div>
-              {item.notes && <div className="text-xs text-yellow-300 mt-1">📝 {item.notes}</div>}
-              {item.addedBy && <div className="text-xs text-slate-400 mt-1">👤 {item.addedBy}</div>}
-            </div>
-          ))}
-        </div>
-        <div className="bg-gradient-to-r from-[#94cb47]/30 to-[#7ab035]/30 rounded-xl p-4 border border-[#94cb47]/50 mb-4">
-          <div className="text-slate-300 text-sm">TOTAL</div>
-          <div className="text-3xl font-bold text-[#94cb47]">₡{order.total.toLocaleString()}</div>
-        </div>
-        <button onClick={onClose} className="w-full bg-gradient-to-r from-slate-600 to-slate-700 hover:from-slate-700 hover:to-slate-800 text-white font-bold py-3 rounded-lg transition">Cerrar</button>
-      </div>
-    </div>
-  );
-}
-
-// ─────────────────────────────────────────────
-// MODAL CUENTA (cobrar)
-// ─────────────────────────────────────────────
-const payBadge = (m) => {
-  if (m === 'sinpe')   return <span style={{whiteSpace:'nowrap'}} className="inline-flex items-center gap-1 bg-blue-900/50 text-blue-300 border border-blue-600 px-2 py-0.5 rounded-full text-xs font-bold">📱 Sinpe</span>;
-  if (m === 'tarjeta') return <span style={{whiteSpace:'nowrap'}} className="inline-flex items-center gap-1 bg-purple-900/50 text-purple-300 border border-purple-600 px-2 py-0.5 rounded-full text-xs font-bold">💳 Tarjeta</span>;
-  return <span style={{whiteSpace:'nowrap'}} className="inline-flex items-center gap-1 bg-green-900/50 text-green-300 border border-green-600 px-2 py-0.5 rounded-full text-xs font-bold">💵 Efectivo</span>;
-};
-
-function BillModal({ order, onClose, onPay }) {
-  const [payMethod, setPayMethod] = useState(null);
-  if (!order) return null;
-  const methods = [
-    { id: 'efectivo', label: '💵 Efectivo', color: 'border-green-500 bg-green-900/30 text-green-300' },
-    { id: 'sinpe',    label: '📱 Sinpe',    color: 'border-blue-500 bg-blue-900/30 text-blue-300' },
-    { id: 'tarjeta',  label: '💳 Tarjeta',  color: 'border-purple-500 bg-purple-900/30 text-purple-300' },
-  ];
-  return (
-    <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
-      <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-6 shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
-        <div className="text-center mb-4">
-          <h2 className="text-3xl font-bold text-[#94cb47] mb-1">CUENTA</h2>
-          <p className="text-slate-400 text-sm">Restaurante LORE</p>
-        </div>
-        <div className="border-b border-[#94cb47]/30 mb-4 pb-3 space-y-1">
-          <div className="text-white text-sm"><span className="text-slate-400">Cliente: </span><span className="font-bold">{order.clientName || 'Sin nombre'}</span></div>
-          <div className="text-white text-sm"><span className="text-slate-400">Mesa: </span><span className="font-bold">{order.locationLabel || order.barra || (order.table ? `Mesa ${order.table}` : '-')}</span></div>
-          {order.mesera && <div className="text-white text-sm"><span className="text-slate-400">Mesera: </span><span className="font-bold">{order.mesera}</span></div>}
-        </div>
-        <div className="bg-slate-800/50 rounded-xl p-3 mb-4 border border-slate-700 space-y-1 max-h-48 overflow-y-auto">
-          {order.items.map((item, i) => (
-            <div key={i} className="py-1.5 border-b border-slate-700/50 last:border-0">
-              <div className="flex justify-between text-white text-sm">
-                <span>{item.quantity}x {item.name}</span>
-                <span className="text-[#94cb47] font-bold">₡{(item.price * item.quantity).toLocaleString()}</span>
-              </div>
-              {item.notes && <div className="text-xs text-yellow-300 mt-0.5">📝 {item.notes}</div>}
-            </div>
-          ))}
-        </div>
-        <div className="bg-gradient-to-r from-[#94cb47]/30 to-[#7ab035]/30 rounded-xl p-4 border border-[#94cb47]/50 mb-4">
-          <div className="text-slate-300 text-sm">TOTAL A PAGAR</div>
-          <div className="text-4xl font-bold text-[#94cb47]">₡{order.total.toLocaleString()}</div>
-        </div>
-        {/* Método de pago */}
-        <div className="mb-4">
-          <p className="text-slate-400 text-xs mb-2 font-bold uppercase tracking-wide">Método de pago</p>
-          <div className="grid grid-cols-3 gap-2">
-            {methods.map(m => (
-              <button key={m.id} onClick={() => setPayMethod(m.id)}
-                className={`border-2 rounded-xl py-3 font-bold text-sm transition ${payMethod === m.id ? m.color : 'border-slate-600 text-slate-400 hover:border-slate-500'}`}>
-                {m.label}
-              </button>
-            ))}
-          </div>
-        </div>
-        <div className="flex gap-2">
-          {onPay && (
-            <button
-              onClick={() => payMethod ? onPay(order, payMethod) : alert('Selecciona el método de pago')}
-              className={`flex-1 font-bold py-3 rounded-lg transition ${payMethod ? 'bg-[#94cb47] hover:bg-[#7ab035] text-black' : 'bg-slate-700 text-slate-500 cursor-not-allowed'}`}>
-              ✅ Cobrar
-            </button>
-          )}
-          <button onClick={() => window.print()} className="bg-blue-700 hover:bg-blue-800 text-white font-bold px-4 py-3 rounded-lg transition">🖨️</button>
-          <button onClick={onClose} className="bg-slate-700 hover:bg-slate-600 text-white font-bold px-4 py-3 rounded-lg transition">✕</button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-
-
-// ─────────────────────────────────────────────
-// PINES DE ACCESO
-// ─────────────────────────────────────────────
-const PINES = {
-  'Caja Bar':           { pin: '1970', role: 'caja',   zone: 'bar' },
-  'Caja Restaurante':   { pin: '1969', role: 'caja',   zone: 'restaurante' },
-  'Tablet Restaurante': { pin: '7878', role: 'mesera', zone: 'restaurante' },
-  'Cocina':             { pin: '7878', role: 'cocina', zone: 'restaurante' },
-  'María':              { pin: '5456', role: 'mesera', zone: 'bar' },
-  'Milena':             { pin: '8995', role: 'mesera', zone: 'bar' },
-  'Lin':                { pin: '7777', role: 'mesera', zone: 'bar' },
-  'Temp Bar':           { pin: '1221', role: 'mesera', zone: 'bar' },
-  'Admin':              { pin: '3306', role: 'admin',  zone: 'admin' },
-};
-
-// ─────────────────────────────────────────────
-// MODAL DE PIN
-// ─────────────────────────────────────────────
-function PinModal({ userName, onSuccess, onCancel }) {
-  const [pin, setPin] = useState('');
-  const [error, setError] = useState(false);
-
-  const handleDigit = (d) => {
-    if (pin.length >= 4) return;
-    const next = pin + d;
-    setPin(next);
-    setError(false);
-    if (next.length === 4) {
-      setTimeout(() => {
-        if (next === PINES[userName]?.pin) {
-          onSuccess();
-        } else {
-          setError(true);
-          setPin('');
-        }
-      }, 200);
-    }
-  };
-
-  const handleDelete = () => { setPin(p => p.slice(0, -1)); setError(false); };
-
-  return (
-    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-8 w-full max-w-xs shadow-2xl">
-        <div className="text-center mb-6">
-          <div className="text-3xl mb-2">🔐</div>
-          <h2 className="text-white font-bold text-xl">{userName}</h2>
-          <p className="text-slate-400 text-sm mt-1">Ingresa tu PIN de 4 dígitos</p>
-        </div>
-
-        {/* Dots */}
-        <div className="flex justify-center gap-4 mb-6">
-          {[0,1,2,3].map(i => (
-            <div key={i} className={`w-4 h-4 rounded-full border-2 transition-all ${
-              i < pin.length
-                ? error ? 'bg-red-500 border-red-500' : 'bg-[#94cb47] border-[#94cb47]'
-                : 'border-slate-500'
-            }`} />
-          ))}
-        </div>
-
-        {error && <p className="text-red-400 text-center text-sm mb-4">PIN incorrecto, intenta de nuevo</p>}
-
-        {/* Numpad */}
-        <div className="grid grid-cols-3 gap-3 mb-4">
-          {[1,2,3,4,5,6,7,8,9].map(d => (
-            <button key={d} onClick={() => handleDigit(String(d))}
-              className="bg-slate-700 hover:bg-slate-600 active:bg-[#94cb47] text-white font-bold text-xl py-4 rounded-xl transition">
-              {d}
-            </button>
-          ))}
-          <button onClick={handleDelete}
-            className="bg-slate-700 hover:bg-slate-600 text-slate-300 font-bold text-lg py-4 rounded-xl transition">
-            ⌫
-          </button>
-          <button onClick={() => handleDigit('0')}
-            className="bg-slate-700 hover:bg-slate-600 active:bg-[#94cb47] text-white font-bold text-xl py-4 rounded-xl transition">
-            0
-          </button>
-          <button onClick={onCancel}
-            className="bg-red-900/50 hover:bg-red-900 text-red-300 font-bold text-sm py-4 rounded-xl transition">
-            ✕
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ─────────────────────────────────────────────
-// MESERA SCREEN — Responsive (tabs en móvil)
-// ─────────────────────────────────────────────
-function MeseraScreen({
-  currentUser, zona, menu, maxTables, onLogout, addToCart,
-  cartItems, updateQuantity, removeFromCart, updateNotes,
-  completeOrder, orderType, setOrderType,
-  selectedTable, setSelectedTable, selectedBarra, setSelectedBarra,
-  clientName, setClientName, barras, kitchenOrders,
-  openAccounts, selectedAccount, onSelectAccount,
-  onDirectPay, isBar,
-}) {
-  const [mobileTab, setMobileTab] = useState('menu');
-  const [isLandscape, setIsLandscape] = useState(
-    () => window.matchMedia('(orientation: landscape)').matches
-  );
-  useEffect(() => {
-    const mq = window.matchMedia('(orientation: landscape)');
-    const handler = (e) => setIsLandscape(e.matches);
-    mq.addEventListener('change', handler);
-    return () => mq.removeEventListener('change', handler);
-  }, []);
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-slate-900 to-black flex flex-col">
-      <Header mesera={currentUser} zona={zona} onLogout={onLogout} />
-
-      {/* ── Desktop layout (landscape) ── */}
-      <div className={`${isLandscape ? "grid" : "hidden"} grid-cols-3 gap-4 p-4 max-w-7xl mx-auto w-full flex-1`}>
-        <div className="col-span-2 space-y-6">
-          <MenuDropdown menu={menu} onSelectItem={addToCart} />
-          <ReadyOrdersPanel kitchenOrders={kitchenOrders} mesera={currentUser} />
-        </div>
-        <ShoppingCart
-          cartItems={cartItems} updateQuantity={updateQuantity}
-          removeFromCart={removeFromCart} updateNotes={updateNotes}
-          completeOrder={completeOrder} orderType={orderType} setOrderType={setOrderType}
-          selectedTable={selectedTable} setSelectedTable={setSelectedTable}
-          selectedBarra={selectedBarra} setSelectedBarra={setSelectedBarra}
-          clientName={clientName} setClientName={setClientName}
-          barras={barras} maxTables={maxTables}
-          openAccounts={openAccounts} selectedAccount={selectedAccount}
-          onSelectAccount={onSelectAccount}
-          mobileVisible='landscape'
-          isBar={isBar}
-          onDirectPay={onDirectPay}
-        />
-      </div>
-
-      {/* ── Mobile layout (portrait) ── */}
-      <div className={`${isLandscape ? "hidden" : "flex"} flex-col flex-1 overflow-hidden`}>
-        {/* Tab content */}
-        <div className="flex-1 overflow-y-auto p-3">
-          {mobileTab === 'menu' ? (
-            <div className="space-y-4">
-              <MenuDropdown menu={menu} onSelectItem={addToCart} />
-              <ReadyOrdersPanel kitchenOrders={kitchenOrders} mesera={currentUser} />
-            </div>
-          ) : (
-            <ShoppingCart
-              cartItems={cartItems} updateQuantity={updateQuantity}
-              removeFromCart={removeFromCart} updateNotes={updateNotes}
-              completeOrder={completeOrder} orderType={orderType} setOrderType={setOrderType}
-              selectedTable={selectedTable} setSelectedTable={setSelectedTable}
-              selectedBarra={selectedBarra} setSelectedBarra={setSelectedBarra}
-              clientName={clientName} setClientName={setClientName}
-              barras={barras} maxTables={maxTables}
-              openAccounts={openAccounts} selectedAccount={selectedAccount}
-              onSelectAccount={onSelectAccount}
-              mobileVisible={true}
-              isBar={isBar}
-              onDirectPay={onDirectPay}
-            />
-          )}
-        </div>
-
-        {/* Bottom tab bar */}
-        <div className="flex border-t border-[#94cb47]/30 bg-slate-900 safe-area-bottom">
-          <button
-            onClick={() => setMobileTab('menu')}
-            className={`flex-1 flex flex-col items-center py-3 gap-1 transition ${mobileTab === 'menu' ? 'text-[#94cb47]' : 'text-slate-500'}`}
-          >
-            <Utensils size={20} />
-            <span className="text-xs font-bold">Menú</span>
-          </button>
-          <button
-            onClick={() => setMobileTab('carrito')}
-            className={`flex-1 flex flex-col items-center py-3 gap-1 transition relative ${mobileTab === 'carrito' ? 'text-[#94cb47]' : 'text-slate-500'}`}
-          >
-            {cartItems.length > 0 && (
-              <span className="absolute top-2 right-1/4 bg-[#94cb47] text-black text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
-                {cartItems.length}
-              </span>
-            )}
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
-            <span className="text-xs font-bold">Carrito</span>
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-
-
-// ─────────────────────────────────────────────
-// COMPONENTE PRINCIPAL — conectado a MongoDB
-// ─────────────────────────────────────────────
 export default function RestaurantePOS() {
   const [currentUser, setCurrentUser] = useState(null);
   const [userRole, setUserRole]       = useState(null);
   const [currentZone, setCurrentZone] = useState(null);
   const [loading, setLoading]         = useState(false);
   const [syncError, setSyncError]     = useState(null);
+  const [pendingUser, setPendingUser] = useState(null);
 
-  // Carrito local (no se guarda hasta completar)
   const [cartItems, setCartItems]         = useState([]);
   const [selectedTable, setSelectedTable] = useState(null);
   const [selectedBarra, setSelectedBarra] = useState(null);
   const [clientName, setClientName]       = useState('');
   const [orderType, setOrderType]         = useState(null);
 
-  // Datos que vienen del servidor
-  const [openAccounts, setOpenAccounts] = useState([]);
-  const [paidOrders, setPaidOrders]     = useState([]);
+  const [openAccounts, setOpenAccounts]   = useState([]);
+  const [paidOrders, setPaidOrders]       = useState([]);
   const [kitchenOrders, setKitchenOrders] = useState([]);
   const [selectedAccount, setSelectedAccount] = useState(null);
 
-  // Modales caja
   const [billOrder, setBillOrder]           = useState(null);
   const [viewItemsOrder, setViewItemsOrder] = useState(null);
 
-  const meseras = ['María', 'Milena', 'Lin', 'Temp Bar'];
-  const barras  = ['Barra 1', 'Barra 2', 'Barra 3', 'Barra Grande'];
-
-  // ── Cargar datos del servidor al hacer login ──
   const loadData = useCallback(async (zone, role, silent = false) => {
     if (!silent) setLoading(true);
     setSyncError(null);
     try {
       if (role === 'mesera' || role === 'caja') {
-        const [open, paid] = await Promise.all([
-          api.getOpenAccounts(zone),
-          api.getPaidAccounts(zone),
-        ]);
+        const [open, paid] = await Promise.all([api.getOpenAccounts(zone), api.getPaidAccounts(zone)]);
         setOpenAccounts(open);
         setPaidOrders(paid);
       }
       if (role === 'cocina') {
-        // Cocina ve pedidos de AMBAS zonas
-        const [kitchenRest, kitchenBar] = await Promise.all([
-          api.getKitchenOrders('restaurante'),
-          api.getKitchenOrders('bar'),
-        ]);
-        setKitchenOrders([...kitchenRest, ...kitchenBar]);
+        const [kr, kb] = await Promise.all([api.getKitchenOrders('restaurante'), api.getKitchenOrders('bar')]);
+        setKitchenOrders([...kr, ...kb]);
       }
       if (role === 'mesera') {
-        // Mesera solo ve sus propios pedidos listos (de su zona)
         const kitchen = await api.getKitchenOrders(zone);
         setKitchenOrders(kitchen);
       }
@@ -876,37 +51,26 @@ export default function RestaurantePOS() {
         setKitchenOrders(kitchen);
       }
       if (role === 'admin') {
-        const [barOpen, barPaid, restOpen, restPaid] = await Promise.all([
-          api.getOpenAccounts('bar'),
-          api.getPaidAccounts('bar'),
-          api.getOpenAccounts('restaurante'),
-          api.getPaidAccounts('restaurante'),
-        ]);
-        setOpenAccounts([...barOpen, ...restOpen]);
-        setPaidOrders([...barPaid, ...restPaid]);
+        const [bo, bp, ro, rp] = await Promise.all([api.getOpenAccounts('bar'), api.getPaidAccounts('bar'), api.getOpenAccounts('restaurante'), api.getPaidAccounts('restaurante')]);
+        setOpenAccounts([...bo, ...ro]);
+        setPaidOrders([...bp, ...rp]);
       }
     } catch (err) {
-      setSyncError('Sin conexión al servidor. Verifica tu red.');
+      setSyncError('Sin conexión al servidor.');
       console.error(err);
     } finally {
       setLoading(false);
     }
   }, []);
 
-  // Polling cada 8 segundos para sincronizar entre dispositivos
   useEffect(() => {
     if (!currentUser || !userRole) return;
-    const interval = setInterval(() => {
-      loadData(currentZone, userRole, true); // silent=true, no spinner
-    }, 30000);
+    const interval = setInterval(() => loadData(currentZone, userRole, true), 30000);
     return () => clearInterval(interval);
   }, [currentUser, userRole, currentZone, loadData]);
 
-  // ── Login / Logout ────────────────────────────
   const handleLogin = async (name, role, zone) => {
-    setCurrentUser(name);
-    setUserRole(role);
-    setCurrentZone(zone);
+    setCurrentUser(name); setUserRole(role); setCurrentZone(zone);
     await loadData(zone, role);
   };
 
@@ -918,12 +82,17 @@ export default function RestaurantePOS() {
     setSyncError(null);
   };
 
-  // ── Seleccionar cuenta abierta ────────────────
+  const requestLogin = (name) => setPendingUser(name);
+  const confirmPin = async () => {
+    const user = PINES[pendingUser];
+    setPendingUser(null);
+    await handleLogin(pendingUser, user.role, user.zone);
+  };
+
   const handleSelectAccount = (accountId) => {
     if (!accountId) {
       setSelectedAccount(null);
-      setCartItems([]); setSelectedTable(null);
-      setSelectedBarra(null); setClientName(''); setOrderType(null);
+      setCartItems([]); setSelectedTable(null); setSelectedBarra(null); setClientName(''); setOrderType(null);
       return;
     }
     const acc = openAccounts.find(a => (a._id === accountId || a.id === accountId));
@@ -936,7 +105,6 @@ export default function RestaurantePOS() {
     setOrderType(acc.type || 'dine-in');
   };
 
-  // ── Carrito ───────────────────────────────────
   const addToCart = (item, withPotatoes = false) => {
     const itemId = `${item.id}${withPotatoes ? '_cp' : ''}`;
     const price = item.price + (withPotatoes && item.canHavePapas ? 500 : 0);
@@ -952,89 +120,40 @@ export default function RestaurantePOS() {
     });
   };
 
-  const removeFromCart  = (id) => setCartItems(prev => prev.filter(i => i.id !== id));
-  const updateQuantity  = (id, qty) => { if (qty <= 0) removeFromCart(id); else setCartItems(prev => prev.map(i => i.id === id ? { ...i, quantity: qty } : i)); };
-  const updateNotes     = (id, notes) => setCartItems(prev => prev.map(i => i.id === id ? { ...i, notes } : i));
+  const removeFromCart = (id) => setCartItems(prev => prev.filter(i => i.id !== id));
+  const updateQuantity = (id, qty) => {
+    if (qty <= 0) removeFromCart(id);
+    else setCartItems(prev => prev.map(i => i.id === id ? { ...i, quantity: qty } : i));
+  };
+  const updateNotes = (id, notes) => setCartItems(prev => prev.map(i => i.id === id ? { ...i, notes } : i));
 
-  // ── Completar pedido (guarda en MongoDB) ──────
   const completeOrder = async () => {
-    if (cartItems.length === 0)                                      { alert('El carrito está vacío'); return; }
+    if (cartItems.length === 0) { alert('El carrito está vacío'); return; }
     if (orderType === 'dine-in' && !selectedTable && !selectedBarra) { alert('Selecciona una mesa o barra'); return; }
-
-    const total      = cartItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
-    const foodItems  = cartItems.filter(i => i.category === 'food');
-    const drinkItems = cartItems.filter(i => ['alcoholic', 'beverage', 'soda'].includes(i.category));
-
+    const total = cartItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
+    const foodItems = cartItems.filter(i => i.category === 'food');
     setLoading(true);
     try {
       if (selectedAccount) {
-        // ── Actualizar cuenta existente ──
         const acc = openAccounts.find(a => (a._id === selectedAccount || a.id === selectedAccount));
         const accId = acc?.id || selectedAccount;
         await api.updateAccount(accId, { items: cartItems, total });
-
-        // Nuevos items de comida → cocina
-        const prevFoodIds = (acc?.foodItems || acc?.items?.filter(i => i.category === 'food') || []).map(i => i.id);
+        const prevFoodIds = (acc?.items?.filter(i => i.category === 'food') || []).map(i => i.id);
         const newFood = foodItems.filter(i => !prevFoodIds.includes(i.id));
         if (newFood.length > 0) {
-          const ko = {
-            id: `k-${Date.now()}`,
-            zone: currentZone,
-            mesera: currentUser,
-            items: newFood,
-            table: selectedTable || null,
-            barra: selectedBarra || null,
-            clientName: clientName || '',
-            locationLabel: selectedBarra ? selectedBarra : (selectedTable ? `Mesa ${selectedTable}` : 'Sin mesa'),
-            status: 'pending',
-            createdAt: new Date(),
-          };
-          await api.createKitchenOrder(ko);
+          await api.createKitchenOrder({ id: `k-${Date.now()}`, zone: currentZone, mesera: currentUser, items: newFood, table: selectedTable || null, barra: selectedBarra || null, clientName: clientName || '', locationLabel: selectedBarra ? selectedBarra : (selectedTable ? `Mesa ${selectedTable}` : 'Sin mesa'), status: 'pending', createdAt: new Date() });
         }
         alert('✅ Cuenta actualizada');
       } else {
-        // ── Nueva cuenta ──
-        const newAcc = {
-          id: `acc-${currentZone}-${currentUser}-${Date.now()}`,
-          zone: currentZone,
-          mesera: currentUser,
-          items: [...cartItems],
-          total,
-          type: orderType,
-          table: selectedTable,
-          barra: selectedBarra,
-          clientName,
-          foodItems,
-          drinkItems,
-          status: 'open',
-          createdAt: new Date(),
-        };
-        await api.createAccount(newAcc);
-
-        // Comida a cocina
+        await api.createAccount({ id: `acc-${currentZone}-${currentUser}-${Date.now()}`, zone: currentZone, mesera: currentUser, items: [...cartItems], total, type: orderType, table: selectedTable, barra: selectedBarra, clientName, foodItems, drinkItems: cartItems.filter(i => ['alcoholic','beverage','soda'].includes(i.category)), status: 'open', createdAt: new Date() });
         if (foodItems.length > 0) {
-          const ko = {
-            id: `k-${Date.now()}`,
-            zone: currentZone,
-            mesera: currentUser,
-            items: foodItems,
-            table: selectedTable || null,
-            barra: selectedBarra || null,
-            clientName: clientName || '',
-            locationLabel: selectedBarra ? selectedBarra : (selectedTable ? `Mesa ${selectedTable}` : 'Sin mesa'),
-            status: 'pending',
-            createdAt: new Date(),
-          };
-          await api.createKitchenOrder(ko);
+          await api.createKitchenOrder({ id: `k-${Date.now()}`, zone: currentZone, mesera: currentUser, items: foodItems, table: selectedTable || null, barra: selectedBarra || null, clientName: clientName || '', locationLabel: selectedBarra ? selectedBarra : (selectedTable ? `Mesa ${selectedTable}` : 'Sin mesa'), status: 'pending', createdAt: new Date() });
         }
         alert('✅ Cuenta abierta registrada');
       }
-
-      // Refrescar cuentas abiertas
       const fresh = await api.getOpenAccounts(currentZone);
       setOpenAccounts(fresh);
-      setCartItems([]); setSelectedTable(null); setSelectedBarra(null);
-      setClientName(''); setOrderType(null); setSelectedAccount(null);
+      setCartItems([]); setSelectedTable(null); setSelectedBarra(null); setClientName(''); setOrderType(null); setSelectedAccount(null);
     } catch (err) {
       alert('❌ Error al guardar: ' + err.message);
     } finally {
@@ -1042,51 +161,18 @@ export default function RestaurantePOS() {
     }
   };
 
-  // ── Cobro Directo (Bar) — cuenta que se paga de inmediato ──────
   const handleDirectPay = async () => {
     if (cartItems.length === 0) { alert('El carrito está vacío'); return; }
     const total = cartItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
-    const foodItems  = cartItems.filter(i => i.category === 'food');
-    const drinkItems = cartItems.filter(i => ['alcoholic','beverage','soda'].includes(i.category));
-    const location   = selectedBarra ? selectedBarra : (selectedTable ? `Mesa ${selectedTable}` : 'Cobro directo');
+    const foodItems = cartItems.filter(i => i.category === 'food');
+    const location = selectedBarra ? selectedBarra : (selectedTable ? `Mesa ${selectedTable}` : 'Cobro directo');
     setLoading(true);
     try {
-      // Crear y cerrar la cuenta de inmediato (sin método de pago todavía — se elige en el modal)
-      const newAcc = {
-        id: `acc-direct-${Date.now()}`,
-        zone: currentZone,
-        mesera: currentUser,
-        items: [...cartItems],
-        total,
-        type: 'direct',
-        table: selectedTable || null,
-        barra: selectedBarra || null,
-        locationLabel: location,
-        clientName: clientName || '',
-        foodItems,
-        drinkItems,
-        status: 'open',
-        createdAt: new Date(),
-      };
-      const created = await api.createAccount(newAcc);
-      // Mandar comida a cocina si hay
+      await api.createAccount({ id: `acc-direct-${Date.now()}`, zone: currentZone, mesera: currentUser, items: [...cartItems], total, type: 'direct', table: selectedTable || null, barra: selectedBarra || null, locationLabel: location, clientName: clientName || '', foodItems, drinkItems: cartItems.filter(i => ['alcoholic','beverage','soda'].includes(i.category)), status: 'open', createdAt: new Date() });
       if (foodItems.length > 0) {
-        await api.createKitchenOrder({
-          id: `k-direct-${Date.now()}`,
-          zone: currentZone,
-          mesera: currentUser,
-          items: foodItems,
-          locationLabel: location,
-          table: selectedTable || null,
-          barra: selectedBarra || null,
-          clientName: clientName || '',
-          status: 'pending',
-          createdAt: new Date(),
-        });
+        await api.createKitchenOrder({ id: `k-direct-${Date.now()}`, zone: currentZone, mesera: currentUser, items: foodItems, locationLabel: location, table: selectedTable || null, barra: selectedBarra || null, clientName: clientName || '', status: 'pending', createdAt: new Date() });
       }
-      // Solo confirmar — la caja cobra después
-      setCartItems([]); setSelectedTable(null); setSelectedBarra(null);
-      setClientName(''); setOrderType(null); setSelectedAccount(null);
+      setCartItems([]); setSelectedTable(null); setSelectedBarra(null); setClientName(''); setOrderType(null); setSelectedAccount(null);
       alert('✅ Pedido registrado. La caja lo cobrará.');
     } catch (err) {
       alert('❌ Error: ' + err.message);
@@ -1095,19 +181,12 @@ export default function RestaurantePOS() {
     }
   };
 
-  // ── Cobrar cuenta (caja) ─────────────────────
   const payAccount = async (account, paymentMethod = 'efectivo') => {
     setLoading(true);
     try {
-      const accId = account.id || account._id;
-      await api.closeAccount(accId, paymentMethod);
-      const [open, paid] = await Promise.all([
-        api.getOpenAccounts(currentZone),
-        api.getPaidAccounts(currentZone),
-      ]);
-      setOpenAccounts(open);
-      setPaidOrders(paid);
-      setBillOrder(null);
+      await api.closeAccount(account.id || account._id, paymentMethod);
+      const [open, paid] = await Promise.all([api.getOpenAccounts(currentZone), api.getPaidAccounts(currentZone)]);
+      setOpenAccounts(open); setPaidOrders(paid); setBillOrder(null);
     } catch (err) {
       alert('❌ Error al cobrar: ' + err.message);
     } finally {
@@ -1115,7 +194,6 @@ export default function RestaurantePOS() {
     }
   };
 
-  // ── Cocina ────────────────────────────────────
   const markOrderReady = async (orderId) => {
     try {
       await api.updateKitchenOrder(orderId, 'ready');
@@ -1130,92 +208,62 @@ export default function RestaurantePOS() {
     } catch (err) { alert('Error: ' + err.message); }
   };
 
-  // ── Filtros por zona ──────────────────────────
-  const barAccounts  = openAccounts.filter(a => a.zone === 'bar');
-  const restAccounts = openAccounts.filter(a => a.zone === 'restaurante');
-  const barPaid      = paidOrders.filter(a => a.zone === 'bar');
-  const restPaid     = paidOrders.filter(a => a.zone === 'restaurante');
+  const barAccounts      = openAccounts.filter(a => a.zone === 'bar');
+  const restAccounts     = openAccounts.filter(a => a.zone === 'restaurante');
+  const barPaid          = paidOrders.filter(a => a.zone === 'bar');
+  const restPaid         = paidOrders.filter(a => a.zone === 'restaurante');
   const zoneOpenAccounts = currentZone === 'bar' ? barAccounts : restAccounts;
 
-  // ── Loading / Error overlay ───────────────────
-  const Spinner = () => (
-    <div className="fixed bottom-4 right-4 bg-slate-800 border border-[#94cb47]/30 rounded-xl px-4 py-2 flex items-center gap-2 shadow-xl z-50">
-      <div className="w-4 h-4 border-2 border-[#94cb47] border-t-transparent rounded-full animate-spin" />
-      <span className="text-[#94cb47] text-xs font-bold">Guardando...</span>
-    </div>
-  );
-
-  // ════════════════════════════════════════════
-  // PANTALLAS
-  // ════════════════════════════════════════════
-
   // ── LOGIN ─────────────────────────────────────
-  const [pendingUser, setPendingUser] = useState(null);
-
-  const requestLogin = (name) => setPendingUser(name);
-
-  const confirmPin = async () => {
-    const user = PINES[pendingUser];
-    setPendingUser(null);
-    await handleLogin(pendingUser, user.role, user.zone);
-  };
-
   if (!currentUser) {
+    const isLandscape = typeof window !== 'undefined' && window.matchMedia('(orientation: landscape)').matches;
     return (
-      <div className="min-h-screen bg-gradient-to-br from-black via-slate-900 to-black flex items-start sm:items-center justify-center p-4 pt-6 sm:pt-4 overflow-y-auto">
-        <div className="w-full max-w-md">
-          <div className="text-center mb-8">
-            <img src="/logo.png" alt="LORE" className="w-36 h-36 mx-auto mb-2 object-contain drop-shadow-lg" />
-            <p className="text-[#94cb47]/80 text-lg">Sistema de Pedidos</p>
+      <div className="min-h-screen bg-gradient-to-br from-black via-slate-900 to-black flex flex-col items-center justify-center p-4 overflow-y-auto">
+        <div className="text-center mb-4">
+          <img src="/logo.png" alt="LORE" className={`mx-auto object-contain drop-shadow-lg ${isLandscape ? 'w-20 h-20 mb-1' : 'w-36 h-36 mb-2'}`} />
+          <p className="text-[#94cb47]/80 text-base">Sistema de Pedidos</p>
+        </div>
+        {syncError && (
+          <div className="bg-red-900/60 border border-red-500 rounded-xl p-3 mb-3 text-red-200 text-sm text-center w-full max-w-2xl">
+            ⚠️ {syncError}
           </div>
-          {syncError && (
-            <div className="bg-red-900/60 border border-red-500 rounded-xl p-4 mb-4 text-red-200 text-sm text-center">
-              ⚠️ {syncError}
+        )}
+        <div className={`w-full ${isLandscape ? 'grid grid-cols-3 gap-3 max-w-3xl' : 'space-y-3 max-w-md'}`}>
+          <div className="bg-slate-800/80 backdrop-blur border border-[#94cb47]/40 rounded-2xl p-4 shadow-2xl">
+            <h2 className="text-[#94cb47] font-bold text-base mb-3">🍺 ZONA BAR</h2>
+            <button onClick={() => requestLogin('Caja Bar')} className="w-full bg-[#94cb47] hover:bg-[#7ab035] text-white font-bold py-2.5 rounded-xl transition shadow-lg mb-2">💰 Caja Bar</button>
+            <div className="space-y-2">
+              {meseras.map(m => (
+                <button key={m} onClick={() => requestLogin(m)} className="w-full bg-slate-700/60 hover:bg-slate-600 text-[#94cb47] py-2 rounded-lg transition font-medium text-sm">{m}</button>
+              ))}
             </div>
-          )}
-          <div className="space-y-4">
-            <div className="bg-slate-800/80 backdrop-blur border border-[#94cb47]/40 rounded-2xl p-6 shadow-2xl">
-              <h2 className="text-[#94cb47] font-bold text-lg mb-4">🍺 ZONA BAR</h2>
-              <button onClick={() => requestLogin('Caja Bar')} className="w-full bg-gradient-to-r bg-[#94cb47] hover:bg-[#7ab035] text-white font-bold py-3 rounded-xl transition shadow-lg mb-2">💰 Caja Bar</button>
-              <div className="space-y-2">
-                {meseras.map(m => (
-                  <button key={m} onClick={() => requestLogin(m)} className="w-full bg-slate-700/60 hover:bg-slate-600 text-[#94cb47] py-2 rounded-lg transition font-medium">{m}</button>
-                ))}
-              </div>
-            </div>
-            <div className="bg-slate-800/80 backdrop-blur border border-[#94cb47]/40 rounded-2xl p-6 shadow-2xl">
-              <h2 className="text-[#94cb47] font-bold text-lg mb-4">🍽️ ZONA RESTAURANTE</h2>
-              <button onClick={() => requestLogin('Caja Restaurante')} className="w-full bg-gradient-to-r bg-[#94cb47] hover:bg-[#7ab035] text-white font-bold py-3 rounded-xl transition shadow-lg mb-2">💰 Caja</button>
-              <button onClick={() => requestLogin('Tablet Restaurante')} className="w-full bg-gradient-to-r bg-[#94cb47]/90 hover:bg-[#7ab035] text-white font-bold py-3 rounded-xl transition shadow-lg mb-2">📱 Tomar Pedidos</button>
-              <button onClick={() => requestLogin('Cocina')} className="w-full bg-gradient-to-r bg-[#94cb47]/90 hover:bg-[#7ab035] text-white font-bold py-3 rounded-xl transition shadow-lg">👨‍🍳 Cocina</button>
-            </div>
-            <div className="bg-slate-800/80 backdrop-blur border border-[#94cb47]/40 rounded-2xl p-6 shadow-2xl">
-              <button onClick={() => requestLogin('Admin')} className="w-full bg-gradient-to-r bg-[#94cb47]/90 hover:bg-[#7ab035] text-white font-bold py-3 rounded-xl transition shadow-lg">📊 Panel Admin</button>
-            </div>
+          </div>
+          <div className="bg-slate-800/80 backdrop-blur border border-[#94cb47]/40 rounded-2xl p-4 shadow-2xl">
+            <h2 className="text-[#94cb47] font-bold text-base mb-3">🍽️ ZONA RESTAURANTE</h2>
+            <button onClick={() => requestLogin('Caja Restaurante')} className="w-full bg-[#94cb47] hover:bg-[#7ab035] text-white font-bold py-2.5 rounded-xl transition shadow-lg mb-2">💰 Caja</button>
+            <button onClick={() => requestLogin('Tablet Restaurante')} className="w-full bg-[#94cb47]/90 hover:bg-[#7ab035] text-white font-bold py-2.5 rounded-xl transition shadow-lg mb-2">📱 Tomar Pedidos</button>
+            <button onClick={() => requestLogin('Cocina')} className="w-full bg-[#94cb47]/90 hover:bg-[#7ab035] text-white font-bold py-2.5 rounded-xl transition shadow-lg">👨‍🍳 Cocina</button>
+          </div>
+          <div className="bg-slate-800/80 backdrop-blur border border-[#94cb47]/40 rounded-2xl p-4 shadow-2xl flex items-center">
+            <button onClick={() => requestLogin('Admin')} className="w-full bg-[#94cb47]/90 hover:bg-[#7ab035] text-white font-bold py-2.5 rounded-xl transition shadow-lg">📊 Panel Admin</button>
           </div>
         </div>
         {loading && <Spinner />}
         {pendingUser && (
-          <PinModal
-            userName={pendingUser}
-            onSuccess={confirmPin}
-            onCancel={() => setPendingUser(null)}
-          />
+          <PinModal userName={pendingUser} onSuccess={confirmPin} onCancel={() => setPendingUser(null)} />
         )}
       </div>
     );
   }
 
-  // ── MESERA ────────────────────────────────────
   if (userRole === 'mesera') {
-    const zona = currentZone === 'bar' ? 'Bar' : 'Restaurante';
-    const menu = currentZone === 'bar' ? MENU.bar : MENU.restaurante;
-    const maxTables = currentZone === 'bar' ? 10 : 5;
     return (
       <>
         {loading && <Spinner />}
         <MeseraScreen
-          currentUser={currentUser} zona={zona} menu={menu} maxTables={maxTables}
+          currentUser={currentUser} zona={currentZone === 'bar' ? 'Bar' : 'Restaurante'}
+          menu={currentZone === 'bar' ? MENU.bar : MENU.restaurante}
+          maxTables={currentZone === 'bar' ? 10 : 5}
           onLogout={handleLogout} addToCart={addToCart}
           cartItems={cartItems} updateQuantity={updateQuantity}
           removeFromCart={removeFromCart} updateNotes={updateNotes}
@@ -1226,572 +274,23 @@ export default function RestaurantePOS() {
           barras={barras} kitchenOrders={kitchenOrders.filter(o => o.mesera === currentUser)}
           openAccounts={zoneOpenAccounts} selectedAccount={selectedAccount}
           onSelectAccount={handleSelectAccount}
-          isBar={currentZone === 'bar'}
-          onDirectPay={handleDirectPay}
+          isBar={currentZone === 'bar'} onDirectPay={handleDirectPay}
         />
       </>
     );
   }
 
-  // ── COCINA ────────────────────────────────────
   if (userRole === 'cocina') {
-    const ordersBar  = kitchenOrders.filter(o => o.zone === 'bar');
-    const ordersRest = kitchenOrders.filter(o => o.zone === 'restaurante');
-    const totalPending = kitchenOrders.length;
-
-    const KitchenCard = ({ order, colorScheme }) => {
-      // colorScheme: 'bar' = azul/morado, 'rest' = verde LORE
-      const pendingBg  = colorScheme === 'bar' ? 'from-blue-900/40 to-purple-900/40 border-blue-500' : 'from-orange-900/40 to-orange-800/40 border-orange-500';
-      const readyBg    = colorScheme === 'bar' ? 'from-blue-600/30 to-purple-600/30 border-blue-400' : 'from-[#94cb47]/10 to-black border-[#94cb47]';
-      const badgeColor = colorScheme === 'bar' ? 'bg-blue-500 text-white' : 'bg-orange-500 text-white';
-      const readyBadge = colorScheme === 'bar' ? 'bg-blue-400 text-black' : 'bg-[#94cb47] text-black';
-      const noteColor  = colorScheme === 'bar' ? 'text-blue-300' : 'text-[#94cb47]';
-      const readyBtn   = colorScheme === 'bar' ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-[#94cb47] hover:bg-[#7ab035] text-black';
-
-      return (
-        <div className={`rounded-2xl border-2 p-5 shadow-xl transition-all duration-300 bg-gradient-to-br ${order.status === 'ready' ? readyBg : pendingBg}`}>
-          <div className="flex justify-between items-start mb-4">
-            <div>
-              <div className="text-2xl font-bold text-white">{order.locationLabel || (order.barra ? order.barra : (order.table ? `Mesa ${order.table}` : 'Sin mesa'))}</div>
-              <div className="text-xs text-slate-400">👤 {order.mesera}</div>
-              {order.clientName && <div className={`text-sm font-semibold ${noteColor}`}>{order.clientName}</div>}
-            </div>
-            <span className={`px-4 py-2 rounded-full text-sm font-bold ${order.status === 'ready' ? readyBadge : badgeColor}`}>
-              {order.status === 'ready' ? '✓ LISTO' : '⏳ PREP'}
-            </span>
-          </div>
-          <div className="bg-slate-800/50 rounded-xl p-4 mb-4 border border-slate-700">
-            {order.items.map((item, i) => (
-              <div key={i} className="text-white/90 text-sm py-2 border-b border-slate-700/50 last:border-0">
-                <div className="flex justify-between"><span className="font-medium">{item.quantity}x</span><span className="flex-1 mx-2">{item.name}</span></div>
-                {item.notes && <div className={`text-xs mt-1 ${noteColor}`}>📝 {item.notes}</div>}
-              </div>
-            ))}
-          </div>
-          <div className="flex gap-2">
-            {order.status === 'pending' && (
-              <button onClick={() => markOrderReady(order.id)} className={`flex-1 font-bold py-3 rounded-lg transition shadow-lg ${readyBtn}`}>✓ Listo</button>
-            )}
-            {order.status === 'ready' && (
-              <button onClick={() => markOrderDelivered(order.id)} className="flex-1 bg-slate-600 hover:bg-slate-500 text-white font-bold py-3 rounded-lg transition shadow-lg">✓ Entregado</button>
-            )}
-          </div>
-        </div>
-      );
-    };
-
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-black to-slate-900">
-        {loading && <Spinner />}
-        <Header mesera="Cocina" zona="Preparación" onLogout={handleLogout} />
-        <div className="p-4 md:p-6 max-w-7xl mx-auto space-y-8">
-
-          {totalPending === 0 && (
-            <div className="text-center py-20">
-              <div className="text-7xl mb-4">😎</div>
-              <p className="text-slate-400 text-2xl">Todo está listo</p>
-            </div>
-          )}
-
-          {/* ── Bar ── */}
-          {ordersBar.length > 0 && (
-            <div>
-              <div className="flex items-center gap-3 mb-4">
-                <h2 className="text-blue-400 font-bold text-xl">🍺 Bar</h2>
-                <span className="bg-blue-500 text-white text-xs font-bold px-3 py-1 rounded-full">{ordersBar.length}</span>
-              </div>
-              <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
-                {ordersBar.map(order => <KitchenCard key={order.id} order={order} colorScheme="bar" />)}
-              </div>
-            </div>
-          )}
-
-          {/* ── Restaurante ── */}
-          {ordersRest.length > 0 && (
-            <div>
-              <div className="flex items-center gap-3 mb-4">
-                <h2 className="text-[#94cb47] font-bold text-xl">🍽️ Restaurante</h2>
-                <span className="bg-[#94cb47] text-black text-xs font-bold px-3 py-1 rounded-full">{ordersRest.length}</span>
-              </div>
-              <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
-                {ordersRest.map(order => <KitchenCard key={order.id} order={order} colorScheme="rest" />)}
-              </div>
-            </div>
-          )}
-
-        </div>
-      </div>
-    );
+    return <KitchenScreen kitchenOrders={kitchenOrders} loading={loading} onLogout={handleLogout} onReady={markOrderReady} onDelivered={markOrderDelivered} />;
   }
 
-  // ── CAJA BAR ──────────────────────────────────
   if (userRole === 'caja' && currentZone === 'bar') {
-    const totalCobrado = barPaid.reduce((s, o) => s + o.total, 0);
-    const foodCobrado  = barPaid.reduce((s, o) => s + (o.foodItems || o.items?.filter(i=>i.category==='food') || []).reduce((a, i) => a + i.price * i.quantity, 0), 0);
-    const drinkCobrado = barPaid.reduce((s, o) => s + (o.drinkItems || o.items?.filter(i=>i.category!=='food') || []).reduce((a, i) => a + i.price * i.quantity, 0), 0);
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-black via-slate-900 to-black">
-        {loading && <Spinner />}
-        <Header mesera="Caja Bar" zona="Caja" onLogout={handleLogout} />
-        <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-5">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-5 shadow-2xl">
-              <div className="text-slate-400 text-sm">Cuentas Pagadas</div>
-              <div className="text-3xl font-bold text-white mt-2">{barPaid.length}</div>
-            </div>
-            <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-5 shadow-2xl">
-              <div className="text-slate-400 text-sm">Total Comida</div>
-              <div className="text-2xl font-bold text-[#94cb47] mt-2">₡{foodCobrado.toLocaleString()}</div>
-            </div>
-            <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-5 shadow-2xl">
-              <div className="text-slate-400 text-sm">Total Bebidas</div>
-              <div className="text-2xl font-bold text-[#94cb47] mt-2">₡{drinkCobrado.toLocaleString()}</div>
-            </div>
-          </div>
-          <div className="bg-gradient-to-r [#94cb47] rounded-2xl p-6 shadow-2xl">
-            <div className="text-white/80 text-base">💰 Total Cobrado Hoy — Bar</div>
-            <div className="text-4xl font-bold text-white">₡{totalCobrado.toLocaleString()}</div>
-          </div>
-          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-5 shadow-2xl">
-            <h3 className="text-[#94cb47] font-bold text-lg mb-4">📂 Cuentas Abiertas ({barAccounts.length})</h3>
-            {barAccounts.length === 0
-              ? <p className="text-slate-500 text-sm">No hay cuentas abiertas</p>
-              : <div className="space-y-3">
-                {barAccounts.map(acc => (
-                  <div key={acc._id || acc.id} className="bg-slate-700/50 rounded-xl p-4 flex flex-wrap justify-between items-center gap-3 border border-slate-600">
-                    <div>
-                      <div className="text-white font-bold">{acc.barra || `Mesa ${acc.table}`}{acc.clientName ? ` — ${acc.clientName}` : ''}</div>
-                      <div className="text-slate-400 text-xs">👤 {acc.mesera} · {acc.items.length} items</div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-[#94cb47] font-bold">₡{acc.total.toLocaleString()}</span>
-                      <button onClick={() => setViewItemsOrder(acc)} className="bg-slate-600 hover:bg-slate-500 text-white px-3 py-1 rounded text-xs font-bold">📋 Items</button>
-                      <button onClick={() => setBillOrder(acc)} className="bg-[#94cb47] hover:bg-[#94cb47] text-white px-3 py-1 rounded text-xs font-bold">💳 Cobrar</button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            }
-          </div>
-          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-5 shadow-2xl overflow-x-auto">
-            <h3 className="text-[#94cb47] font-bold text-lg mb-4">✅ Historial Pagadas</h3>
-            {barPaid.length === 0 ? <p className="text-slate-500 text-sm">Sin pagos aún</p> :
-              <table className="w-full text-sm"><thead><tr className="border-b border-slate-700">
-                <th className="text-left py-2 px-3 text-slate-400">Mesera</th>
-                <th className="text-left py-2 px-3 text-slate-400">Mesa/Barra</th>
-                <th className="text-left py-2 px-3 text-slate-400">Cliente</th>
-                <th className="text-center py-2 px-3 text-slate-400">Pago</th>
-                <th className="text-right py-2 px-3 text-slate-400">Total</th>
-                <th className="text-center py-2 px-3 text-slate-400">Items</th>
-              </tr></thead><tbody>
-                {barPaid.map(o => (
-                  <tr key={o._id || o.id} className="border-b border-slate-700 hover:bg-slate-700/30">
-                    <td className="py-3 px-3 text-white">{o.mesera}</td>
-                    <td className="py-3 px-3 text-white">{o.locationLabel || o.barra || (o.table ? `Mesa ${o.table}` : '-')}</td>
-                    <td className="py-3 px-3 text-white">{o.clientName || '-'}</td>
-                    <td className="text-center py-3 px-3">{payBadge(o.paymentMethod)}</td>
-                    <td className="text-right py-3 px-3 text-[#94cb47] font-bold">₡{o.total.toLocaleString()}</td>
-                    <td className="text-center py-3 px-3"><button onClick={() => setViewItemsOrder(o)} className="bg-slate-600 hover:bg-slate-500 text-white px-3 py-1 rounded text-xs font-bold">📋 Ver</button></td>
-                  </tr>
-                ))}
-              </tbody></table>
-            }
-          </div>
-        </div>
-        {billOrder && <BillModal order={billOrder} onClose={() => setBillOrder(null)} onPay={payAccount} />}
-        {viewItemsOrder && <ItemsModal order={viewItemsOrder} onClose={() => setViewItemsOrder(null)} />}
-      </div>
-    );
+    return <CajaScreen zona="bar" zonaNombre="Bar" accounts={barAccounts} paid={barPaid} loading={loading} billOrder={billOrder} setBillOrder={setBillOrder} viewItemsOrder={viewItemsOrder} setViewItemsOrder={setViewItemsOrder} onLogout={handleLogout} onPay={payAccount} />;
   }
 
-  // ── CAJA RESTAURANTE ──────────────────────────
   if (userRole === 'caja' && currentZone === 'restaurante') {
-    const totalCobrado = restPaid.reduce((s, o) => s + o.total, 0);
-    const foodCobrado  = restPaid.reduce((s, o) => s + (o.foodItems || o.items?.filter(i=>i.category==='food') || []).reduce((a, i) => a + i.price * i.quantity, 0), 0);
-    const drinkCobrado = restPaid.reduce((s, o) => s + (o.drinkItems || o.items?.filter(i=>i.category!=='food') || []).reduce((a, i) => a + i.price * i.quantity, 0), 0);
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-black via-slate-900 to-black">
-        {loading && <Spinner />}
-        <Header mesera="Caja Restaurante" zona="Caja" onLogout={handleLogout} />
-        <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-5">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-5 shadow-2xl">
-              <div className="text-slate-400 text-sm">Cuentas Pagadas</div>
-              <div className="text-3xl font-bold text-white mt-2">{restPaid.length}</div>
-            </div>
-            <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-5 shadow-2xl">
-              <div className="text-slate-400 text-sm">Total Comida</div>
-              <div className="text-2xl font-bold text-[#94cb47] mt-2">₡{foodCobrado.toLocaleString()}</div>
-            </div>
-            <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-5 shadow-2xl">
-              <div className="text-slate-400 text-sm">Total Bebidas</div>
-              <div className="text-2xl font-bold text-[#94cb47] mt-2">₡{drinkCobrado.toLocaleString()}</div>
-            </div>
-          </div>
-          <div className="bg-gradient-to-r [#94cb47] rounded-2xl p-6 shadow-2xl">
-            <div className="text-white/80 text-base">💰 Total Cobrado Hoy — Restaurante</div>
-            <div className="text-4xl font-bold text-white">₡{totalCobrado.toLocaleString()}</div>
-          </div>
-          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-5 shadow-2xl">
-            <h3 className="text-[#94cb47] font-bold text-lg mb-4">📂 Cuentas Abiertas ({restAccounts.length})</h3>
-            {restAccounts.length === 0
-              ? <p className="text-slate-500 text-sm">No hay cuentas abiertas</p>
-              : <div className="space-y-3">
-                {restAccounts.map(acc => (
-                  <div key={acc._id || acc.id} className="bg-slate-700/50 rounded-xl p-4 flex flex-wrap justify-between items-center gap-3 border border-slate-600">
-                    <div>
-                      <div className="text-white font-bold">{acc.barra || `Mesa ${acc.table}`}{acc.clientName ? ` — ${acc.clientName}` : ''}</div>
-                      <div className="text-slate-400 text-xs">👤 {acc.mesera} · {acc.items.length} items</div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-[#94cb47] font-bold">₡{acc.total.toLocaleString()}</span>
-                      <button onClick={() => setViewItemsOrder(acc)} className="bg-slate-600 hover:bg-slate-500 text-white px-3 py-1 rounded text-xs font-bold">📋 Items</button>
-                      <button onClick={() => setBillOrder(acc)} className="bg-[#94cb47] hover:bg-[#94cb47] text-white px-3 py-1 rounded text-xs font-bold">💳 Cobrar</button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            }
-          </div>
-          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-5 shadow-2xl overflow-x-auto">
-            <h3 className="text-[#94cb47] font-bold text-lg mb-4">✅ Historial Pagadas</h3>
-            {restPaid.length === 0 ? <p className="text-slate-500 text-sm">Sin pagos aún</p> :
-              <table className="w-full text-sm"><thead><tr className="border-b border-slate-700">
-                <th className="text-left py-2 px-3 text-slate-400">Mesera</th>
-                <th className="text-left py-2 px-3 text-slate-400">Mesa/Barra</th>
-                <th className="text-left py-2 px-3 text-slate-400">Cliente</th>
-                <th className="text-center py-2 px-3 text-slate-400">Pago</th>
-                <th className="text-right py-2 px-3 text-slate-400">Total</th>
-                <th className="text-center py-2 px-3 text-slate-400">Items</th>
-              </tr></thead><tbody>
-                {restPaid.map(o => (
-                  <tr key={o._id || o.id} className="border-b border-slate-700 hover:bg-slate-700/30">
-                    <td className="py-3 px-3 text-white">{o.mesera}</td>
-                    <td className="py-3 px-3 text-white">{o.locationLabel || o.barra || (o.table ? `Mesa ${o.table}` : '-')}</td>
-                    <td className="py-3 px-3 text-white">{o.clientName || '-'}</td>
-                    <td className="text-center py-3 px-3">{payBadge(o.paymentMethod)}</td>
-                    <td className="text-right py-3 px-3 text-[#94cb47] font-bold">₡{o.total.toLocaleString()}</td>
-                    <td className="text-center py-3 px-3"><button onClick={() => setViewItemsOrder(o)} className="bg-slate-600 hover:bg-slate-500 text-white px-3 py-1 rounded text-xs font-bold">📋 Ver</button></td>
-                  </tr>
-                ))}
-              </tbody></table>
-            }
-          </div>
-        </div>
-        {billOrder && <BillModal order={billOrder} onClose={() => setBillOrder(null)} onPay={payAccount} />}
-        {viewItemsOrder && <ItemsModal order={viewItemsOrder} onClose={() => setViewItemsOrder(null)} />}
-      </div>
-    );
+    return <CajaScreen zona="restaurante" zonaNombre="Restaurante" accounts={restAccounts} paid={restPaid} loading={loading} billOrder={billOrder} setBillOrder={setBillOrder} viewItemsOrder={viewItemsOrder} setViewItemsOrder={setViewItemsOrder} onLogout={handleLogout} onPay={payAccount} />;
   }
 
-  // ── ADMIN ─────────────────────────────────────
-  const totalBarCobrado  = barPaid.reduce((s, o) => s + o.total, 0);
-  const totalRestCobrado = restPaid.reduce((s, o) => s + o.total, 0);
-  const grandTotal = totalBarCobrado + totalRestCobrado;
-  const barFoodTotal    = barPaid.reduce((s, o) => s + (o.items||[]).filter(i=>i.category==='food').reduce((a,i)=>a+i.price*i.quantity,0), 0);
-  // Todas las bebidas que pidió restaurante (nos las sirvió bar → les debemos)
-  const restDrinksTotal = restPaid.reduce((s, o) => s + (o.items||[]).filter(i=>['alcoholic','beverage','soda'].includes(i.category)).reduce((a,i)=>a+i.price*i.quantity,0), 0);
-  // Compatibilidad con variable vieja para el PDF
-  const barSodaTotal  = restDrinksTotal;
-  const restSodaTotal = restDrinksTotal;
-  const deudaBar = barFoodTotal - restDrinksTotal;
-
-  const StatRow = ({ label, value }) => (
-    <div className="flex justify-between items-center p-3 bg-slate-700/50 rounded-lg gap-2">
-      <span className="text-slate-400 text-sm">{label}</span>
-      <span className="text-white font-bold text-sm whitespace-nowrap">{value}</span>
-    </div>
-  );
-
-  const descargarCierrePDF = () => {
-    const now = new Date();
-    const fecha = now.toLocaleDateString('es-CR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-    const hora  = now.toLocaleTimeString('es-CR', { hour: '2-digit', minute: '2-digit' });
-
-    const barFoodTotal2  = barPaid.reduce((s,o)=>s+(o.items||[]).filter(i=>i.category==='food').reduce((a,i)=>a+i.price*i.quantity,0),0);
-    const barDrinkTotal  = barPaid.reduce((s,o)=>s+(o.items||[]).filter(i=>i.category!=='food').reduce((a,i)=>a+i.price*i.quantity,0),0);
-    const restFoodTotal  = restPaid.reduce((s,o)=>s+(o.items||[]).filter(i=>i.category==='food').reduce((a,i)=>a+i.price*i.quantity,0),0);
-    const restDrinkTotal = restPaid.reduce((s,o)=>s+(o.items||[]).filter(i=>i.category!=='food').reduce((a,i)=>a+i.price*i.quantity,0),0);
-
-    const methodLabel = (m) => m === 'sinpe' ? '📱 Sinpe' : m === 'tarjeta' ? '💳 Tarjeta' : '💵 Efectivo';
-
-    // Totales por método de pago
-    const countMethod = (arr, m) => arr.filter(o => (o.paymentMethod || 'efectivo') === m).length;
-    const sumMethod   = (arr, m) => arr.filter(o => (o.paymentMethod || 'efectivo') === m).reduce((s,o)=>s+o.total,0);
-
-    const cuentasBarHTML = barPaid.map(o => `
-      <tr>
-        <td>${o.mesera}</td>
-        <td>${o.locationLabel || o.barra || 'Mesa ' + o.table}${o.clientName ? ' — ' + o.clientName : ''}</td>
-        <td style="text-align:center">${methodLabel(o.paymentMethod)}</td>
-        <td style="text-align:right">₡${o.total.toLocaleString()}</td>
-      </tr>`).join('');
-
-    const cuentasRestHTML = restPaid.map(o => `
-      <tr>
-        <td>${o.mesera}</td>
-        <td>${o.locationLabel || o.barra || 'Mesa ' + o.table}${o.clientName ? ' — ' + o.clientName : ''}</td>
-        <td style="text-align:center">${methodLabel(o.paymentMethod)}</td>
-        <td style="text-align:right">₡${o.total.toLocaleString()}</td>
-      </tr>`).join('');
-
-    const html = `<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <title>Cierre de Caja — LORE ${fecha}</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: Arial, sans-serif; font-size: 13px; color: #1a1a1a; padding: 30px; }
-    .header { text-align: center; border-bottom: 3px solid #059669; padding-bottom: 16px; margin-bottom: 24px; }
-    .header h1 { font-size: 28px; color: #94cb47; letter-spacing: 4px; }
-    .header p { color: #666; margin-top: 4px; }
-    .fecha { font-size: 15px; font-weight: bold; color: #333; }
-    .total-box { background: #94cb47; color: white; border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 24px; }
-    .total-box .label { font-size: 14px; opacity: 0.85; }
-    .total-box .monto { font-size: 36px; font-weight: bold; margin-top: 4px; }
-    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
-    .card { border: 1px solid #ddd; border-radius: 10px; padding: 16px; }
-    .card h2 { font-size: 16px; color: #94cb47; margin-bottom: 12px; border-bottom: 1px solid #eee; padding-bottom: 8px; }
-    .row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #f0f0f0; }
-    .row:last-child { border: none; }
-    .row .label { color: #666; }
-    .row .val { font-weight: bold; }
-    .total-row { display: flex; justify-content: space-between; background: #f0fde8; padding: 10px 12px; border-radius: 8px; margin-top: 10px; }
-    .total-row .val { color: #94cb47; font-weight: bold; font-size: 16px; }
-    .liquidacion { border: 2px solid #f59e0b; border-radius: 10px; padding: 16px; margin-bottom: 24px; background: #fffbeb; }
-    .liquidacion h2 { color: #d97706; font-size: 16px; margin-bottom: 12px; }
-    .saldo-final { background: ${deudaBar >= 0 ? '#fff7ed' : '#f0fdf4'}; border: 2px solid ${deudaBar >= 0 ? '#f59e0b' : '#059669'}; border-radius: 8px; padding: 12px; margin-top: 12px; display: flex; justify-content: space-between; align-items: center; }
-    .saldo-monto { font-size: 22px; font-weight: bold; color: ${deudaBar >= 0 ? '#d97706' : '#059669'}; }
-    table { width: 100%; border-collapse: collapse; font-size: 12px; }
-    th { background: #f1f5f9; text-align: left; padding: 8px; }
-    td { padding: 6px 8px; border-bottom: 1px solid #f0f0f0; }
-    tr:last-child td { border: none; }
-    .section-title { font-size: 15px; font-weight: bold; color: #333; margin: 20px 0 10px; }
-    .footer { text-align: center; color: #999; font-size: 11px; margin-top: 30px; border-top: 1px solid #eee; padding-top: 16px; }
-    @media print { body { padding: 15px; } }
-  </style>
-</head>
-<body>
-  <div class="header">
-    <h1>🍽️ LORE</h1>
-    <p class="fecha">${fecha}</p>
-    <p style="color:#999; font-size:12px">Generado a las ${hora}</p>
-  </div>
-
-  <div class="total-box">
-    <div class="label">💰 Total del Día</div>
-    <div class="monto">₡${grandTotal.toLocaleString()}</div>
-  </div>
-
-  <div class="grid">
-    <div class="card">
-      <h2>🍺 Bar</h2>
-      <div class="row"><span class="label">Cuentas cobradas</span><span class="val">${barPaid.length}</span></div>
-      <div class="row"><span class="label">Comida</span><span class="val">₡${barFoodTotal2.toLocaleString()}</span></div>
-      <div class="row"><span class="label">Bebidas</span><span class="val">₡${barDrinkTotal.toLocaleString()}</span></div>
-      <div class="total-row"><span>Total Bar</span><span class="val">₡${totalBarCobrado.toLocaleString()}</span></div>
-    </div>
-    <div class="card">
-      <h2>🍽️ Restaurante</h2>
-      <div class="row"><span class="label">Cuentas cobradas</span><span class="val">${restPaid.length}</span></div>
-      <div class="row"><span class="label">Comida</span><span class="val">₡${restFoodTotal.toLocaleString()}</span></div>
-      <div class="row"><span class="label">Bebidas</span><span class="val">₡${restDrinkTotal.toLocaleString()}</span></div>
-      <div class="total-row"><span>Total Restaurante</span><span class="val">₡${totalRestCobrado.toLocaleString()}</span></div>
-    </div>
-  </div>
-
-  <div class="liquidacion">
-    <h2>🍺 Liquidación con Bar</h2>
-    <div class="row"><span class="label">Comida que pidió Bar (Bar nos debe)</span><span class="val">₡${barFoodTotal.toLocaleString()}</span></div>
-    <div class="row"><span class="label">Refrescos cobrados por Bar (les debemos)</span><span class="val">₡${barSodaTotal.toLocaleString()}</span></div>
-    <div class="saldo-final">
-      <div>
-        <div style="font-weight:bold">SALDO FINAL</div>
-        <div style="font-size:11px;color:#666">${deudaBar >= 0 ? '📤 Bar nos paga' : '📥 Nosotros le pagamos al Bar'}</div>
-      </div>
-      <div class="saldo-monto">₡${Math.abs(deudaBar).toLocaleString()}</div>
-    </div>
-  </div>
-
-  ${barPaid.length > 0 ? `
-  <div class="section-title">📋 Detalle Cuentas — Bar (${barPaid.length})</div>
-  <div style="display:flex;gap:12px;margin-bottom:8px;font-size:12px">
-    <span style="background:#14532d;color:#86efac;padding:3px 10px;border-radius:20px">💵 Efectivo: ${countMethod(barPaid,'efectivo')} — ₡${sumMethod(barPaid,'efectivo').toLocaleString()}</span>
-    <span style="background:#1e3a5f;color:#93c5fd;padding:3px 10px;border-radius:20px">📱 Sinpe: ${countMethod(barPaid,'sinpe')} — ₡${sumMethod(barPaid,'sinpe').toLocaleString()}</span>
-    <span style="background:#3b1f6e;color:#d8b4fe;padding:3px 10px;border-radius:20px">💳 Tarjeta: ${countMethod(barPaid,'tarjeta')} — ₡${sumMethod(barPaid,'tarjeta').toLocaleString()}</span>
-  </div>
-  <table>
-    <thead><tr><th>Mesera</th><th>Mesa / Barra</th><th style="text-align:center">Pago</th><th style="text-align:right">Total</th></tr></thead>
-    <tbody>${cuentasBarHTML}</tbody>
-  </table>` : ''}
-
-  ${restPaid.length > 0 ? `
-  <div class="section-title">📋 Detalle Cuentas — Restaurante (${restPaid.length})</div>
-  <div style="display:flex;gap:12px;margin-bottom:8px;font-size:12px">
-    <span style="background:#14532d;color:#86efac;padding:3px 10px;border-radius:20px">💵 Efectivo: ${countMethod(restPaid,'efectivo')} — ₡${sumMethod(restPaid,'efectivo').toLocaleString()}</span>
-    <span style="background:#1e3a5f;color:#93c5fd;padding:3px 10px;border-radius:20px">📱 Sinpe: ${countMethod(restPaid,'sinpe')} — ₡${sumMethod(restPaid,'sinpe').toLocaleString()}</span>
-    <span style="background:#3b1f6e;color:#d8b4fe;padding:3px 10px;border-radius:20px">💳 Tarjeta: ${countMethod(restPaid,'tarjeta')} — ₡${sumMethod(restPaid,'tarjeta').toLocaleString()}</span>
-  </div>
-  <table>
-    <thead><tr><th>Mesera</th><th>Mesa / Barra</th><th style="text-align:center">Pago</th><th style="text-align:right">Total</th></tr></thead>
-    <tbody>${cuentasRestHTML}</tbody>
-  </table>` : ''}
-
-  <div class="footer">
-    LORE POS — Cierre de Caja ${fecha}
-  </div>
-</body>
-</html>`;
-
-    const blob = new Blob([html], { type: 'text/html' });
-    const url  = URL.createObjectURL(blob);
-    const win  = window.open(url, '_blank');
-    setTimeout(() => { win?.print(); URL.revokeObjectURL(url); }, 800);
-  };
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-slate-900 to-black">
-      {loading && <Spinner />}
-      <Header mesera="Admin" zona="Control" onLogout={handleLogout} />
-      <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-5">
-        <div className="bg-gradient-to-r [#94cb47] rounded-2xl p-6 shadow-2xl flex flex-wrap justify-between items-center gap-4">
-          <div>
-            <div className="text-white/80 text-base">💰 Total del Día</div>
-            <div className="text-4xl md:text-6xl font-bold text-white mt-1">₡{grandTotal.toLocaleString()}</div>
-          </div>
-          <button
-            onClick={descargarCierrePDF}
-            className="bg-white/20 hover:bg-white/30 text-white font-bold px-6 py-3 rounded-xl transition flex items-center gap-2 border border-white/30"
-          >
-            📄 Descargar Cierre del Día
-          </button>
-            <button
-              onClick={() => {
-                if (window.confirm('⚠️ ¿Seguro? Esto borrará todas las cuentas pagadas del día. Descarga el cierre primero.')) {
-                  fetch('/api/admin/clear-day', { method: 'DELETE' })
-                    .then(r => r.json())
-                    .then(() => { setPaidOrders([]); alert('✅ Datos del día eliminados'); })
-                    .catch(e => alert('❌ Error: ' + e.message));
-                }
-              }}
-              className="bg-red-900/40 hover:bg-red-900/70 text-red-300 font-bold px-6 py-3 rounded-xl transition flex items-center gap-2 border border-red-500/40"
-            >
-              🗑️ Limpiar Día
-            </button>
-        </div>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-5 shadow-2xl space-y-3">
-            <h3 className="text-white font-bold text-xl">🍺 Bar</h3>
-            <StatRow label="Cuentas cobradas" value={barPaid.length} />
-            <StatRow label="Comida vendida" value={`₡${barPaid.reduce((s,o)=>s+(o.items||[]).filter(i=>i.category==='food').reduce((a,i)=>a+i.price*i.quantity,0),0).toLocaleString()}`} />
-            <StatRow label="Bebidas vendidas" value={`₡${barPaid.reduce((s,o)=>s+(o.items||[]).filter(i=>i.category!=='food').reduce((a,i)=>a+i.price*i.quantity,0),0).toLocaleString()}`} />
-            <div className="border-t border-slate-700 pt-2 space-y-1">
-              <div className="text-slate-400 text-xs font-bold uppercase tracking-wide mb-1">Forma de pago</div>
-              {['efectivo','sinpe','tarjeta'].map(m => {
-                const total = barPaid.filter(o=>(o.paymentMethod||'efectivo')===m).reduce((s,o)=>s+o.total,0);
-                const count = barPaid.filter(o=>(o.paymentMethod||'efectivo')===m).length;
-                if (count === 0) return null;
-                return <div key={m} className="flex justify-between items-center">
-                  <span className="text-sm">{payBadge(m)}</span>
-                  <span className="text-white text-sm font-bold">₡{total.toLocaleString()} <span className="text-slate-400 font-normal text-xs">({count})</span></span>
-                </div>;
-              })}
-            </div>
-            <div className="bg-black/30 rounded-xl p-4">
-              <div className="text-white/80 text-xs">Total Bar</div>
-              <div className="text-2xl font-bold text-white">₡{totalBarCobrado.toLocaleString()}</div>
-            </div>
-          </div>
-          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-5 shadow-2xl space-y-3">
-            <h3 className="text-white font-bold text-xl">🍽️ Restaurante</h3>
-            <StatRow label="Cuentas cobradas" value={restPaid.length} />
-            <StatRow label="Comida vendida" value={`₡${restPaid.reduce((s,o)=>s+(o.items||[]).filter(i=>i.category==='food').reduce((a,i)=>a+i.price*i.quantity,0),0).toLocaleString()}`} />
-            <StatRow label="Bebidas vendidas" value={`₡${restPaid.reduce((s,o)=>s+(o.items||[]).filter(i=>i.category!=='food').reduce((a,i)=>a+i.price*i.quantity,0),0).toLocaleString()}`} />
-            <div className="border-t border-slate-700 pt-2 space-y-1">
-              <div className="text-slate-400 text-xs font-bold uppercase tracking-wide mb-1">Forma de pago</div>
-              {['efectivo','sinpe','tarjeta'].map(m => {
-                const total = restPaid.filter(o=>(o.paymentMethod||'efectivo')===m).reduce((s,o)=>s+o.total,0);
-                const count = restPaid.filter(o=>(o.paymentMethod||'efectivo')===m).length;
-                if (count === 0) return null;
-                return <div key={m} className="flex justify-between items-center">
-                  <span className="text-sm">{payBadge(m)}</span>
-                  <span className="text-white text-sm font-bold">₡{total.toLocaleString()} <span className="text-slate-400 font-normal text-xs">({count})</span></span>
-                </div>;
-              })}
-            </div>
-            <div className="bg-black/30 rounded-xl p-4">
-              <div className="text-white/80 text-xs">Total Restaurante</div>
-              <div className="text-2xl font-bold text-white">₡{totalRestCobrado.toLocaleString()}</div>
-            </div>
-          </div>
-        </div>
-        <div className="bg-gradient-to-br from-orange-900/40 to-red-900/40 rounded-2xl border-2 border-orange-500/60 p-5 shadow-2xl">
-          <h3 className="text-orange-300 font-bold text-xl mb-4">🍺 Liquidación con Bar</h3>
-          <div className="space-y-3 mb-4">
-            <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700 flex justify-between items-center gap-3">
-              <div><div className="text-slate-400 text-sm">Comida que pidió Bar</div><div className="text-xs text-slate-500">Bar nos debe esto</div></div>
-              <div className="text-xl font-bold text-orange-300 whitespace-nowrap">₡{barFoodTotal.toLocaleString()}</div>
-            </div>
-            <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700 flex justify-between items-center gap-3">
-              <div><div className="text-slate-400 text-sm">Bebidas cobradas por Bar al Restaurante</div><div className="text-xs text-slate-500">Nosotros les debemos esto</div></div>
-              <div className="text-xl font-bold text-[#94cb47] whitespace-nowrap">₡{barSodaTotal.toLocaleString()}</div>
-            </div>
-            <div className={`rounded-xl p-4 border flex justify-between items-center gap-3 ${deudaBar >= 0 ? 'bg-orange-900/40 border-orange-500' : 'bg-[#94cb47]/40 border-[#94cb47]'}`}>
-              <div><div className="text-slate-300 text-sm font-bold">SALDO FINAL</div><div className="text-xs text-slate-400">{deudaBar >= 0 ? '📤 Bar nos paga esto' : '📥 Nosotros le pagamos al Bar'}</div></div>
-              <div className={`text-2xl font-bold whitespace-nowrap ${deudaBar >= 0 ? 'text-orange-300' : 'text-[#94cb47]'}`}>₡{Math.abs(deudaBar).toLocaleString()}</div>
-            </div>
-          </div>
-          {restSodaTotal > 0 && (
-            <div className="bg-slate-800/40 rounded-xl p-3 border border-slate-600 text-xs text-slate-400">
-              Refrescos vendidos en Restaurante: <span className="text-[#94cb47] font-bold">₡{restSodaTotal.toLocaleString()}</span> (no afectan deuda)
-            </div>
-          )}
-        </div>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-5 shadow-2xl">
-            <h3 className="text-[#94cb47] font-bold text-lg mb-4">📋 Pagadas Bar</h3>
-            {barPaid.length === 0 ? <p className="text-slate-500 text-sm">Sin pagos</p> :
-              <div className="space-y-2 max-h-60 overflow-y-auto">
-                {barPaid.map(o => (
-                  <div key={o._id || o.id} className="flex justify-between items-center p-3 bg-slate-700/50 rounded-lg gap-2">
-                    <div className="min-w-0">
-                      <div className="text-white text-sm font-bold truncate">{o.locationLabel || o.barra || (o.table ? `Mesa ${o.table}` : '-')}{o.clientName ? ` — ${o.clientName}` : ''}</div>
-                      <div className="text-slate-400 text-xs">👤 {o.mesera}</div>
-                    </div>
-                    <div className="flex flex-col items-end gap-1 flex-shrink-0">
-                      {payBadge(o.paymentMethod)}
-                      <span className="text-[#94cb47] font-bold text-sm whitespace-nowrap">₡{o.total.toLocaleString()}</span>
-                      <button onClick={() => setViewItemsOrder(o)} className="bg-slate-600 hover:bg-slate-500 text-white px-2 py-1 rounded text-xs">📋</button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            }
-          </div>
-          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-5 shadow-2xl">
-            <h3 className="text-[#94cb47] font-bold text-lg mb-4">📋 Pagadas Restaurante</h3>
-            {restPaid.length === 0 ? <p className="text-slate-500 text-sm">Sin pagos</p> :
-              <div className="space-y-2 max-h-60 overflow-y-auto">
-                {restPaid.map(o => (
-                  <div key={o._id || o.id} className="flex justify-between items-center p-3 bg-slate-700/50 rounded-lg gap-2">
-                    <div className="min-w-0">
-                      <div className="text-white text-sm font-bold truncate">{o.locationLabel || o.barra || (o.table ? `Mesa ${o.table}` : '-')}{o.clientName ? ` — ${o.clientName}` : ''}</div>
-                      <div className="text-slate-400 text-xs">👤 {o.mesera}</div>
-                    </div>
-                    <div className="flex flex-col items-end gap-1 flex-shrink-0">
-                      {payBadge(o.paymentMethod)}
-                      <span className="text-[#94cb47] font-bold text-sm whitespace-nowrap">₡{o.total.toLocaleString()}</span>
-                      <button onClick={() => setViewItemsOrder(o)} className="bg-slate-600 hover:bg-slate-500 text-white px-2 py-1 rounded text-xs">📋</button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            }
-          </div>
-        </div>
-      </div>
-      {viewItemsOrder && <ItemsModal order={viewItemsOrder} onClose={() => setViewItemsOrder(null)} />}
-    </div>
-  );
+  return <AdminScreen barPaid={barPaid} restPaid={restPaid} loading={loading} onLogout={handleLogout} setPaidOrders={setPaidOrders} />;
 }
