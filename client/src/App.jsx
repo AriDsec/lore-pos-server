@@ -282,7 +282,8 @@ export default function RestaurantePOS() {
           currentUser={currentUser} zona={currentZone === 'bar' ? 'Bar' : 'Restaurante'}
           menu={currentZone === 'bar' ? MENU.bar : MENU.restaurante}
           licores={LICORES}
-          maxTables={currentZone === 'bar' ? 10 : 5}
+          maxTables={currentZone === 'bar' ? 12 : 5}
+          tables={currentZone === 'bar' ? [0,1,2,3,4,5,6,7,8,9,10,11,12] : null}
           onLogout={handleLogout} addToCart={addToCart}
           cartItems={cartItems} updateQuantity={updateQuantity}
           removeFromCart={removeFromCart} updateNotes={updateNotes}
