@@ -1,30 +1,133 @@
 // ─────────────────────────────────────────────
-// MENÚ COMPLETO
+// LICORES CON PRESENTACIONES
+// ─────────────────────────────────────────────
+export const LICORES = [
+  { id: 'lic_1800_anejo', name: '1800 Añejo', category: 'alcoholic', presentaciones: [
+    { id: 'tp', label: 'Trago Pequeño', price: 3000 }, { id: 'tg', label: 'Trago Grande', price: 5000 },
+    { id: 'cu', label: 'Cuarto', price: 15000 }, { id: 'me', label: 'Media', price: 20000 },
+    { id: 'bo', label: 'Botella', price: 40000 }, { id: 've', label: 'Venta', price: 30000 },
+  ]},
+  { id: 'lic_1800_blanco', name: '1800 Blanco', category: 'alcoholic', presentaciones: [
+    { id: 'tp', label: 'Trago Pequeño', price: 2500 }, { id: 'tg', label: 'Trago Grande', price: 4000 },
+    { id: 'cu', label: 'Cuarto', price: 10000 }, { id: 'me', label: 'Media', price: 16000 },
+    { id: 'bo', label: 'Botella', price: 32000 }, { id: 've', label: 'Venta', price: 24000 },
+  ]},
+  { id: 'lic_1800_reposado', name: '1800 Reposado', category: 'alcoholic', presentaciones: [
+    { id: 'tp', label: 'Trago Pequeño', price: 2500 }, { id: 'tg', label: 'Trago Grande', price: 4000 },
+    { id: 'cu', label: 'Cuarto', price: 10000 }, { id: 'me', label: 'Media', price: 16000 },
+    { id: 'bo', label: 'Botella', price: 32000 }, { id: 've', label: 'Venta', price: 24000 },
+  ]},
+  { id: 'lic_absolut', name: 'Absolut', category: 'alcoholic', presentaciones: [
+    { id: 'tp', label: 'Trago Pequeño', price: 2000 }, { id: 'tg', label: 'Trago Grande', price: 3000 },
+    { id: 'cu', label: 'Cuarto', price: 6000 }, { id: 'me', label: 'Media', price: 9000 },
+    { id: 'li', label: 'Litro', price: 22000 }, { id: 've', label: 'Venta', price: 17000 },
+  ]},
+  { id: 'lic_amarula', name: 'Amarula', category: 'alcoholic', presentaciones: [
+    { id: 'tp', label: 'Trago Pequeño', price: 2000 }, { id: 'tg', label: 'Trago Grande', price: 3000 },
+    { id: 'cu', label: 'Cuarto', price: 8000 }, { id: 'me', label: 'Media', price: 13000 },
+    { id: 'li', label: 'Litro', price: 30000 }, { id: 've', label: 'Venta', price: 22000 },
+  ]},
+  { id: 'lic_antioq_azul', name: 'Antioqueño Azul', category: 'alcoholic', presentaciones: [
+    { id: 'tp', label: 'Trago Pequeño', price: 2000 }, { id: 'tg', label: 'Trago Grande', price: 3000 },
+    { id: 'cu', label: 'Cuarto', price: 7000 }, { id: 'me', label: 'Media', price: 10000 },
+    { id: 'li', label: 'Litro', price: 21000 }, { id: 've', label: 'Venta', price: 16000 },
+  ]},
+  { id: 'lic_antioq_rojo', name: 'Antioqueño Rojo', category: 'alcoholic', presentaciones: [
+    { id: 'tp', label: 'Trago Pequeño', price: 2000 }, { id: 'tg', label: 'Trago Grande', price: 3000 },
+    { id: 'cu', label: 'Cuarto', price: 7000 }, { id: 'me', label: 'Media', price: 10000 },
+    { id: 'li', label: 'Litro', price: 21000 }, { id: 've', label: 'Venta', price: 16000 },
+  ]},
+  { id: 'lic_antioq_verde', name: 'Antioqueño Verde', category: 'alcoholic', presentaciones: [
+    { id: 'tp', label: 'Trago Pequeño', price: 2000 }, { id: 'tg', label: 'Trago Grande', price: 3000 },
+    { id: 'cu', label: 'Cuarto', price: 7000 }, { id: 'me', label: 'Media', price: 10000 },
+    { id: 'li', label: 'Litro', price: 21000 }, { id: 've', label: 'Venta', price: 16000 },
+  ]},
+  { id: 'lic_anis_imperial', name: 'Anís Imperial', category: 'alcoholic', presentaciones: [
+    { id: 'tp', label: 'Trago Pequeño', price: 1500 }, { id: 'tg', label: 'Trago Grande', price: 2500 },
+    { id: 'cu', label: 'Cuarto', price: 5000 }, { id: 'me', label: 'Media', price: 8000 },
+    { id: 'bo', label: 'Botella', price: 15000 }, { id: 've', label: 'Venta', price: 11000 },
+  ]},
+  { id: 'lic_bacardi', name: 'Bacardi', category: 'alcoholic', presentaciones: [
+    { id: 'tp', label: 'Trago Pequeño', price: 1500 }, { id: 'tg', label: 'Trago Grande', price: 2500 },
+    { id: 'cu', label: 'Cuarto', price: 5000 }, { id: 'me', label: 'Media', price: 8000 },
+    { id: 'li', label: 'Litro', price: 15000 }, { id: 've', label: 'Venta', price: 12000 },
+  ]},
+  { id: 'lic_ballantines', name: 'Ballantines', category: 'alcoholic', presentaciones: [
+    { id: 'tp', label: 'Trago Pequeño', price: 2000 }, { id: 'tg', label: 'Trago Grande', price: 3000 },
+    { id: 'cu', label: 'Cuarto', price: 7000 }, { id: 'me', label: 'Media', price: 12000 },
+    { id: 'li', label: 'Litro', price: 30000 }, { id: 've', label: 'Venta', price: 20000 },
+  ]},
+  { id: 'lic_baileys', name: 'Baileys', category: 'alcoholic', presentaciones: [
+    { id: 'tp', label: 'Trago Pequeño', price: 2000 }, { id: 'tg', label: 'Trago Grande', price: 3500 },
+    { id: 'cu', label: 'Cuarto', price: 9000 }, { id: 'me', label: 'Media', price: 13000 },
+    { id: 'li', label: 'Litro', price: 31000 }, { id: 've', label: 'Venta', price: 25000 },
+  ]},
+  { id: 'lic_black_white', name: 'Black & White', category: 'alcoholic', presentaciones: [
+    { id: 'tp', label: 'Trago Pequeño', price: 1500 }, { id: 'tg', label: 'Trago Grande', price: 2500 },
+    { id: 'cu', label: 'Cuarto', price: 6000 }, { id: 'me', label: 'Media', price: 9000 },
+    { id: 'li', label: 'Litro', price: 20000 }, { id: 've', label: 'Venta', price: 15000 },
+  ]},
+  { id: 'lic_buchanans', name: "Buchanan's", category: 'alcoholic', presentaciones: [
+    { id: 'tp', label: 'Trago Pequeño', price: 3000 }, { id: 'tg', label: 'Trago Grande', price: 5000 },
+    { id: 'cu', label: 'Cuarto', price: 15000 }, { id: 'me', label: 'Media', price: 27000 },
+    { id: 'li', label: 'Litro', price: 65000 }, { id: 've', label: 'Venta', price: 35000 },
+  ]},
+  { id: 'lic_cacique', name: 'Cacique', category: 'alcoholic', presentaciones: [
+    { id: 'tp', label: 'Trago Pequeño', price: 1000 }, { id: 'tg', label: 'Trago Grande', price: 1500 },
+    { id: 'cu', label: 'Cuarto', price: 4000 }, { id: 'me', label: 'Media', price: 6000 },
+    { id: 'li', label: 'Litro', price: 12000 }, { id: 've', label: 'Venta', price: 10000 },
+  ]},
+  { id: 'lic_campari', name: 'Campari', category: 'alcoholic', presentaciones: [
+    { id: 'tp', label: 'Trago Pequeño', price: 2000 }, { id: 'tg', label: 'Trago Grande', price: 3000 },
+    { id: 'cu', label: 'Cuarto', price: 7000 }, { id: 'me', label: 'Media', price: 12000 },
+    { id: 'li', label: 'Litro', price: 27000 }, { id: 've', label: 'Venta', price: 20000 },
+  ]},
+  { id: 'lic_captain_morgan', name: 'Captain Morgan', category: 'alcoholic', presentaciones: [
+    { id: 'tp', label: 'Trago Pequeño', price: 1500 }, { id: 'tg', label: 'Trago Grande', price: 2500 },
+    { id: 'cu', label: 'Cuarto', price: 5000 }, { id: 'me', label: 'Media', price: 8000 },
+    { id: 'li', label: 'Litro', price: 20000 }, { id: 've', label: 'Venta', price: 15000 },
+  ]},
+  { id: 'lic_centenario', name: 'Centenario', category: 'alcoholic', presentaciones: [
+    { id: 'tp', label: 'Trago Pequeño', price: 1500 }, { id: 'tg', label: 'Trago Grande', price: 2500 },
+    { id: 'cu', label: 'Cuarto', price: 7000 }, { id: 'me', label: 'Media', price: 10000 },
+    { id: 'li', label: 'Litro', price: 23000 }, { id: 've', label: 'Venta', price: 18000 },
+  ]},
+  { id: 'lic_chivas_regal', name: 'Chivas Regal', category: 'alcoholic', presentaciones: [
+    { id: 'tp', label: 'Trago Pequeño', price: 2200 }, { id: 'tg', label: 'Trago Grande', price: 4000 },
+    { id: 'cu', label: 'Cuarto', price: 12000 }, { id: 'me', label: 'Media', price: 17000 },
+    { id: 'li', label: 'Litro', price: 50000 }, { id: 've', label: 'Venta', price: 35000 },
+  ]},
+  { id: 'lic_don_julio', name: 'Don Julio', category: 'alcoholic', presentaciones: [
+    { id: 'tp', label: 'Trago Pequeño', price: 5000 }, { id: 'tg', label: 'Trago Grande', price: 10000 },
+    { id: 'cu', label: 'Cuarto', price: 30000 }, { id: 'me', label: 'Media', price: 50000 },
+    { id: 'li', label: 'Litro', price: 100000 }, { id: 've', label: 'Venta', price: 75000 },
+  ]},
+];
+
+// ─────────────────────────────────────────────
+// MENUDEO / OTROS
+// ─────────────────────────────────────────────
+export const OTROS = [
+  { id: 'o_cigarro',        name: 'Cigarro suelto',       price: 500,  category: 'otro' },
+  { id: 'o_cigarros_caja',  name: 'Caja cigarros',        price: 5000, category: 'otro' },
+  { id: 'o_snack_papitas',  name: 'Papitas snack',         price: 500,  category: 'otro' },
+  { id: 'o_snack_chifles',  name: 'Chifles',              price: 500,  category: 'otro' },
+  { id: 'o_snack_maiz',     name: 'Maíz tostado',         price: 500,  category: 'otro' },
+  { id: 'o_snack_nueces',   name: 'Nueces/Manís',         price: 500,  category: 'otro' },
+  { id: 'o_mayo_sobre',     name: 'Mayo (sobre)',          price: 200,  category: 'otro' },
+  { id: 'o_ketchup_sobre',  name: 'Ketchup (sobre)',       price: 200,  category: 'otro' },
+  { id: 'o_mostaza_sobre',  name: 'Mostaza (sobre)',       price: 200,  category: 'otro' },
+  { id: 'o_salsa_lizano',   name: 'Salsa Lizano (sobre)',  price: 200,  category: 'otro' },
+  { id: 'o_chicle',         name: 'Chicle',               price: 100,  category: 'otro' },
+  { id: 'o_dulce',          name: 'Dulce/Caramelo',       price: 100,  category: 'otro' },
+  { id: 'o_agua_botella',   name: 'Agua botella',         price: 800,  category: 'otro' },
+];
+
+// ─────────────────────────────────────────────
+// MENÚ (sin licores — se manejan vía LICORES)
 // ─────────────────────────────────────────────
 export const MENU = {
   bar: {
-    'Licores': [
-      { id: 'b_añejo_1800', name: '1800 Añejo', price: 3000, category: 'alcoholic' },
-      { id: 'b_blanco_1800', name: '1800 Blanco', price: 2500, category: 'alcoholic' },
-      { id: 'b_reposado_1800', name: '1800 Reposado', price: 2500, category: 'alcoholic' },
-      { id: 'b_absolut', name: 'Absolut', price: 2000, category: 'alcoholic' },
-      { id: 'b_amarula', name: 'Amarula', price: 2000, category: 'alcoholic' },
-      { id: 'b_antioq_azul', name: 'Antioqueño Azul', price: 2000, category: 'alcoholic' },
-      { id: 'b_antioq_rojo', name: 'Antioqueño Rojo', price: 2000, category: 'alcoholic' },
-      { id: 'b_antioq_verde', name: 'Antioqueño Verde', price: 2000, category: 'alcoholic' },
-      { id: 'b_anis_imperial', name: 'Anís Imperial', price: 1500, category: 'alcoholic' },
-      { id: 'b_bacardi', name: 'Bacardi', price: 1500, category: 'alcoholic' },
-      { id: 'b_ballantines', name: 'Ballantines', price: 2000, category: 'alcoholic' },
-      { id: 'b_baileys', name: 'Baileys', price: 2000, category: 'alcoholic' },
-      { id: 'b_black_white', name: 'Black & White', price: 1500, category: 'alcoholic' },
-      { id: 'b_buchanans', name: "Buchanan's", price: 3000, category: 'alcoholic' },
-      { id: 'b_cacique', name: 'Cacique', price: 1000, category: 'alcoholic' },
-      { id: 'b_campari', name: 'Campari', price: 2000, category: 'alcoholic' },
-      { id: 'b_captain_morgan', name: 'Captain Morgan', price: 1500, category: 'alcoholic' },
-      { id: 'b_centenario', name: 'Centenario', price: 1500, category: 'alcoholic' },
-      { id: 'b_chivas_regal', name: 'Chivas Regal', price: 2200, category: 'alcoholic' },
-      { id: 'b_don_julio', name: 'Don Julio', price: 5000, category: 'alcoholic' },
-    ],
     'Cervezas Nacionales': [
       { id: 'b_imperial', name: 'Imperial', price: 1500, category: 'beverage' },
       { id: 'b_pilsen', name: 'Pilsen', price: 1500, category: 'beverage' },
@@ -120,28 +223,6 @@ export const MENU = {
     ],
   },
   restaurante: {
-    'Licores': [
-      { id: 'r_añejo_1800', name: '1800 Añejo', price: 3000, category: 'alcoholic' },
-      { id: 'r_blanco_1800', name: '1800 Blanco', price: 2500, category: 'alcoholic' },
-      { id: 'r_reposado_1800', name: '1800 Reposado', price: 2500, category: 'alcoholic' },
-      { id: 'r_absolut', name: 'Absolut', price: 2000, category: 'alcoholic' },
-      { id: 'r_amarula', name: 'Amarula', price: 2000, category: 'alcoholic' },
-      { id: 'r_antioq_azul', name: 'Antioqueño Azul', price: 2000, category: 'alcoholic' },
-      { id: 'r_antioq_rojo', name: 'Antioqueño Rojo', price: 2000, category: 'alcoholic' },
-      { id: 'r_antioq_verde', name: 'Antioqueño Verde', price: 2000, category: 'alcoholic' },
-      { id: 'r_anis_imperial', name: 'Anís Imperial', price: 1500, category: 'alcoholic' },
-      { id: 'r_bacardi', name: 'Bacardi', price: 1500, category: 'alcoholic' },
-      { id: 'r_ballantines', name: 'Ballantines', price: 2000, category: 'alcoholic' },
-      { id: 'r_baileys', name: 'Baileys', price: 2000, category: 'alcoholic' },
-      { id: 'r_black_white', name: 'Black & White', price: 1500, category: 'alcoholic' },
-      { id: 'r_buchanans', name: "Buchanan's", price: 3000, category: 'alcoholic' },
-      { id: 'r_cacique', name: 'Cacique', price: 1000, category: 'alcoholic' },
-      { id: 'r_campari', name: 'Campari', price: 2000, category: 'alcoholic' },
-      { id: 'r_captain_morgan', name: 'Captain Morgan', price: 1500, category: 'alcoholic' },
-      { id: 'r_centenario', name: 'Centenario', price: 1500, category: 'alcoholic' },
-      { id: 'r_chivas_regal', name: 'Chivas Regal', price: 2200, category: 'alcoholic' },
-      { id: 'r_don_julio', name: 'Don Julio', price: 5000, category: 'alcoholic' },
-    ],
     'Cervezas Nacionales': [
       { id: 'r_imperial', name: 'Imperial', price: 1500, category: 'beverage' },
       { id: 'r_pilsen', name: 'Pilsen', price: 1500, category: 'beverage' },
