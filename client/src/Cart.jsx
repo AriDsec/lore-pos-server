@@ -6,7 +6,7 @@ export function ShoppingCart({
   selectedBarra, setSelectedBarra, clientName, setClientName,
   barras, maxTables, tables,
   openAccounts, selectedAccount, onSelectAccount,
-  mobileVisible, onDirectPay, isBar,
+  mobileVisible, onDirectPay, isBar, onSplit,
 }) {
   const total = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const baseClass = "bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 overflow-hidden flex flex-col shadow-2xl";
@@ -116,6 +116,15 @@ export function ShoppingCart({
             <div className="text-2xl font-bold text-[#94cb47]">₡{total.toLocaleString()}</div>
           </div>
           <button onClick={completeOrder} className="w-full bg-[#94cb47] hover:bg-[#7ab035] text-black font-bold py-3 rounded-xl transition shadow-xl text-base">✓ Guardar Cuenta</button>
+          {selectedAccount && cartItems.length > 1 && onSplit && (
+            <button
+              onClick={() => {
+                const acc = openAccounts.find(a => a.id === selectedAccount || a._id === selectedAccount);
+                if (acc) onSplit(acc);
+              }}
+              className="w-full bg-orange-700 hover:bg-orange-600 text-white font-bold py-3 rounded-xl transition shadow-xl text-base"
+            >✂️ Separar Cuenta</button>
+          )}
           {isBar && onDirectPay && (
             <button onClick={onDirectPay} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition shadow-xl text-base">💵 Cobro Directo</button>
           )}
