@@ -13,9 +13,7 @@ export function ShoppingCart({
 
   if (!mobileVisible) return null;
 
-  const wrapClass = isLandscapeMode
-    ? "bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 shadow-2xl overflow-y-auto h-[calc(100vh-72px)] sticky top-3"
-    : "bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 shadow-2xl overflow-y-auto max-h-[calc(100vh-140px)]";
+  const wrapClass = "bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 shadow-2xl";
 
   return (
     <div className={wrapClass}>
