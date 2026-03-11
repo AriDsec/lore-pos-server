@@ -1,4 +1,4 @@
-import { Header, payBadge, BillModal, ItemsModal, Spinner } from './components.jsx';
+import { Header, payBadge, BillModal, ItemsModal, SplitModal, Spinner } from './components.jsx';
 
 function CajaStats({ paid, zona }) {
   const totalCobrado = paid.reduce((s, o) => s + o.total, 0);
@@ -10,6 +10,7 @@ function CajaStats({ paid, zona }) {
 export function CajaScreen({
   zona, zonaNombre, accounts, paid,
   loading, billOrder, setBillOrder, viewItemsOrder, setViewItemsOrder,
+  splitOrder, setSplitOrder, onSplit,
   onLogout, onPay,
 }) {
   const { totalCobrado, foodCobrado, drinkCobrado } = CajaStats({ paid });
@@ -49,12 +50,15 @@ export function CajaScreen({
                 {accounts.map(acc => (
                   <div key={acc._id || acc.id} className="bg-slate-700/50 rounded-xl p-4 flex flex-wrap justify-between items-center gap-3 border border-slate-600">
                     <div>
-                      <div className="text-white font-bold">{acc.barra || `Mesa ${acc.table}`}{acc.clientName ? ` — ${acc.clientName}` : ''}</div>
+                      <div className="text-white font-bold">{acc.barra || (acc.table != null ? `Mesa ${acc.table}` : acc.locationLabel || 'Barra')}{acc.clientName ? ` — ${acc.clientName}` : ''}</div>
                       <div className="text-slate-400 text-xs">👤 {acc.mesera} · {acc.items.length} items</div>
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="text-[#94cb47] font-bold">₡{acc.total.toLocaleString()}</span>
                       <button onClick={() => setViewItemsOrder(acc)} className="bg-slate-600 hover:bg-slate-500 text-white px-3 py-1 rounded text-xs font-bold">📋 Items</button>
+                      {acc.items.length > 1 && (
+                        <button onClick={() => setSplitOrder(acc)} className="bg-orange-700 hover:bg-orange-600 text-white px-3 py-1 rounded text-xs font-bold">✂️ Separar</button>
+                      )}
                       <button onClick={() => setBillOrder(acc)} className="bg-[#94cb47] hover:bg-[#7ab035] text-black px-3 py-1 rounded text-xs font-bold">💳 Cobrar</button>
                     </div>
                   </div>
@@ -82,7 +86,7 @@ export function CajaScreen({
                 {paid.map(o => (
                   <tr key={o._id || o.id} className="border-b border-slate-700 hover:bg-slate-700/30">
                     <td className="py-3 px-3 text-white">{o.mesera}</td>
-                    <td className="py-3 px-3 text-white">{o.locationLabel || o.barra || (o.table ? `Mesa ${o.table}` : '-')}</td>
+                    <td className="py-3 px-3 text-white">{o.locationLabel || o.barra || (o.table != null ? `Mesa ${o.table}` : 'Barra')}</td>
                     <td className="py-3 px-3 text-white">{o.clientName || '-'}</td>
                     <td className="text-center py-3 px-3">{payBadge(o.paymentMethod)}</td>
                     <td className="text-right py-3 px-3 text-[#94cb47] font-bold">₡{o.total.toLocaleString()}</td>
@@ -99,6 +103,7 @@ export function CajaScreen({
 
       {billOrder && <BillModal order={billOrder} onClose={() => setBillOrder(null)} onPay={onPay} />}
       {viewItemsOrder && <ItemsModal order={viewItemsOrder} onClose={() => setViewItemsOrder(null)} />}
+      {splitOrder && <SplitModal account={splitOrder} onConfirm={onSplit} onClose={() => setSplitOrder(null)} />}
     </div>
   );
 }
