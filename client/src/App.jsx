@@ -278,8 +278,11 @@ export default function RestaurantePOS() {
   const barPaid          = paidOrders.filter(a => a.zone === 'bar');
   const restPaid         = paidOrders.filter(a => a.zone === 'restaurante');
   // Meseras solo ven sus propias cuentas normales (no cobros directos de otras)
+  // Meseras ven todas las cuentas normales de su zona (no solo las propias)
+  // para poder agregar items a cuentas de otros clientes
+  // La Tablet Restaurante sigue viendo solo las suyas (es una terminal fija)
   const zoneOpenAccounts = (currentZone === 'bar' ? barAccounts : restAccounts)
-    .filter(a => a.type !== 'direct' && a.mesera === currentUser);
+    .filter(a => a.type !== 'direct' && (currentUser === 'Tablet Restaurante' ? a.mesera === currentUser : true));
 
   // ── LOGIN ─────────────────────────────────────
   if (!currentUser) {
