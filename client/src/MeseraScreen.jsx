@@ -19,10 +19,14 @@ export function MeseraScreen({
   );
 
   useEffect(() => {
+    const check = () => setIsLandscape(window.matchMedia('(orientation: landscape)').matches);
     const mq = window.matchMedia('(orientation: landscape)');
-    const handler = (e) => setIsLandscape(e.matches);
-    mq.addEventListener('change', handler);
-    return () => mq.removeEventListener('change', handler);
+    mq.addEventListener('change', check);
+    window.addEventListener('resize', check);
+    return () => {
+      mq.removeEventListener('change', check);
+      window.removeEventListener('resize', check);
+    };
   }, []);
 
   const cartProps = {
@@ -78,12 +82,14 @@ export function MeseraScreen({
     <div className="min-h-screen bg-gradient-to-br from-black via-slate-900 to-black flex flex-col">
       <Header mesera={currentUser} zona={zona} onLogout={onLogout} />
 
-      {/* ── Landscape: 3 columnas ── */}
-      <div className={`${isLandscape ? "grid" : "hidden"} grid-cols-3 gap-4 p-4 max-w-7xl mx-auto w-full flex-1`}>
-        <div className="col-span-2 space-y-4">
+      {/* ── Landscape: 5 columnas — 3 menú / 2 carrito ── */}
+      <div className={`${isLandscape ? "grid" : "hidden"} grid-cols-5 gap-3 p-3 max-w-7xl mx-auto w-full flex-1 min-h-0`}>
+        <div className="col-span-3 space-y-3 overflow-y-auto min-h-0">
           <MenuCenter />
         </div>
-        <ShoppingCart {...cartProps} mobileVisible="landscape" />
+        <div className="col-span-2 min-h-0">
+          <ShoppingCart {...cartProps} mobileVisible="landscape" />
+        </div>
       </div>
 
       {/* ── Portrait: tabs ── */}
