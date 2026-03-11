@@ -129,7 +129,10 @@ export default function RestaurantePOS() {
 
   const completeOrder = async () => {
     if (cartItems.length === 0) { alert('El carrito está vacío'); return; }
+    if (!orderType) { alert('Selecciona el tipo de pedido (Local o Llevar)'); return; }
     if (orderType === 'dine-in' && !selectedTable && !selectedBarra) { alert('Selecciona una mesa o barra'); return; }
+    if (!clientName.trim()) { alert('Ingresa un nombre o seña del cliente'); return; }
+    if (clientName.trim().toLowerCase() === 'cliente general') { alert('"Cliente General" es solo para cobros directos. Ingresa un nombre real.'); return; }
     const total = cartItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
     const foodItems = cartItems.filter(i => i.category === 'food');
     setLoading(true);
@@ -165,15 +168,30 @@ export default function RestaurantePOS() {
     if (cartItems.length === 0) { alert('El carrito está vacío'); return; }
     const total = cartItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
     const foodItems = cartItems.filter(i => i.category === 'food');
-    const location = selectedBarra ? selectedBarra : (selectedTable ? `Mesa ${selectedTable}` : 'Cobro directo');
+    const location = selectedBarra ? selectedBarra : (selectedTable ? `Mesa ${selectedTable}` : 'Barra');
+    const accId = `acc-direct-${Date.now()}`;
     setLoading(true);
     try {
-      await api.createAccount({ id: `acc-direct-${Date.now()}`, zone: currentZone, mesera: currentUser, items: [...cartItems], total, type: 'direct', table: selectedTable || null, barra: selectedBarra || null, locationLabel: location, clientName: clientName || '', foodItems, drinkItems: cartItems.filter(i => ['alcoholic','beverage','soda'].includes(i.category)), status: 'open', createdAt: new Date() });
+      // Crear cuenta y cerrarla de inmediato — no aparece como abierta para nadie
+      await api.createAccount({
+        id: accId, zone: currentZone, mesera: currentUser,
+        items: [...cartItems], total, type: 'direct',
+        table: selectedTable || null, barra: selectedBarra || null,
+        locationLabel: location, clientName: 'Cliente General',
+        foodItems, drinkItems: cartItems.filter(i => ['alcoholic','beverage','soda'].includes(i.category)),
+        status: 'open', createdAt: new Date(),
+      });
+      await api.closeAccount(accId, 'efectivo');
       if (foodItems.length > 0) {
-        await api.createKitchenOrder({ id: `k-direct-${Date.now()}`, zone: currentZone, mesera: currentUser, items: foodItems, locationLabel: location, table: selectedTable || null, barra: selectedBarra || null, clientName: clientName || '', status: 'pending', createdAt: new Date() });
+        await api.createKitchenOrder({
+          id: `k-direct-${Date.now()}`, zone: currentZone, mesera: currentUser,
+          items: foodItems, locationLabel: location,
+          table: selectedTable || null, barra: selectedBarra || null,
+          clientName: 'Cliente General', status: 'pending', createdAt: new Date(),
+        });
       }
       setCartItems([]); setSelectedTable(null); setSelectedBarra(null); setClientName(''); setOrderType(null); setSelectedAccount(null);
-      alert('✅ Pedido registrado. La caja lo cobrará.');
+      alert('✅ Cobrado. Pedido enviado a cocina.');
     } catch (err) {
       alert('❌ Error: ' + err.message);
     } finally {
