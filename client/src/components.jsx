@@ -84,21 +84,21 @@ export function LicorModal({ licor, onSelect, onClose }) {
   if (!licor) return null;
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/40 p-6 shadow-2xl w-full max-w-sm">
+      <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/40 p-6 shadow-2xl w-full max-w-lg">
         <div className="text-center mb-5">
           <div className="text-3xl mb-1">🥃</div>
           <h2 className="text-xl font-bold text-[#94cb47]">{licor.name}</h2>
           <p className="text-slate-400 text-xs mt-1">Selecciona la presentación</p>
         </div>
-        <div className="space-y-2">
+        <div className="grid grid-cols-2 gap-2">
           {licor.presentaciones.map(p => (
             <button
               key={p.id}
               onClick={() => onSelect(licor, p)}
-              className="w-full flex items-center justify-between bg-slate-700 hover:bg-[#94cb47]/10 border border-slate-600 hover:border-[#94cb47]/60 rounded-xl px-4 py-3 transition-all group"
+              className="flex items-center justify-between bg-slate-700 hover:bg-[#94cb47]/10 border border-slate-600 hover:border-[#94cb47]/60 rounded-xl px-4 py-3 transition-all group"
             >
-              <span className="font-bold text-white group-hover:text-[#94cb47] transition">{p.label}</span>
-              <span className="text-[#94cb47] font-bold text-sm">₡{p.price.toLocaleString()}</span>
+              <span className="font-bold text-white group-hover:text-[#94cb47] transition text-sm">{p.label}</span>
+              <span className="text-[#94cb47] font-bold text-sm ml-2">₡{p.price.toLocaleString()}</span>
             </button>
           ))}
         </div>
