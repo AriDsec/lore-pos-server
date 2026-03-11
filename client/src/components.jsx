@@ -59,9 +59,9 @@ export function ItemButton({ item, onSelectItem }) {
         </button>
       </div>
       {item.canHavePapas && (
-        <div className="flex items-center gap-2 bg-slate-700/50 border border-amber-500/20 hover:border-amber-500/50 rounded-lg px-3 py-2 ml-3 transition-all">
+        <div className="flex items-center gap-2 bg-slate-700/50 border border-[#94cb47]/20 hover:border-[#94cb47]/50 rounded-lg px-3 py-2 ml-3 transition-all">
           <span className="flex-1 text-amber-200/80 text-xs">↳ con Papas</span>
-          <span className="text-amber-300 font-bold text-xs whitespace-nowrap">₡{(item.price + 500).toLocaleString()}</span>
+          <span className="text-[#94cb47] font-bold text-xs whitespace-nowrap">₡{(item.price + 500).toLocaleString()}</span>
           <button
             onClick={() => onSelectItem(item, true)}
             className="bg-amber-600 hover:bg-amber-500 text-white rounded-md w-6 h-6 flex items-center justify-center flex-shrink-0 transition"
@@ -81,10 +81,10 @@ export function LicorModal({ licor, onSelect, onClose }) {
   if (!licor) return null;
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-amber-500/40 p-6 shadow-2xl w-full max-w-sm">
+      <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/40 p-6 shadow-2xl w-full max-w-sm">
         <div className="text-center mb-5">
           <div className="text-3xl mb-1">🥃</div>
-          <h2 className="text-xl font-bold text-amber-300">{licor.name}</h2>
+          <h2 className="text-xl font-bold text-[#94cb47]">{licor.name}</h2>
           <p className="text-slate-400 text-xs mt-1">Selecciona la presentación</p>
         </div>
         <div className="space-y-2">
@@ -92,10 +92,10 @@ export function LicorModal({ licor, onSelect, onClose }) {
             <button
               key={p.id}
               onClick={() => onSelect(licor, p)}
-              className="w-full flex items-center justify-between bg-slate-700 hover:bg-amber-900/40 border border-slate-600 hover:border-amber-500/60 rounded-xl px-4 py-3 transition-all group"
+              className="w-full flex items-center justify-between bg-slate-700 hover:bg-[#94cb47]/10 border border-slate-600 hover:border-[#94cb47]/60 rounded-xl px-4 py-3 transition-all group"
             >
-              <span className="font-bold text-white group-hover:text-amber-300 transition">{p.label}</span>
-              <span className="text-amber-400 font-bold text-sm">₡{p.price.toLocaleString()}</span>
+              <span className="font-bold text-white group-hover:text-[#94cb47] transition">{p.label}</span>
+              <span className="text-[#94cb47] font-bold text-sm">₡{p.price.toLocaleString()}</span>
             </button>
           ))}
         </div>
@@ -135,8 +135,8 @@ export function LicoresPanel({ onAddToCart }) {
 
   return (
     <>
-      <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-amber-500/30 overflow-hidden shadow-2xl">
-        <div className="bg-gradient-to-r from-amber-900/40 to-slate-800 p-5">
+      <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 overflow-hidden shadow-2xl">
+        <div className="bg-gradient-to-r from-[#94cb47]/20 to-slate-800 p-5">
           <h2 className="text-white font-bold text-xl mb-3 flex items-center gap-2">🥃 Licores</h2>
           <div className="relative">
             <Search size={18} className="absolute left-3 top-2.5 text-slate-400" />
@@ -145,7 +145,7 @@ export function LicoresPanel({ onAddToCart }) {
               placeholder="Buscar licor..."
               value={search}
               onChange={e => setSearch(e.target.value)}
-              className="w-full bg-slate-700 border border-amber-500/30 text-white rounded-lg pl-9 pr-4 py-2 text-sm focus:outline-none focus:border-amber-500 placeholder-slate-500"
+              className="w-full bg-slate-700 border border-[#94cb47]/30 text-white rounded-lg pl-9 pr-4 py-2 text-sm focus:outline-none focus:border-[#94cb47] placeholder-slate-500"
             />
           </div>
         </div>
@@ -154,10 +154,10 @@ export function LicoresPanel({ onAddToCart }) {
             <button
               key={licor.id}
               onClick={() => setSelectedLicor(licor)}
-              className="w-full flex items-center justify-between bg-slate-700/60 hover:bg-amber-900/30 border border-slate-600 hover:border-amber-500/50 rounded-lg px-4 py-3 transition-all group text-left"
+              className="w-full flex items-center justify-between bg-slate-700/60 hover:bg-[#94cb47]/10 border border-slate-600 hover:border-[#94cb47]/50 rounded-lg px-4 py-3 transition-all group text-left"
             >
-              <span className="font-bold text-white text-sm group-hover:text-amber-300 transition">{licor.name}</span>
-              <span className="text-amber-400/70 text-xs flex items-center gap-1">
+              <span className="font-bold text-white text-sm group-hover:text-[#94cb47] transition">{licor.name}</span>
+              <span className="text-[#94cb47]/70 text-xs flex items-center gap-1">
                 desde ₡{Math.min(...licor.presentaciones.map(p => p.price)).toLocaleString()}
                 <ChevronDown size={14} className="-rotate-90" />
               </span>
