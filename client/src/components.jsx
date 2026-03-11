@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
-import { Plus, Minus, Trash2, LogOut, Utensils, ChevronDown, Search, Clock } from 'lucide-react';
-import { PINES } from './constants.js';
+import { Plus, Minus, Trash2, LogOut, Utensils, ChevronDown, Search, Clock, Package } from 'lucide-react';
+import { PINES, LICORES, OTROS } from './constants.js';
 
 // ─────────────────────────────────────────────
 // SPINNER
@@ -43,7 +43,7 @@ export const payBadge = (m) => {
 };
 
 // ─────────────────────────────────────────────
-// ITEM BUTTON (menú)
+// ITEM BUTTON (menú regular)
 // ─────────────────────────────────────────────
 export function ItemButton({ item, onSelectItem }) {
   return (
@@ -75,7 +75,218 @@ export function ItemButton({ item, onSelectItem }) {
 }
 
 // ─────────────────────────────────────────────
-// MENÚ DROPDOWN
+// MODAL LICOR — selección de presentación
+// ─────────────────────────────────────────────
+export function LicorModal({ licor, onSelect, onClose }) {
+  if (!licor) return null;
+  return (
+    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-amber-500/40 p-6 shadow-2xl w-full max-w-sm">
+        <div className="text-center mb-5">
+          <div className="text-3xl mb-1">🥃</div>
+          <h2 className="text-xl font-bold text-amber-300">{licor.name}</h2>
+          <p className="text-slate-400 text-xs mt-1">Selecciona la presentación</p>
+        </div>
+        <div className="space-y-2">
+          {licor.presentaciones.map(p => (
+            <button
+              key={p.id}
+              onClick={() => onSelect(licor, p)}
+              className="w-full flex items-center justify-between bg-slate-700 hover:bg-amber-900/40 border border-slate-600 hover:border-amber-500/60 rounded-xl px-4 py-3 transition-all group"
+            >
+              <span className="font-bold text-white group-hover:text-amber-300 transition">{p.label}</span>
+              <span className="text-amber-400 font-bold text-sm">₡{p.price.toLocaleString()}</span>
+            </button>
+          ))}
+        </div>
+        <button
+          onClick={onClose}
+          className="mt-4 w-full bg-slate-700 hover:bg-slate-600 text-slate-300 font-bold py-2.5 rounded-xl transition"
+        >
+          Cancelar
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────
+// LICORES PANEL — lista de licores con modal
+// ─────────────────────────────────────────────
+export function LicoresPanel({ onAddToCart }) {
+  const [selectedLicor, setSelectedLicor] = useState(null);
+  const [search, setSearch] = useState('');
+
+  const filtered = useMemo(() =>
+    LICORES.filter(l => l.name.toLowerCase().includes(search.toLowerCase())),
+    [search]
+  );
+
+  const handleSelect = (licor, presentacion) => {
+    onAddToCart({
+      id: `${licor.id}_${presentacion.id}_${Date.now()}`,
+      name: `${licor.name} — ${presentacion.label}`,
+      price: presentacion.price,
+      category: 'alcoholic',
+      quantity: 1,
+    }, false);
+    setSelectedLicor(null);
+  };
+
+  return (
+    <>
+      <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-amber-500/30 overflow-hidden shadow-2xl">
+        <div className="bg-gradient-to-r from-amber-900/40 to-slate-800 p-5">
+          <h2 className="text-white font-bold text-xl mb-3 flex items-center gap-2">🥃 Licores</h2>
+          <div className="relative">
+            <Search size={18} className="absolute left-3 top-2.5 text-slate-400" />
+            <input
+              type="text"
+              placeholder="Buscar licor..."
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              className="w-full bg-slate-700 border border-amber-500/30 text-white rounded-lg pl-9 pr-4 py-2 text-sm focus:outline-none focus:border-amber-500 placeholder-slate-500"
+            />
+          </div>
+        </div>
+        <div className="p-4 max-h-72 overflow-y-auto space-y-1.5">
+          {filtered.map(licor => (
+            <button
+              key={licor.id}
+              onClick={() => setSelectedLicor(licor)}
+              className="w-full flex items-center justify-between bg-slate-700/60 hover:bg-amber-900/30 border border-slate-600 hover:border-amber-500/50 rounded-lg px-4 py-3 transition-all group text-left"
+            >
+              <span className="font-bold text-white text-sm group-hover:text-amber-300 transition">{licor.name}</span>
+              <span className="text-amber-400/70 text-xs flex items-center gap-1">
+                desde ₡{Math.min(...licor.presentaciones.map(p => p.price)).toLocaleString()}
+                <ChevronDown size={14} className="-rotate-90" />
+              </span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {selectedLicor && (
+        <LicorModal
+          licor={selectedLicor}
+          onSelect={handleSelect}
+          onClose={() => setSelectedLicor(null)}
+        />
+      )}
+    </>
+  );
+}
+
+// ─────────────────────────────────────────────
+// OTROS EDIT MODAL — editar nombre y precio
+// ─────────────────────────────────────────────
+function OtroEditModal({ item, onConfirm, onClose }) {
+  const [nombre, setNombre] = useState(item.name);
+  const [precio, setPrecio] = useState(String(item.price));
+
+  const handleConfirm = () => {
+    const p = parseInt(precio.replace(/\D/g, ''), 10);
+    if (!nombre.trim()) { alert('Ingresa un nombre'); return; }
+    if (!p || p <= 0)   { alert('Ingresa un precio válido'); return; }
+    onConfirm({ ...item, name: nombre.trim(), price: p });
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-slate-500/50 p-6 shadow-2xl w-full max-w-xs">
+        <div className="text-center mb-5">
+          <div className="text-3xl mb-1">📦</div>
+          <h2 className="text-lg font-bold text-white">Confirmar item</h2>
+          <p className="text-slate-400 text-xs mt-1">Edita nombre y precio si es necesario</p>
+        </div>
+        <div className="space-y-3 mb-5">
+          <div>
+            <label className="text-slate-400 text-xs font-bold uppercase tracking-wide block mb-1">Nombre</label>
+            <input
+              type="text"
+              value={nombre}
+              onChange={e => setNombre(e.target.value)}
+              className="w-full bg-slate-700 border border-slate-500 focus:border-[#94cb47] text-white rounded-lg px-3 py-2.5 text-sm focus:outline-none"
+              placeholder="Ej: Cigarro Marlboro..."
+            />
+          </div>
+          <div>
+            <label className="text-slate-400 text-xs font-bold uppercase tracking-wide block mb-1">Precio (₡)</label>
+            <input
+              type="number"
+              value={precio}
+              onChange={e => setPrecio(e.target.value)}
+              className="w-full bg-slate-700 border border-slate-500 focus:border-[#94cb47] text-white rounded-lg px-3 py-2.5 text-sm focus:outline-none"
+              placeholder="500"
+              min="0"
+            />
+          </div>
+        </div>
+        <div className="flex gap-2">
+          <button
+            onClick={handleConfirm}
+            className="flex-1 bg-[#94cb47] hover:bg-[#7ab035] text-black font-bold py-3 rounded-xl transition"
+          >
+            ✓ Agregar
+          </button>
+          <button
+            onClick={onClose}
+            className="bg-slate-700 hover:bg-slate-600 text-slate-300 font-bold px-4 py-3 rounded-xl transition"
+          >
+            ✕
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────
+// OTROS PANEL — menudeo con precios editables
+// ─────────────────────────────────────────────
+export function OtrosPanel({ onAddToCart }) {
+  const [editingItem, setEditingItem] = useState(null);
+
+  const handleConfirm = (item) => {
+    onAddToCart({ ...item, id: `${item.id}_${Date.now()}`, quantity: 1 }, false);
+    setEditingItem(null);
+  };
+
+  return (
+    <>
+      <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-slate-500/30 overflow-hidden shadow-2xl">
+        <div className="bg-gradient-to-r from-slate-700 to-slate-800 p-5">
+          <h2 className="text-white font-bold text-xl flex items-center gap-2"><Package size={20} /> Otros</h2>
+          <p className="text-slate-400 text-xs mt-1">Toca para editar nombre y precio antes de agregar</p>
+        </div>
+        <div className="p-4 grid grid-cols-2 gap-2">
+          {OTROS.map(item => (
+            <button
+              key={item.id}
+              onClick={() => setEditingItem(item)}
+              className="flex flex-col items-start bg-slate-700/60 hover:bg-slate-600/60 border border-slate-600 hover:border-slate-400 rounded-xl px-3 py-2.5 transition-all text-left group"
+            >
+              <span className="font-bold text-white text-sm leading-tight group-hover:text-[#94cb47] transition">{item.name}</span>
+              <span className="text-[#94cb47] font-bold text-xs mt-1">₡{item.price.toLocaleString()}</span>
+              <span className="text-slate-500 text-xs mt-0.5">✏️ editable</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {editingItem && (
+        <OtroEditModal
+          item={editingItem}
+          onConfirm={handleConfirm}
+          onClose={() => setEditingItem(null)}
+        />
+      )}
+    </>
+  );
+}
+
+// ─────────────────────────────────────────────
+// MENÚ DROPDOWN (sin licores — van aparte)
 // ─────────────────────────────────────────────
 export function MenuDropdown({ menu, onSelectItem }) {
   const [searchTerm, setSearchTerm] = useState('');
@@ -158,18 +369,16 @@ export function ReadyOrdersPanel({ kitchenOrders, mesera }) {
 }
 
 // ─────────────────────────────────────────────
-// ITEMS MODAL
+// ITEMS MODAL (ver cuenta)
 // ─────────────────────────────────────────────
 export function ItemsModal({ order, onClose }) {
   if (!order) return null;
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
-      <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-8 shadow-2xl max-w-md w-full max-h-[80vh] overflow-y-auto">
-        <div className="text-center mb-6">
-          <h2 className="text-2xl font-bold text-[#94cb47] mb-1">📋 Detalle de Pedido</h2>
-          <p className="text-slate-400 text-sm">{order.barra || `Mesa ${order.table}`} {order.clientName ? `— ${order.clientName}` : ''}</p>
-        </div>
-        <div className="bg-slate-800/50 rounded-xl p-4 mb-4 border border-slate-700 space-y-2">
+      <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-6 shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+        <h2 className="text-xl font-bold text-[#94cb47] mb-1">{order.clientName || 'Sin nombre'}</h2>
+        <p className="text-slate-400 text-sm mb-4">{order.locationLabel || order.barra || (order.table ? `Mesa ${order.table}` : '-')}</p>
+        <div className="bg-slate-800/50 rounded-xl p-3 mb-4 border border-slate-700 space-y-1">
           {order.items.map((item, i) => (
             <div key={i} className="py-2 border-b border-slate-700/50 last:border-0">
               <div className="flex justify-between text-white">
