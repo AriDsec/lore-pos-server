@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
-import { Utensils } from 'lucide-react';
-import { Header } from './components.jsx';
-import { MenuDropdown, ReadyOrdersPanel } from './components.jsx';
+import { Utensils, Package } from 'lucide-react';
+import { Header, MenuDropdown, ReadyOrdersPanel, LicoresPanel, OtrosPanel } from './components.jsx';
 import { ShoppingCart } from './Cart.jsx';
 
 export function MeseraScreen({
@@ -38,15 +37,48 @@ export function MeseraScreen({
     onDirectPay,
   };
 
+  // Panel central en landscape: Menú + Licores + Otros con tabs
+  const [menuTab, setMenuTab] = useState('menu');
+
+  const MenuCenter = () => (
+    <div className="space-y-3">
+      {/* Mini tabs para menu/licores/otros */}
+      <div className="flex gap-2">
+        {[
+          { id: 'menu',    label: '🍽️ Menú' },
+          { id: 'licores', label: '🥃 Licores' },
+          { id: 'otros',   label: '📦 Otros' },
+        ].map(t => (
+          <button
+            key={t.id}
+            onClick={() => setMenuTab(t.id)}
+            className={`flex-1 py-2 rounded-lg font-bold text-sm transition ${
+              menuTab === t.id
+                ? 'bg-[#94cb47] text-black'
+                : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+            }`}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {menuTab === 'menu'    && <MenuDropdown menu={menu} onSelectItem={addToCart} />}
+      {menuTab === 'licores' && <LicoresPanel onAddToCart={addToCart} />}
+      {menuTab === 'otros'   && <OtrosPanel onAddToCart={addToCart} />}
+
+      <ReadyOrdersPanel kitchenOrders={kitchenOrders} mesera={currentUser} />
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-slate-900 to-black flex flex-col">
       <Header mesera={currentUser} zona={zona} onLogout={onLogout} />
 
       {/* ── Landscape: 3 columnas ── */}
       <div className={`${isLandscape ? "grid" : "hidden"} grid-cols-3 gap-4 p-4 max-w-7xl mx-auto w-full flex-1`}>
-        <div className="col-span-2 space-y-6">
-          <MenuDropdown menu={menu} onSelectItem={addToCart} />
-          <ReadyOrdersPanel kitchenOrders={kitchenOrders} mesera={currentUser} />
+        <div className="col-span-2 space-y-4">
+          <MenuCenter />
         </div>
         <ShoppingCart {...cartProps} mobileVisible="landscape" />
       </div>
@@ -54,16 +86,42 @@ export function MeseraScreen({
       {/* ── Portrait: tabs ── */}
       <div className={`${isLandscape ? "hidden" : "flex"} flex-col flex-1 overflow-hidden`}>
         <div className="flex-1 overflow-y-auto p-3">
-          {mobileTab === 'menu' ? (
+          {mobileTab === 'menu' && (
             <div className="space-y-4">
-              <MenuDropdown menu={menu} onSelectItem={addToCart} />
+              {/* Mini tabs también en portrait */}
+              <div className="flex gap-2">
+                {[
+                  { id: 'menu',    label: '🍽️ Menú' },
+                  { id: 'licores', label: '🥃 Licores' },
+                  { id: 'otros',   label: '📦 Otros' },
+                ].map(t => (
+                  <button
+                    key={t.id}
+                    onClick={() => setMenuTab(t.id)}
+                    className={`flex-1 py-2 rounded-lg font-bold text-xs transition ${
+                      menuTab === t.id
+                        ? 'bg-[#94cb47] text-black'
+                        : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                    }`}
+                  >
+                    {t.label}
+                  </button>
+                ))}
+              </div>
+
+              {menuTab === 'menu'    && <MenuDropdown menu={menu} onSelectItem={addToCart} />}
+              {menuTab === 'licores' && <LicoresPanel onAddToCart={addToCart} />}
+              {menuTab === 'otros'   && <OtrosPanel onAddToCart={addToCart} />}
+
               <ReadyOrdersPanel kitchenOrders={kitchenOrders} mesera={currentUser} />
             </div>
-          ) : (
+          )}
+          {mobileTab === 'carrito' && (
             <ShoppingCart {...cartProps} mobileVisible={true} />
           )}
         </div>
 
+        {/* Bottom nav */}
         <div className="flex border-t border-[#94cb47]/30 bg-slate-900">
           <button
             onClick={() => setMobileTab('menu')}
