@@ -82,12 +82,12 @@ export function MeseraScreen({
     <div className="min-h-screen bg-gradient-to-br from-black via-slate-900 to-black flex flex-col">
       <Header mesera={currentUser} zona={zona} onLogout={onLogout} />
 
-      {/* ── Landscape: 5 columnas — 3 menú / 2 carrito ── */}
-      <div className={`${isLandscape ? "grid" : "hidden"} grid-cols-5 gap-3 p-3 max-w-7xl mx-auto w-full flex-1 min-h-0`}>
-        <div className="col-span-3 space-y-3 overflow-y-auto min-h-0">
+      {/* ── Landscape: flex — menú flexible / carrito ancho fijo ── */}
+      <div className={`${isLandscape ? "flex" : "hidden"} gap-3 p-3 w-full overflow-hidden`} style={{height: "calc(100vh - 64px)"}}>
+        <div className="flex-1 overflow-y-auto">
           <MenuCenter />
         </div>
-        <div className="col-span-2 min-h-0">
+        <div style={{width: "380px", flexShrink: 0, overflowY: "auto", height: "100%"}}>
           <ShoppingCart {...cartProps} mobileVisible="landscape" />
         </div>
       </div>
