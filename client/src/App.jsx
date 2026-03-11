@@ -248,6 +248,7 @@ export default function RestaurantePOS() {
   };
 
 
+  const markOrderReady = async (orderId) => {
     try {
       await api.updateKitchenOrder(orderId, 'ready');
       setKitchenOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: 'ready' } : o));
