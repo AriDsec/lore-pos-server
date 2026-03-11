@@ -66,7 +66,7 @@ export default function RestaurantePOS() {
 
   useEffect(() => {
     if (!currentUser || !userRole) return;
-    const interval = setInterval(() => loadData(currentZone, userRole, true), 30000);
+    const interval = setInterval(() => loadData(currentZone, userRole, true), 15000);
     return () => clearInterval(interval);
   }, [currentUser, userRole, currentZone, loadData]);
 
