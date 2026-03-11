@@ -109,18 +109,16 @@ export const LICORES = [
 // ─────────────────────────────────────────────
 export const OTROS = [
   { id: 'o_cigarro',        name: 'Cigarro suelto',       price: 500,  category: 'otro' },
-  { id: 'o_cigarros_caja',  name: 'Caja cigarros',        price: 5000, category: 'otro' },
-  { id: 'o_snack_papitas',  name: 'Papitas snack',         price: 500,  category: 'otro' },
-  { id: 'o_snack_chifles',  name: 'Chifles',              price: 500,  category: 'otro' },
-  { id: 'o_snack_maiz',     name: 'Maíz tostado',         price: 500,  category: 'otro' },
-  { id: 'o_snack_nueces',   name: 'Nueces/Manís',         price: 500,  category: 'otro' },
-  { id: 'o_mayo_sobre',     name: 'Mayo (sobre)',          price: 200,  category: 'otro' },
-  { id: 'o_ketchup_sobre',  name: 'Ketchup (sobre)',       price: 200,  category: 'otro' },
-  { id: 'o_mostaza_sobre',  name: 'Mostaza (sobre)',       price: 200,  category: 'otro' },
-  { id: 'o_salsa_lizano',   name: 'Salsa Lizano (sobre)',  price: 200,  category: 'otro' },
+  { id: 'o_cigarros_caja',  name: 'Caja cigarros',        price: 3000, category: 'otro' },
+  { id: 'o_paquetitos',     name: 'Paquetitos',           price: 500,  category: 'otro' },
+  { id: 'o_mani',           name: 'Maní',                 price: 500,  category: 'otro' },
+  { id: 'o_mayo_sobre',     name: 'Mayo (sobre)',          price: 300,  category: 'otro' },
+  { id: 'o_ketchup_sobre',  name: 'Ketchup (sobre)',       price: 300,  category: 'otro' },
+  { id: 'o_porcion_arroz',  name: 'Porción de arroz',     price: 500,  category: 'otro' },
+  { id: 'o_confites',       name: 'Confites',             price: 100,  category: 'otro' },
   { id: 'o_chicle',         name: 'Chicle',               price: 100,  category: 'otro' },
-  { id: 'o_dulce',          name: 'Dulce/Caramelo',       price: 100,  category: 'otro' },
   { id: 'o_agua_botella',   name: 'Agua botella',         price: 800,  category: 'otro' },
+  { id: 'o_otro',           name: 'Otro',                 price: 0,    category: 'otro' },
 ];
 
 // ─────────────────────────────────────────────
