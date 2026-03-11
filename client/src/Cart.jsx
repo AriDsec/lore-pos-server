@@ -134,7 +134,7 @@ export function ShoppingCart({
   );
 
   if (mobileVisible === 'landscape') {
-    return <div className={`${baseClass} h-[calc(100vh-80px)] sticky top-4`}>{inner}</div>;
+    return <div className={`${baseClass} h-[calc(100vh-72px)] sticky top-3`}>{inner}</div>;
   }
   return (
     <div className={`${baseClass} ${mobileClass}`}>{inner}</div>
