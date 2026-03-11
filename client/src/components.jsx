@@ -602,14 +602,14 @@ export function PinModal({ userName, onSuccess, onCancel }) {
   const handleDelete = () => { setPin(p => p.slice(0, -1)); setError(false); };
 
   return (
-    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-8 w-full max-w-xs shadow-2xl">
-        <div className="text-center mb-6">
-          <div className="text-3xl mb-2">🔐</div>
-          <h2 className="text-white font-bold text-xl">{userName}</h2>
-          <p className="text-slate-400 text-sm mt-1">Ingresa tu PIN de 4 dígitos</p>
+    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-2 overflow-y-auto">
+      <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-5 w-full max-w-xs shadow-2xl my-auto">
+        <div className="text-center mb-4">
+          <div className="text-2xl mb-1">🔐</div>
+          <h2 className="text-white font-bold text-lg">{userName}</h2>
+          <p className="text-slate-400 text-xs mt-0.5">Ingresa tu PIN de 4 dígitos</p>
         </div>
-        <div className="flex justify-center gap-4 mb-6">
+        <div className="flex justify-center gap-4 mb-4">
           {[0,1,2,3].map(i => (
             <div key={i} className={`w-4 h-4 rounded-full border-2 transition-all ${
               i < pin.length
@@ -618,24 +618,24 @@ export function PinModal({ userName, onSuccess, onCancel }) {
             }`} />
           ))}
         </div>
-        {error && <p className="text-red-400 text-center text-sm mb-4">PIN incorrecto, intenta de nuevo</p>}
-        <div className="grid grid-cols-3 gap-3 mb-4">
+        {error && <p className="text-red-400 text-center text-xs mb-3">PIN incorrecto, intenta de nuevo</p>}
+        <div className="grid grid-cols-3 gap-2 mb-2">
           {[1,2,3,4,5,6,7,8,9].map(d => (
             <button key={d} onClick={() => handleDigit(String(d))}
-              className="bg-slate-700 hover:bg-slate-600 active:bg-[#94cb47] text-white font-bold text-xl py-4 rounded-xl transition">
+              className="bg-slate-700 hover:bg-slate-600 active:bg-[#94cb47] text-white font-bold text-xl py-3 rounded-xl transition">
               {d}
             </button>
           ))}
           <button onClick={handleDelete}
-            className="bg-slate-700 hover:bg-slate-600 text-slate-300 font-bold text-lg py-4 rounded-xl transition">
+            className="bg-slate-700 hover:bg-slate-600 text-slate-300 font-bold text-lg py-3 rounded-xl transition">
             ⌫
           </button>
           <button onClick={() => handleDigit('0')}
-            className="bg-slate-700 hover:bg-slate-600 active:bg-[#94cb47] text-white font-bold text-xl py-4 rounded-xl transition">
+            className="bg-slate-700 hover:bg-slate-600 active:bg-[#94cb47] text-white font-bold text-xl py-3 rounded-xl transition">
             0
           </button>
           <button onClick={onCancel}
-            className="bg-red-900/50 hover:bg-red-900 text-red-300 font-bold text-sm py-4 rounded-xl transition">
+            className="bg-red-900/50 hover:bg-red-900 text-red-300 font-bold text-sm py-3 rounded-xl transition">
             ✕
           </button>
         </div>
