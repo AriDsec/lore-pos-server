@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Utensils, Package } from 'lucide-react';
-import { Header, MenuDropdown, ReadyOrdersPanel, LicoresPanel, OtrosPanel } from './components.jsx';
+import { Header, MenuDropdown, ReadyOrdersPanel, LicoresPanel, OtrosPanel, SplitModal } from './components.jsx';
 import { ShoppingCart } from './Cart.jsx';
 
 export function MeseraScreen({
@@ -11,6 +11,7 @@ export function MeseraScreen({
   clientName, setClientName, barras, kitchenOrders,
   openAccounts, selectedAccount, onSelectAccount,
   onDirectPay, isBar, tables,
+  splitOrder, setSplitOrder, onSplit,
 }) {
   const [mobileTab, setMobileTab] = useState('menu');
   const [isLandscape, setIsLandscape] = useState(
@@ -36,6 +37,7 @@ export function MeseraScreen({
     isBar,
     onDirectPay,
     tables,
+    onSplit: (acc) => setSplitOrder(acc),
   };
 
   // Panel central en landscape: Menú + Licores + Otros con tabs
@@ -148,6 +150,9 @@ export function MeseraScreen({
           </button>
         </div>
       </div>
+      {splitOrder && (
+        <SplitModal account={splitOrder} onConfirm={onSplit} onClose={() => setSplitOrder(null)} />
+      )}
     </div>
   );
 }
