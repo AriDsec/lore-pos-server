@@ -401,6 +401,113 @@ export function ItemsModal({ order, onClose }) {
 }
 
 // ─────────────────────────────────────────────
+// SPLIT MODAL — separar cuenta
+// ─────────────────────────────────────────────
+export function SplitModal({ account, onConfirm, onClose }) {
+  // splitQty: { itemId -> cantidad que va a la cuenta nueva }
+  const [splitQty, setSplitQty] = useState({});
+
+  if (!account) return null;
+
+  const setQty = (itemId, max, val) => {
+    const n = Math.max(0, Math.min(max, Number(val)));
+    setSplitQty(prev => ({ ...prev, [itemId]: n }));
+  };
+
+  const totalSplit = account.items.reduce((s, i) => {
+    const q = splitQty[i.id] || 0;
+    return s + i.price * q;
+  }, 0);
+
+  const hasSplit = Object.values(splitQty).some(q => q > 0);
+
+  const handleConfirm = () => {
+    // items que van a la nueva cuenta
+    const newItems = account.items
+      .map(i => ({ ...i, quantity: splitQty[i.id] || 0 }))
+      .filter(i => i.quantity > 0);
+    // items que quedan en la original
+    const remaining = account.items
+      .map(i => ({ ...i, quantity: i.quantity - (splitQty[i.id] || 0) }))
+      .filter(i => i.quantity > 0);
+    if (newItems.length === 0) { alert('Selecciona al menos un item para separar'); return; }
+    if (remaining.length === 0) { alert('No puedes mover todos los items — mejor cobra la cuenta completa'); return; }
+    onConfirm(account, newItems, remaining);
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/40 p-5 shadow-2xl w-full max-w-md max-h-[90vh] flex flex-col">
+        <div className="mb-4">
+          <h2 className="text-xl font-bold text-[#94cb47] flex items-center gap-2">✂️ Separar Cuenta</h2>
+          <p className="text-slate-400 text-xs mt-1">
+            {account.clientName || 'Sin nombre'} · {account.locationLabel || account.barra || (account.table != null ? `Mesa ${account.table}` : 'Barra')}
+          </p>
+          <p className="text-slate-500 text-xs mt-1">Indica cuántos de cada item van a la cuenta nueva</p>
+        </div>
+
+        <div className="flex-1 overflow-y-auto space-y-2 min-h-0">
+          {account.items.map(item => {
+            const sq = splitQty[item.id] || 0;
+            return (
+              <div key={item.id} className={`rounded-xl border p-3 transition-all ${sq > 0 ? 'bg-[#94cb47]/10 border-[#94cb47]/50' : 'bg-slate-700/40 border-slate-600'}`}>
+                <div className="flex justify-between items-center mb-2">
+                  <div>
+                    <div className="font-bold text-white text-sm">{item.name}</div>
+                    <div className="text-[#94cb47] text-xs">₡{item.price.toLocaleString()} c/u · {item.quantity} en cuenta</div>
+                  </div>
+                  {sq > 0 && (
+                    <div className="text-[#94cb47] font-bold text-sm">→ ₡{(item.price * sq).toLocaleString()}</div>
+                  )}
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-slate-400 text-xs w-16">Separar:</span>
+                  <button
+                    onClick={() => setQty(item.id, item.quantity, sq - 1)}
+                    className="w-7 h-7 bg-slate-600 hover:bg-slate-500 text-white rounded-lg flex items-center justify-center font-bold transition"
+                  >−</button>
+                  <span className={`w-8 text-center font-bold text-sm ${sq > 0 ? 'text-[#94cb47]' : 'text-slate-400'}`}>{sq}</span>
+                  <button
+                    onClick={() => setQty(item.id, item.quantity, sq + 1)}
+                    className="w-7 h-7 bg-slate-600 hover:bg-slate-500 text-white rounded-lg flex items-center justify-center font-bold transition"
+                  >+</button>
+                  <button
+                    onClick={() => setQty(item.id, item.quantity, item.quantity)}
+                    className="ml-1 text-xs text-slate-400 hover:text-[#94cb47] transition px-2 py-1 rounded-lg hover:bg-slate-700"
+                  >Todo</button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {hasSplit && (
+          <div className="mt-3 bg-[#94cb47]/10 border border-[#94cb47]/30 rounded-xl p-3">
+            <div className="flex justify-between text-sm">
+              <span className="text-slate-300">Cuenta nueva:</span>
+              <span className="text-[#94cb47] font-bold">₡{totalSplit.toLocaleString()}</span>
+            </div>
+            <div className="flex justify-between text-sm mt-1">
+              <span className="text-slate-300">Queda en original:</span>
+              <span className="text-white font-bold">₡{(account.total - totalSplit).toLocaleString()}</span>
+            </div>
+          </div>
+        )}
+
+        <div className="flex gap-2 mt-4">
+          <button
+            onClick={handleConfirm}
+            disabled={!hasSplit}
+            className={`flex-1 font-bold py-3 rounded-xl transition ${hasSplit ? 'bg-[#94cb47] hover:bg-[#7ab035] text-black' : 'bg-slate-700 text-slate-500 cursor-not-allowed'}`}
+          >✂️ Separar</button>
+          <button onClick={onClose} className="bg-slate-700 hover:bg-slate-600 text-slate-300 font-bold px-5 py-3 rounded-xl transition">✕</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────
 // BILL MODAL (cobrar)
 // ─────────────────────────────────────────────
 export function BillModal({ order, onClose, onPay }) {
