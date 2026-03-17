@@ -253,10 +253,31 @@ export default function RestaurantePOS() {
         const acc = openAccounts.find(a => (a._id === selectedAccount || a.id === selectedAccount));
         const accId = acc?.id || selectedAccount;
         await api.updateAccount(accId, { items: cartItems, total });
-        const prevFoodIds = (acc?.items?.filter(i => i.category === 'food') || []).map(i => i.id);
-        const newFood = foodItems.filter(i => !prevFoodIds.includes(i.id));
-        if (newFood.length > 0) {
-          await api.createKitchenOrder({ id: `k-${Date.now()}`, zone: currentZone, mesera: currentUser, items: newFood, table: selectedTable || null, barra: selectedBarra || null, clientName: clientName || '', locationLabel: selectedBarra ? selectedBarra : (selectedTable ? `Mesa ${selectedTable}` : 'Sin mesa'), status: 'pending', createdAt: new Date() });
+
+        // Detectar items nuevos o con cantidad aumentada vs lo que ya estaba en la cuenta
+        const prevItems = acc?.items || [];
+        const itemsParaCocina = foodItems.reduce((nuevos, item) => {
+          const prev = prevItems.find(p => p.id === item.id);
+          if (!prev) {
+            // Item completamente nuevo
+            nuevos.push({ ...item, esNuevo: true });
+          } else if (item.quantity > prev.quantity) {
+            // Cantidad aumentada — mandar solo la diferencia
+            nuevos.push({ ...item, quantity: item.quantity - prev.quantity, esNuevo: true });
+          }
+          return nuevos;
+        }, []);
+
+        if (itemsParaCocina.length > 0) {
+          await api.createKitchenOrder({
+            id: `k-${Date.now()}`, zone: currentZone, mesera: currentUser,
+            items: itemsParaCocina,
+            table: selectedTable || null, barra: selectedBarra || null,
+            clientName: clientName || '',
+            locationLabel: selectedBarra ? selectedBarra : (selectedTable ? `Mesa ${selectedTable}` : 'Sin mesa'),
+            status: 'pending', createdAt: new Date(),
+            esActualizacion: true,  // bandera para que cocina sepa que es adicional
+          });
         }
         showToast('Cuenta actualizada');
       } else {
