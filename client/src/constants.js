@@ -343,8 +343,8 @@ export const MENU = {
       { id: 'f_arroz_camarones', name: 'Arroz con Camarones', price: 4300, category: 'food' },
     ],
     'Surtido': [
-      { id: 'f_surtido_grande', name: 'Grande', price: 10400, category: 'food' },
-      { id: 'f_surtido_pequeno', name: 'Pequeño', price: 8400, category: 'food' },
+      { id: 'f_surtido_grande', name: 'Surtido Grande', price: 10400, category: 'food' },
+      { id: 'f_surtido_pequeno', name: 'Surtido Pequeño', price: 8400, category: 'food' },
     ],
     'Bocas': [
       { id: 'f_carne_salsa', name: 'Carne en salsa', price: 3000, category: 'food' },
@@ -442,8 +442,8 @@ export const MENU = {
       { id: 'f_arroz_camarones', name: 'Arroz con Camarones', price: 4300, category: 'food' },
     ],
     'Surtido': [
-      { id: 'f_surtido_grande', name: 'Grande', price: 10400, category: 'food' },
-      { id: 'f_surtido_pequeno', name: 'Pequeño', price: 8400, category: 'food' },
+      { id: 'f_surtido_grande', name: 'Surtido Grande', price: 10400, category: 'food' },
+      { id: 'f_surtido_pequeno', name: 'Surtido Pequeño', price: 8400, category: 'food' },
     ],
     'Bocas': [
       { id: 'f_carne_salsa', name: 'Carne en salsa', price: 3000, category: 'food' },
