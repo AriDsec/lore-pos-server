@@ -81,7 +81,10 @@ export function CajaScreen({
                         {o.locationLabel || o.barra || (o.table != null ? `Mesa ${o.table}` : '—')}
                         {o.clientName ? <span className="text-slate-300"> — {o.clientName}</span> : ''}
                       </div>
-                      <div className="text-slate-400 text-xs mt-0.5">👤 {o.mesera}</div>
+                      <div className="text-slate-400 text-xs mt-0.5">
+                        👤 {o.mesera}
+                        {o.closedAt && <span className="ml-2 text-slate-500">· {new Date(o.closedAt).toLocaleTimeString('es-CR', { hour: '2-digit', minute: '2-digit' })}</span>}
+                      </div>
                     </div>
                     <div className="text-[#94cb47] font-bold text-lg whitespace-nowrap">₡{o.total.toLocaleString()}</div>
                   </div>
