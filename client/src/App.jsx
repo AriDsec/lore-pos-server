@@ -8,6 +8,7 @@ import { KitchenScreen } from './KitchenScreen.jsx';
 import { CajaScreen } from './CajaScreen.jsx';
 import { AdminScreen } from './AdminScreen.jsx';
 
+// LORE POS v2.1
 export default function RestaurantePOS() {
   const savedSession = (() => { try { return JSON.parse(localStorage.getItem('lore_session')); } catch { return null; } })();
   const savedAdmin   = (() => { try { return localStorage.getItem('lore_admin'); } catch { return null; } })();
