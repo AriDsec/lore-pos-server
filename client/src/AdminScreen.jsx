@@ -15,6 +15,11 @@ export function AdminScreen({ barPaid, restPaid, loading, onLogout, setPaidOrder
   const [viewItemsOrder, setViewItemsOrder] = useState(null);
   const [accessLog, setAccessLog] = useState([]);
 
+  // Servicio 10% — automático los sábados
+  const isSabado = new Date().getDay() === 6;
+  const [servicioActivo, setServicioActivo] = useState(isSabado);
+  const [numMeseras, setNumMeseras] = useState(3);
+
   useEffect(() => {
     api.getAccessLog().then(setAccessLog).catch(() => {});
   }, []);
@@ -36,6 +41,11 @@ export function AdminScreen({ barPaid, restPaid, loading, onLogout, setPaidOrder
 
   // Saldo: positivo = Bar le paga al Restaurante, negativo = Restaurante le paga al Bar
   const deudaBar = barFoodTotal - restAlcoholTotal;
+
+  // Cálculo del servicio 10% — solo bar, ya incluido en precios
+  // Si precio = base * 1.10, entonces servicio = precio - base = precio * (1/11)
+  const totalServicio = servicioActivo ? Math.round(totalBarCobrado / 11) : 0;
+  const porMesera     = numMeseras > 0 ? Math.round(totalServicio / numMeseras) : 0;
 
   const countMethod = (arr, m) => arr.filter(o => (o.paymentMethod || 'efectivo') === m).length;
   const sumMethod   = (arr, m) => arr.filter(o => (o.paymentMethod || 'efectivo') === m).reduce((s, o) => s + o.total, 0);
@@ -219,6 +229,59 @@ ${restPaid.length > 0 ? `<div class="section-title">📋 Detalle — Restaurante
               </div>
             </div>
           </div>
+        </div>
+
+        {/* ── Servicio 10% Meseras (Sábados) ── */}
+        <div className={`rounded-2xl border-2 p-5 shadow-2xl ${servicioActivo ? 'bg-gradient-to-br from-purple-900/40 to-indigo-900/40 border-purple-500/60' : 'bg-slate-800/50 border-slate-600/40'}`}>
+          <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+            <div>
+              <h3 className={`font-bold text-xl ${servicioActivo ? 'text-purple-300' : 'text-slate-400'}`}>
+                💜 Servicio 10% — Meseras
+              </h3>
+              <p className="text-slate-500 text-xs mt-0.5">
+                {isSabado ? '📅 Hoy es sábado — activo automáticamente' : '📅 No es sábado — activar manualmente si aplica'}
+              </p>
+            </div>
+            <button
+              onClick={() => setServicioActivo(v => !v)}
+              className={`px-4 py-2 rounded-xl font-bold text-sm transition border ${servicioActivo ? 'bg-purple-600 hover:bg-purple-700 text-white border-purple-400' : 'bg-slate-700 hover:bg-slate-600 text-slate-300 border-slate-500'}`}
+            >
+              {servicioActivo ? '✅ Activo' : '⭕ Inactivo'}
+            </button>
+          </div>
+
+          {servicioActivo && (
+            <div className="space-y-3">
+              <div className="bg-slate-800/60 rounded-xl p-4 border border-slate-700 flex flex-wrap justify-between items-center gap-2">
+                <div>
+                  <div className="text-slate-300 text-sm">Servicio extraído del total Bar</div>
+                  <div className="text-xs text-slate-500">₡{totalBarCobrado.toLocaleString()} ÷ 11 (10% ya incluido en precios)</div>
+                </div>
+                <div className="text-xl font-bold text-purple-300">₡{totalServicio.toLocaleString()}</div>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <span className="text-slate-400 text-sm">Dividir entre:</span>
+                {[3, 4].map(n => (
+                  <button
+                    key={n}
+                    onClick={() => setNumMeseras(n)}
+                    className={`px-4 py-1.5 rounded-lg font-bold text-sm transition border ${numMeseras === n ? 'bg-purple-600 text-white border-purple-400' : 'bg-slate-700 text-slate-300 border-slate-600 hover:bg-slate-600'}`}
+                  >
+                    {n} meseras
+                  </button>
+                ))}
+              </div>
+
+              <div className="bg-purple-900/50 rounded-xl p-4 border border-purple-500/50 flex justify-between items-center">
+                <div>
+                  <div className="text-purple-200 text-sm font-bold">Por mesera</div>
+                  <div className="text-xs text-purple-400">María, Milena, Lin{numMeseras === 4 ? ', Temp Bar' : ''}</div>
+                </div>
+                <div className="text-2xl font-bold text-purple-200">₡{porMesera.toLocaleString()}</div>
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
