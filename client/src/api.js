@@ -70,3 +70,14 @@ export const deleteKitchenOrder = (id) =>
 
 export const getReport = (zone) =>
   fetch(`${BASE}/reports/${zone}`).then(handleResponse);
+
+// ── REGISTRO DE ACCESO ────────────────────────
+export const logAccess = (user, pin, action = 'login', selected = null) =>
+  fetch(`${BASE}/access-log`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ user, pin, action, selected }),
+  }).then(r => r.json()).catch(() => null); // silencioso si falla
+
+export const getAccessLog = () =>
+  fetch(`${BASE}/access-log`).then(r => r.json());
