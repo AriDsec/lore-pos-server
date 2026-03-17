@@ -50,9 +50,8 @@ export function MeseraScreen({
   // Panel central en landscape: Menú + Licores + Otros con tabs
   const [menuTab, setMenuTab] = useState('menu');
 
-  const MenuCenter = () => (
+  const menuCenterJSX = (
     <div className="space-y-3">
-      {/* Mini tabs para menu/licores/otros */}
       <div className="flex gap-2">
         {[
           { id: 'menu',    label: '🍽️ Menú' },
@@ -72,11 +71,9 @@ export function MeseraScreen({
           </button>
         ))}
       </div>
-
       {menuTab === 'menu'    && <MenuDropdown menu={menu} onSelectItem={addToCart} />}
       {menuTab === 'licores' && <LicoresPanel onAddToCart={addToCart} onModalChange={onModalChange} />}
       {menuTab === 'otros'   && <OtrosPanel onAddToCart={addToCart} onModalChange={onModalChange} />}
-
       <ReadyOrdersPanel kitchenOrders={kitchenOrders} mesera={currentUser} />
     </div>
   );
@@ -105,7 +102,7 @@ export function MeseraScreen({
       {/* ── Landscape: flex — menú flexible / carrito ancho fijo ── */}
       <div className={`${isLandscape ? "flex" : "hidden"} gap-3 p-3 w-full overflow-hidden`} style={{height: "calc(100vh - 64px)"}}>
         <div className="flex-1 overflow-y-auto">
-          <MenuCenter />
+          {menuCenterJSX}
         </div>
         <div style={{width: "380px", flexShrink: 0, overflowY: "auto", height: "100%"}}>
           <ShoppingCart {...cartProps} mobileVisible="landscape" />
