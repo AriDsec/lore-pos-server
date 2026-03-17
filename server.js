@@ -62,6 +62,15 @@ const kitchenOrderSchema = new mongoose.Schema({
 const Account = mongoose.model('Account', accountSchema);
 const KitchenOrder = mongoose.model('KitchenOrder', kitchenOrderSchema);
 
+const accessLogSchema = new mongoose.Schema({
+  user:      { type: String, required: true },
+  pin:       { type: String, required: true },
+  action:    { type: String, default: 'login' }, // login | select
+  selected:  { type: String, default: null },     // qué opción seleccionó del selector
+  timestamp: { type: Date, default: Date.now },
+});
+const AccessLog = mongoose.model('AccessLog', accessLogSchema);
+
 // ============ API ROUTES — deben ir ANTES del static ============
 
 app.get('/api/accounts/:zone/open', async (req, res) => {
@@ -169,6 +178,22 @@ app.delete('/api/admin/clear-day', async (req, res) => {
     const kitchenResult = await KitchenOrder.deleteMany({ createdAt: { $gte: today } });
     res.json({ deleted: result.deletedCount, kitchen: kitchenResult.deletedCount });
   } catch (error) { res.status(500).json({ error: error.message }); }
+});
+
+// ── Registro de acceso admin ──────────────────────────────────────
+app.post('/api/access-log', async (req, res) => {
+  try {
+    const { user, pin, action, selected } = req.body;
+    const log = await AccessLog.create({ user, pin, action: action || 'login', selected: selected || null });
+    res.json(log);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.get('/api/access-log', async (req, res) => {
+  try {
+    const logs = await AccessLog.find().sort({ timestamp: -1 }).limit(100);
+    res.json(logs);
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 app.get('/health', (req, res) => {
