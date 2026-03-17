@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import * as api from "./api.js";
 import { MENU, LICORES, PINES, meseras, barras } from './constants.js';
 import { Spinner, Toast, PinLoginScreen, SelectorScreen } from './components.jsx';
@@ -18,6 +18,7 @@ export default function RestaurantePOS() {
   const [showSelector, setShowSelector] = useState(!!savedAdmin && !savedSession?.user);
   const [adminUser, setAdminUser]       = useState(savedAdmin || null);
   const [toasts, setToasts]             = useState([]);
+  const modalOpenRef = useRef(false); // pausa el sync cuando hay modal abierto
 
   const showToast = (message, type = 'success') => {
     const id = Date.now();
@@ -94,7 +95,10 @@ export default function RestaurantePOS() {
 
   useEffect(() => {
     if (!currentUser || !userRole) return;
-    const interval = setInterval(() => loadData(currentZone, userRole, true), 15000);
+    const interval = setInterval(() => {
+      const anyModalOpen = modalOpenRef.current || !!splitOrder || !!billOrder || !!viewItemsOrder;
+      if (!anyModalOpen) loadData(currentZone, userRole, true);
+    }, 15000);
     return () => clearInterval(interval);
   }, [currentUser, userRole, currentZone, loadData]);
 
@@ -385,6 +389,7 @@ export default function RestaurantePOS() {
           onSelectAccount={handleSelectAccount}
           isBar={currentZone === 'bar'} onDirectPay={handleDirectPay}
           splitOrder={splitOrder} setSplitOrder={setSplitOrder} onSplit={handleSplitAccount}
+          onModalChange={(open) => { modalOpenRef.current = open; }}
         />
       </>
     );
