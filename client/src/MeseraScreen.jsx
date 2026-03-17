@@ -74,7 +74,6 @@ export function MeseraScreen({
       {menuTab === 'menu'    && <MenuDropdown menu={menu} onSelectItem={addToCart} />}
       {menuTab === 'licores' && <LicoresPanel onAddToCart={addToCart} onModalChange={onModalChange} />}
       {menuTab === 'otros'   && <OtrosPanel onAddToCart={addToCart} onModalChange={onModalChange} />}
-      <ReadyOrdersPanel kitchenOrders={kitchenOrders} mesera={currentUser} />
     </div>
   );
 
@@ -89,23 +88,44 @@ export function MeseraScreen({
         </div>
       )}
 
-      {/* Banner pedidos listos */}
-      {kitchenOrders.filter(o => o.status === 'ready').length > 0 && (
-        <div className="bg-[#94cb47]/20 border-b border-[#94cb47]/50 px-4 py-2 flex items-center gap-2 animate-pulse">
-          <span className="text-[#94cb47] font-bold text-sm">
-            ✅ {kitchenOrders.filter(o => o.status === 'ready').length} pedido{kitchenOrders.filter(o => o.status === 'ready').length > 1 ? 's' : ''} listo{kitchenOrders.filter(o => o.status === 'ready').length > 1 ? 's' : ''} para entregar —
-            {kitchenOrders.filter(o => o.status === 'ready').map(o => ` ${o.barra || (o.table ? `Mesa ${o.table}` : '')} ${o.clientName || ''}`).join(' ·')}
-          </span>
-        </div>
-      )}
+      {/* Banner pedidos listos — fijo arriba, no empuja contenido */}
+      {(() => {
+        const readyOrders = kitchenOrders.filter(o => o.status === 'ready');
+        if (readyOrders.length === 0) return null;
+        const mesas = readyOrders.map(o => o.barra || (o.table ? `Mesa ${o.table}` : '')).filter(Boolean).join(' · ');
+        return (
+          <div className="bg-[#94cb47] px-4 py-2 flex items-center gap-2">
+            <span className="text-black font-bold text-sm animate-pulse">🔔</span>
+            <span className="text-black font-bold text-sm flex-1">
+              {readyOrders.length} pedido{readyOrders.length > 1 ? 's' : ''} listo{readyOrders.length > 1 ? 's' : ''} — {mesas}
+            </span>
+          </div>
+        );
+      })()}
 
       {/* ── Landscape: flex — menú flexible / carrito ancho fijo ── */}
       <div className={`${isLandscape ? "flex" : "hidden"} gap-3 p-3 w-full overflow-hidden`} style={{height: "calc(100vh - 64px)"}}>
         <div className="flex-1 overflow-y-auto">
           {menuCenterJSX}
         </div>
-        <div style={{width: "380px", flexShrink: 0, overflowY: "auto", height: "100%"}}>
-          <ShoppingCart {...cartProps} mobileVisible="landscape" />
+        <div style={{width: "380px", flexShrink: 0, height: "100%", display: "flex", flexDirection: "column", gap: "8px"}}>
+          <div style={{flex: 1, overflowY: "auto", minHeight: 0}}>
+            <ShoppingCart {...cartProps} mobileVisible="landscape" />
+          </div>
+          {/* Pedidos listos debajo del carrito en landscape */}
+          {kitchenOrders.filter(o => o.status === 'ready').length > 0 && (
+            <div className="bg-[#94cb47]/10 border border-[#94cb47]/40 rounded-xl p-3 flex-shrink-0">
+              <div className="text-[#94cb47] font-bold text-xs mb-2">
+                🔔 {kitchenOrders.filter(o => o.status === 'ready').length} pedido{kitchenOrders.filter(o => o.status === 'ready').length > 1 ? 's' : ''} listo{kitchenOrders.filter(o => o.status === 'ready').length > 1 ? 's' : ''}
+              </div>
+              {kitchenOrders.filter(o => o.status === 'ready').map((o, i) => (
+                <div key={i} className="text-white text-xs py-1 border-t border-[#94cb47]/20">
+                  <span className="font-bold">{o.barra || (o.table ? `Mesa ${o.table}` : '')}</span>
+                  {o.clientName && <span className="text-slate-400"> — {o.clientName}</span>}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
@@ -139,7 +159,6 @@ export function MeseraScreen({
               {menuTab === 'licores' && <LicoresPanel onAddToCart={addToCart} onModalChange={onModalChange} />}
               {menuTab === 'otros'   && <OtrosPanel onAddToCart={addToCart} onModalChange={onModalChange} />}
 
-              <ReadyOrdersPanel kitchenOrders={kitchenOrders} mesera={currentUser} />
             </div>
           )}
           {mobileTab === 'carrito' && (
