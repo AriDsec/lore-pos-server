@@ -7,7 +7,7 @@ export function ShoppingCart({
   barras, maxTables, tables,
   openAccounts, selectedAccount, onSelectAccount,
   mobileVisible, onDirectPay, isBar, onSplit,
-  currentUser,
+  currentUser, aplicaServicio,
 }) {
   // Si la cuenta seleccionada pertenece a otra mesera, solo se pueden agregar items (no borrar/editar los existentes)
   const selectedAcc = selectedAccount ? openAccounts.find(a => a.id === selectedAccount || a._id === selectedAccount) : null;
@@ -27,6 +27,9 @@ export function ShoppingCart({
           🛒 Carrito
           {cartItems.length > 0 && (
             <span className="bg-white/20 text-white text-xs font-bold px-2 py-0.5 rounded-full ml-2">{cartItems.length}</span>
+          )}
+          {aplicaServicio && (
+            <span className="ml-2 bg-purple-800/70 text-purple-300 text-xs font-bold px-2 py-0.5 rounded-full border border-purple-500/50">+10% serv.</span>
           )}
         </h2>
       </div>
