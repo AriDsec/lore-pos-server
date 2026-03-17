@@ -15,10 +15,26 @@ export function AdminScreen({ barPaid, restPaid, loading, onLogout, setPaidOrder
   const [viewItemsOrder, setViewItemsOrder] = useState(null);
   const [accessLog, setAccessLog] = useState([]);
 
-  // Servicio 10% — automático los sábados
+  // Servicio 10% — automático los sábados, persiste en localStorage
   const isSabado = new Date().getDay() === 6;
-  const [servicioActivo, setServicioActivo] = useState(isSabado);
-  const [numMeseras, setNumMeseras] = useState(3);
+  const [servicioActivo, setServicioActivo] = useState(() => {
+    const saved = localStorage.getItem('lore_servicio');
+    if (saved !== null) return saved === 'true';
+    return isSabado; // default: activo si es sábado
+  });
+  const [numMeseras, setNumMeseras] = useState(() => {
+    return parseInt(localStorage.getItem('lore_num_meseras') || '3');
+  });
+
+  const toggleServicio = (val) => {
+    setServicioActivo(val);
+    localStorage.setItem('lore_servicio', String(val));
+  };
+
+  const changeNumMeseras = (n) => {
+    setNumMeseras(n);
+    localStorage.setItem('lore_num_meseras', String(n));
+  };
 
   useEffect(() => {
     api.getAccessLog().then(setAccessLog).catch(() => {});
@@ -243,7 +259,7 @@ ${restPaid.length > 0 ? `<div class="section-title">📋 Detalle — Restaurante
               </p>
             </div>
             <button
-              onClick={() => setServicioActivo(v => !v)}
+              onClick={() => toggleServicio(!servicioActivo)}
               className={`px-4 py-2 rounded-xl font-bold text-sm transition border ${servicioActivo ? 'bg-purple-600 hover:bg-purple-700 text-white border-purple-400' : 'bg-slate-700 hover:bg-slate-600 text-slate-300 border-slate-500'}`}
             >
               {servicioActivo ? '✅ Activo' : '⭕ Inactivo'}
@@ -265,7 +281,7 @@ ${restPaid.length > 0 ? `<div class="section-title">📋 Detalle — Restaurante
                 {[3, 4].map(n => (
                   <button
                     key={n}
-                    onClick={() => setNumMeseras(n)}
+                    onClick={() => changeNumMeseras(n)}
                     className={`px-4 py-1.5 rounded-lg font-bold text-sm transition border ${numMeseras === n ? 'bg-purple-600 text-white border-purple-400' : 'bg-slate-700 text-slate-300 border-slate-600 hover:bg-slate-600'}`}
                   >
                     {n} meseras
