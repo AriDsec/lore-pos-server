@@ -53,10 +53,11 @@ const accountSchema = new mongoose.Schema({
 
 const kitchenOrderSchema = new mongoose.Schema({
   id: String, zone: String, mesera: String, clientName: String,
-  table: Number, barra: String,
-  items: [{ id: String, name: String, quantity: Number, notes: String, category: String }],
+  table: Number, barra: String, locationLabel: String,
+  items: [{ id: String, name: String, quantity: Number, notes: String, category: String, esNuevo: Boolean }],
   status: { type: String, default: 'pending' },
   createdAt: Date,
+  esActualizacion: { type: Boolean, default: false },
 });
 
 const Account = mongoose.model('Account', accountSchema);
