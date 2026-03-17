@@ -42,6 +42,7 @@ export function MeseraScreen({
     onDirectPay,
     tables,
     onSplit: (acc) => setSplitOrder(acc),
+    currentUser,
   };
 
   // Panel central en landscape: Menú + Licores + Otros con tabs
