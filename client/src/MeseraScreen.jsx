@@ -13,7 +13,7 @@ export function MeseraScreen({
   onDirectPay, isBar, tables,
   splitOrder, setSplitOrder, onSplit,
   onModalChange, aplicaServicio,
-  mesaConflict, setMesaConflict, onSelectAccount,
+  mesaConflict, setMesaConflict, onAddToExisting,
 }) {
   const [mobileTab, setMobileTab] = useState('menu');
   const [isLandscape, setIsLandscape] = useState(
@@ -216,7 +216,7 @@ export function MeseraScreen({
             <div className="space-y-2">
               <button
                 onClick={() => {
-                  onSelectAccount && onSelectAccount(mesaConflict.existingAcc._id || mesaConflict.existingAcc.id);
+                  onAddToExisting && onAddToExisting(mesaConflict.existingAcc._id || mesaConflict.existingAcc.id);
                   setMesaConflict(null);
                 }}
                 className="w-full bg-[#94cb47] hover:bg-[#7ab035] text-black font-bold py-3 rounded-xl transition"
@@ -230,7 +230,7 @@ export function MeseraScreen({
                 👤 Nueva cuenta (persona diferente)
               </button>
               <button
-                onClick={() => { mesaConflict.onConfirm(false); setMesaConflict(null); }}
+                onClick={() => setMesaConflict(null)}
                 className="w-full text-slate-500 hover:text-slate-300 text-sm py-2 transition"
               >
                 Cancelar
