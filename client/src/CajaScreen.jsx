@@ -1,4 +1,4 @@
-import { Header, payBadge, BillModal, ItemsModal, SplitModal, Spinner } from './components.jsx';
+import { Header, payBadge, BillModal, ItemsModal, SplitModal, Spinner, imprimirTiquete } from './components.jsx';
 
 function CajaStats({ paid, zona }) {
   const totalCobrado = paid.reduce((s, o) => s + o.total, 0);
@@ -92,6 +92,7 @@ export function CajaScreen({
                     <td className="text-right py-3 px-3 text-[#94cb47] font-bold">₡{o.total.toLocaleString()}</td>
                     <td className="text-center py-3 px-3">
                       <button onClick={() => setViewItemsOrder(o)} className="bg-slate-600 hover:bg-slate-500 text-white px-3 py-1 rounded text-xs font-bold">📋 Ver</button>
+                      <button onClick={() => imprimirTiquete(o, zona)} className="bg-blue-700 hover:bg-blue-800 text-white px-3 py-1 rounded text-xs font-bold">🖨️</button>
                     </td>
                   </tr>
                 ))}
@@ -101,7 +102,7 @@ export function CajaScreen({
         </div>
       </div>
 
-      {billOrder && <BillModal order={billOrder} onClose={() => setBillOrder(null)} onPay={onPay} />}
+      {billOrder && <BillModal order={billOrder} onClose={() => setBillOrder(null)} onPay={onPay} zona={zona} />}
       {viewItemsOrder && <ItemsModal order={viewItemsOrder} onClose={() => setViewItemsOrder(null)} />}
       {splitOrder && <SplitModal account={splitOrder} onConfirm={onSplit} onClose={() => setSplitOrder(null)} />}
     </div>
