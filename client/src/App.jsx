@@ -94,8 +94,19 @@ export default function RestaurantePOS() {
       }
       if (role === 'mesera') {
         const kitchen = await api.getKitchenOrders(zone);
+        if (!silent) {
+          // Primer load — inicializar refs sin disparar sonidos
+          prevKitchenIds.current = new Set(kitchen.map(o => o.id));
+          prevReadyIds.current = new Set(kitchen.filter(o => o.status === 'ready').map(o => o.id));
+        }
         if (silent) {
-          // Detectar pedidos recién marcados como listos
+          // Detectar pedidos nuevos o adicionales (sonido de nuevo pedido — para saber que se mandó)
+          const allIds = new Set(kitchen.map(o => o.id));
+          const brandNew = kitchen.filter(o => !prevKitchenIds.current.has(o.id));
+          if (brandNew.length > 0) sonidoPedidoNuevo();
+          prevKitchenIds.current = allIds;
+
+          // Detectar pedidos recién marcados como listos (sonido diferente)
           const readyNow = kitchen.filter(o => o.status === 'ready');
           const newReady = readyNow.filter(o => !prevReadyIds.current.has(o.id));
           if (newReady.length > 0) sonidoPedidoListo();
@@ -122,10 +133,13 @@ export default function RestaurantePOS() {
 
   useEffect(() => {
     if (!currentUser || !userRole) return;
+    // Meseras y cocina sincronizan cada 5s para notificaciones rápidas
+    // Caja y admin cada 15s
+    const interval_ms = (userRole === 'mesera' || userRole === 'cocina') ? 5000 : 15000;
     const interval = setInterval(() => {
       const anyModalOpen = modalOpenRef.current || !!splitOrder || !!billOrder || !!viewItemsOrder;
       if (!anyModalOpen) loadData(currentZone, userRole, true);
-    }, 15000);
+    }, interval_ms);
     return () => clearInterval(interval);
   }, [currentUser, userRole, currentZone, loadData]);
 
