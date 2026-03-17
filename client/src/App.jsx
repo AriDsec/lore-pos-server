@@ -23,19 +23,30 @@ export default function RestaurantePOS() {
   const prevKitchenIds = useRef(new Set()); // para detectar pedidos nuevos en cocina
   const prevReadyIds   = useRef(new Set()); // para detectar pedidos listos para meseras
 
-  // Servicio 10% — lee el estado guardado por Admin en localStorage
-  const aplicaServicio = (() => {
+  // Servicio 10% — estado reactivo, persiste en servidor + localStorage como fallback
+  const [servicioActivoGlobal, setServicioActivoGlobal] = useState(() => {
     const saved = localStorage.getItem('lore_servicio');
-    // Si no hay valor guardado, default = sábado
-    const activo = saved !== null ? saved === 'true' : new Date().getDay() === 6;
-    return activo && currentZone === 'bar';
-  })();
+    return saved !== null ? saved === 'true' : new Date().getDay() === 6;
+  });
+
+  // Al iniciar, sincronizar con el servidor
+  useEffect(() => {
+    api.getConfig('servicio_activo').then(({ value }) => {
+      if (value !== null && value !== undefined) {
+        setServicioActivoGlobal(value);
+        localStorage.setItem('lore_servicio', String(value));
+      }
+    }).catch(() => {}); // si falla usa localStorage
+  }, []);
+
+  const aplicaServicio = servicioActivoGlobal && currentZone === 'bar';
   const conServicio = (precio) => aplicaServicio ? Math.ceil(precio * 1.10 / 100) * 100 : precio;
 
   const showToast = (message, type = 'success') => {
     const id = Date.now();
     setToasts(prev => [...prev, { id, message, type }]);
-    setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 3000);
+    const duration = type === 'error' ? 5000 : type === 'warning' ? 4500 : 4000;
+    setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), duration);
   };
 
   const [cartItems, setCartItems]         = useState([]);
