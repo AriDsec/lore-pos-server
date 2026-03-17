@@ -82,24 +82,6 @@ export default function RestaurantePOS() {
     }
   }, []); // eslint-disable-line
 
-  // Timeout de sesión — 8 horas, aviso 10 min antes
-  useEffect(() => {
-    if (!currentUser || userRole === 'admin') return; // admin no expira
-    const OCHO_HORAS = 8 * 60 * 60 * 1000;
-    const AVISO = 10 * 60 * 1000; // 10 min antes
-
-    const avisoTimer = setTimeout(() => {
-      showToast('⏰ La sesión cierra en 10 minutos', 'warning');
-    }, OCHO_HORAS - AVISO);
-
-    const logoutTimer = setTimeout(() => {
-      showToast('Sesión cerrada por inactividad', 'warning');
-      setTimeout(handleLogout, 2000);
-    }, OCHO_HORAS);
-
-    return () => { clearTimeout(avisoTimer); clearTimeout(logoutTimer); };
-  }, [currentUser, userRole]); // eslint-disable-line
-
   // Reintento automático cuando hay error de conexión
   useEffect(() => {
     if (!syncError || !currentUser) return;
@@ -211,6 +193,21 @@ export default function RestaurantePOS() {
     'Tablet Restaurante': { role: 'mesera', zone: 'restaurante' },
     'Cocina':             { role: 'cocina', zone: 'restaurante' },
   };
+
+  // Timeout de sesión — 8 horas, aviso 10 min antes (debe ir después de handleLogout)
+  useEffect(() => {
+    if (!currentUser || userRole === 'admin') return;
+    const OCHO_HORAS = 8 * 60 * 60 * 1000;
+    const AVISO = 10 * 60 * 1000;
+    const avisoTimer = setTimeout(() => {
+      showToast('⏰ La sesión cierra en 10 minutos', 'warning');
+    }, OCHO_HORAS - AVISO);
+    const logoutTimer = setTimeout(() => {
+      showToast('Sesión cerrada por inactividad', 'warning');
+      setTimeout(handleLogout, 2000);
+    }, OCHO_HORAS);
+    return () => { clearTimeout(avisoTimer); clearTimeout(logoutTimer); };
+  }, [currentUser, userRole]); // eslint-disable-line
 
   const handleSelectorLogin = async (name) => {
     // '__admin__' significa entrar al Panel Admin con el usuario admin actual
