@@ -92,6 +92,16 @@ export function MeseraScreen({
         </div>
       )}
 
+      {/* Banner pedidos listos */}
+      {kitchenOrders.filter(o => o.status === 'ready').length > 0 && (
+        <div className="bg-[#94cb47]/20 border-b border-[#94cb47]/50 px-4 py-2 flex items-center gap-2 animate-pulse">
+          <span className="text-[#94cb47] font-bold text-sm">
+            ✅ {kitchenOrders.filter(o => o.status === 'ready').length} pedido{kitchenOrders.filter(o => o.status === 'ready').length > 1 ? 's' : ''} listo{kitchenOrders.filter(o => o.status === 'ready').length > 1 ? 's' : ''} para entregar —
+            {kitchenOrders.filter(o => o.status === 'ready').map(o => ` ${o.barra || (o.table ? `Mesa ${o.table}` : '')} ${o.clientName || ''}`).join(' ·')}
+          </span>
+        </div>
+      )}
+
       {/* ── Landscape: flex — menú flexible / carrito ancho fijo ── */}
       <div className={`${isLandscape ? "flex" : "hidden"} gap-3 p-3 w-full overflow-hidden`} style={{height: "calc(100vh - 64px)"}}>
         <div className="flex-1 overflow-y-auto">
