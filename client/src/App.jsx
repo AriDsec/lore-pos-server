@@ -17,6 +17,13 @@ export default function RestaurantePOS() {
   const [syncError, setSyncError]     = useState(null);
   const [showSelector, setShowSelector] = useState(!!savedAdmin && !savedSession?.user);
   const [adminUser, setAdminUser]       = useState(savedAdmin || null);
+  const [toasts, setToasts]             = useState([]);
+
+  const showToast = (message, type = 'success') => {
+    const id = Date.now();
+    setToasts(prev => [...prev, { id, message, type }]);
+    setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 3000);
+  };
 
   const [cartItems, setCartItems]         = useState([]);
   const [selectedTable, setSelectedTable] = useState(null);
