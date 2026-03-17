@@ -29,6 +29,7 @@ export function AdminScreen({ barPaid, restPaid, loading, onLogout, setPaidOrder
   const toggleServicio = (val) => {
     setServicioActivo(val);
     localStorage.setItem('lore_servicio', String(val));
+    api.setConfig('servicio_activo', val).catch(() => {}); // guardar en servidor
   };
 
   const changeNumMeseras = (n) => {
