@@ -290,11 +290,11 @@ export const OTROS = [
   { id: 'o_mani',           name: 'Maní',                 price: 500,  category: 'otro' },
   { id: 'o_mayo_sobre',     name: 'Mayo (sobre)',          price: 300,  category: 'otro' },
   { id: 'o_ketchup_sobre',  name: 'Ketchup (sobre)',       price: 300,  category: 'otro' },
-  { id: 'o_porcion_arroz',  name: 'Porción de arroz',     price: 500,  category: 'otro' },
+  { id: 'o_porcion_arroz',  name: 'Porción de arroz',     price: 500,  category: 'otro', kitchen: true },
   { id: 'o_confites',       name: 'Confites',             price: 100,  category: 'otro' },
   { id: 'o_chicle',         name: 'Chicle',               price: 100,  category: 'otro' },
   { id: 'o_agua_botella',   name: 'Agua botella',         price: 800,  category: 'otro' },
-  { id: 'o_otro',           name: 'Otro',                 price: 0,    category: 'otro' },
+  { id: 'o_otro',           name: 'Otro',                 price: 0,    category: 'otro', kitchen: true },
 ];
 
 // ─────────────────────────────────────────────
@@ -505,8 +505,8 @@ export const PINES = {
   'Caja Bar':           { pin: '1970', role: 'caja',   zone: 'bar' },
   'Caja Restaurante':   { pin: '1969', role: 'caja',   zone: 'restaurante' },
   // ── Meseras Bar ──
-  'María':              { pin: '5456', role: 'mesera', zone: 'bar' },
-  'Milena':             { pin: '8995', role: 'mesera', zone: 'bar' },
+  'Mari':              { pin: '5456', role: 'mesera', zone: 'bar' },
+  'Mile':             { pin: '8995', role: 'mesera', zone: 'bar' },
   'Lin':                { pin: '7777', role: 'mesera', zone: 'bar' },
   'Temp Bar':           { pin: '1221', role: 'mesera', zone: 'bar' },
   // ── Admins (selector completo + registro de acceso) ──
