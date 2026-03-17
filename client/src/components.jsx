@@ -746,3 +746,59 @@ export function PinLoginScreen({ isLandscape, syncError, loading, onLogin }) {
     </div>
   );
 }
+
+// ─────────────────────────────────────────────
+// SELECTOR SCREEN (Admin)
+// ─────────────────────────────────────────────
+export function SelectorScreen({ isLandscape, syncError, loading, onSelect, onBack }) {
+  const meseras = ['María', 'Milena', 'Lin', 'Temp Bar'];
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-black via-slate-900 to-black flex flex-col items-center justify-center p-4 overflow-y-auto">
+      {isLandscape ? (
+        <div className="flex items-center gap-5 mb-5 w-full max-w-3xl">
+          <img src="/logo.png" alt="LORE" className="w-24 h-24 object-contain drop-shadow-2xl flex-shrink-0" />
+          <div style={{ fontFamily: "'Cinzel', serif", letterSpacing: '0.14em' }}
+            className="text-white/75 text-2xl font-normal drop-shadow-lg flex-1">
+            Sistema de Pedidos
+          </div>
+          <button onClick={onBack} className="text-slate-400 hover:text-white text-sm underline flex-shrink-0">← Volver</button>
+        </div>
+      ) : (
+        <div className="flex flex-col items-center mb-5 w-full max-w-md">
+          <img src="/logo.png" alt="LORE" className="w-32 h-32 object-contain drop-shadow-2xl mb-2" />
+          <div style={{ fontFamily: "'Cinzel', serif", letterSpacing: '0.12em' }}
+            className="text-white/70 text-lg font-normal mb-3">
+            Sistema de Pedidos
+          </div>
+        </div>
+      )}
+      {syncError && (
+        <div className="bg-red-900/60 border border-red-500 rounded-xl p-3 mb-3 text-red-200 text-sm text-center w-full max-w-2xl">
+          ⚠️ {syncError}
+        </div>
+      )}
+      <div className={`w-full ${isLandscape ? 'grid grid-cols-3 gap-3 max-w-3xl' : 'space-y-3 max-w-md'}`}>
+        <div className="bg-slate-800/80 backdrop-blur border border-[#94cb47]/40 rounded-2xl p-4 shadow-2xl">
+          <h2 className="text-[#94cb47] font-bold text-base mb-3">🍺 ZONA BAR</h2>
+          <button onClick={() => onSelect('Caja Bar')} className="w-full bg-[#94cb47] hover:bg-[#7ab035] text-white font-bold py-2.5 rounded-xl transition shadow-lg mb-2">💰 Caja Bar</button>
+          <div className="space-y-2">
+            {meseras.map(m => (
+              <button key={m} onClick={() => onSelect(m)} className="w-full bg-slate-700/60 hover:bg-slate-600 text-[#94cb47] py-2 rounded-lg transition font-medium text-sm">{m}</button>
+            ))}
+          </div>
+        </div>
+        <div className="bg-slate-800/80 backdrop-blur border border-[#94cb47]/40 rounded-2xl p-4 shadow-2xl">
+          <h2 className="text-[#94cb47] font-bold text-base mb-3">🍽️ ZONA RESTAURANTE</h2>
+          <button onClick={() => onSelect('Caja Restaurante')} className="w-full bg-[#94cb47] hover:bg-[#7ab035] text-white font-bold py-2.5 rounded-xl transition shadow-lg mb-2">💰 Caja</button>
+          <button onClick={() => onSelect('Tablet Restaurante')} className="w-full bg-[#94cb47]/90 hover:bg-[#7ab035] text-white font-bold py-2.5 rounded-xl transition shadow-lg mb-2">📱 Tomar Pedidos</button>
+          <button onClick={() => onSelect('Cocina')} className="w-full bg-[#94cb47]/90 hover:bg-[#7ab035] text-white font-bold py-2.5 rounded-xl transition shadow-lg">👨‍🍳 Cocina</button>
+        </div>
+        <div className="bg-slate-800/80 backdrop-blur border border-[#94cb47]/40 rounded-2xl p-4 shadow-2xl flex flex-col justify-between gap-3">
+          <button onClick={() => onSelect('Admin')} className="w-full bg-[#94cb47]/90 hover:bg-[#7ab035] text-white font-bold py-2.5 rounded-xl transition shadow-lg">📊 Panel Admin</button>
+          {!isLandscape && <button onClick={onBack} className="w-full text-slate-400 hover:text-white text-sm py-2 underline">← Volver al PIN</button>}
+        </div>
+      </div>
+      {loading && <Spinner />}
+    </div>
+  );
+}
