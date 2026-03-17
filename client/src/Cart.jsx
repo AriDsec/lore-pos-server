@@ -7,13 +7,17 @@ export function ShoppingCart({
   barras, maxTables, tables,
   openAccounts, selectedAccount, onSelectAccount,
   mobileVisible, onDirectPay, isBar, onSplit,
+  currentUser,
 }) {
+  // Si la cuenta seleccionada pertenece a otra mesera, solo se pueden agregar items (no borrar/editar los existentes)
+  const selectedAcc = selectedAccount ? openAccounts.find(a => a.id === selectedAccount || a._id === selectedAccount) : null;
+  const isOthersMesera = selectedAcc && selectedAcc.mesera && currentUser && selectedAcc.mesera !== currentUser;
   const total = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const isLandscapeMode = mobileVisible === 'landscape';
 
   if (!mobileVisible) return null;
 
-  const wrapClass = "bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 shadow-2xl";
+  const wrapClass = "bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 shadow-2xl overflow-hidden";
 
   return (
     <div className={wrapClass}>
@@ -63,18 +67,24 @@ export function ShoppingCart({
                     <div className="text-[#94cb47] font-bold text-xs">₡{(item.price * item.quantity).toLocaleString()}</div>
                     {item.addedBy && <div className="text-slate-500 text-xs">👤 {item.addedBy}</div>}
                   </div>
-                  <button onClick={() => removeFromCart(item.id)} className="text-red-400 hover:text-red-300 p-0.5 flex-shrink-0">
-                    <Trash2 size={13} />
-                  </button>
+                  {!isOthersMesera && (
+                    <button onClick={() => removeFromCart(item.id)} className="text-red-400 hover:text-red-300 p-0.5 flex-shrink-0">
+                      <Trash2 size={13} />
+                    </button>
+                  )}
                 </div>
                 <div className="flex items-center gap-1 bg-slate-900/50 rounded-md px-1 py-0.5 mb-1">
-                  <button onClick={() => updateQuantity(item.id, item.quantity - 1)} className="p-1 hover:bg-slate-700 rounded">
-                    <Minus size={11} className="text-slate-400" />
-                  </button>
-                  <span className="flex-1 text-center text-white font-bold text-xs">{item.quantity}</span>
-                  <button onClick={() => updateQuantity(item.id, item.quantity + 1)} className="p-1 hover:bg-slate-700 rounded">
-                    <Plus size={11} className="text-slate-400" />
-                  </button>
+                  {!isOthersMesera ? (<>
+                    <button onClick={() => updateQuantity(item.id, item.quantity - 1)} className="p-1 hover:bg-slate-700 rounded">
+                      <Minus size={11} className="text-slate-400" />
+                    </button>
+                    <span className="flex-1 text-center text-white font-bold text-xs">{item.quantity}</span>
+                    <button onClick={() => updateQuantity(item.id, item.quantity + 1)} className="p-1 hover:bg-slate-700 rounded">
+                      <Plus size={11} className="text-slate-400" />
+                    </button>
+                  </>) : (
+                    <span className="flex-1 text-center text-slate-400 text-xs py-1">x{item.quantity}</span>
+                  )}
                 </div>
                 <input
                   type="text"
