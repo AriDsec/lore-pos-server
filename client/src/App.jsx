@@ -9,13 +9,14 @@ import { AdminScreen } from './AdminScreen.jsx';
 
 export default function RestaurantePOS() {
   const savedSession = (() => { try { return JSON.parse(localStorage.getItem('lore_session')); } catch { return null; } })();
+  const savedAdmin   = (() => { try { return localStorage.getItem('lore_admin'); } catch { return null; } })();
   const [currentUser, setCurrentUser] = useState(savedSession?.user || null);
   const [userRole, setUserRole]       = useState(savedSession?.role || null);
   const [currentZone, setCurrentZone] = useState(savedSession?.zone || null);
   const [loading, setLoading]         = useState(false);
   const [syncError, setSyncError]     = useState(null);
-  const [showSelector, setShowSelector] = useState(false);
-  const [adminUser, setAdminUser]         = useState(null);  // nombre del admin activo en el selector
+  const [showSelector, setShowSelector] = useState(!!savedAdmin && !savedSession?.user);
+  const [adminUser, setAdminUser]       = useState(savedAdmin || null);
 
   const [cartItems, setCartItems]         = useState([]);
   const [selectedTable, setSelectedTable] = useState(null);
@@ -100,6 +101,7 @@ export default function RestaurantePOS() {
     localStorage.removeItem('lore_session');
     const wasAdmin = adminUser !== null;
     setCurrentUser(null); setUserRole(null); setCurrentZone(null);
+    if (wasAdmin) localStorage.setItem('lore_admin', adminUser);
     setCartItems([]); setSelectedTable(null); setSelectedBarra(null);
     setClientName(''); setOrderType(null); setSelectedAccount(null);
     setOpenAccounts([]); setPaidOrders([]); setKitchenOrders([]);
@@ -109,6 +111,7 @@ export default function RestaurantePOS() {
     } else {
       setShowSelector(false);
       setAdminUser(null);
+      localStorage.removeItem('lore_admin');
     }
   };
 
@@ -119,6 +122,7 @@ export default function RestaurantePOS() {
     if (role === 'admin') {
       setAdminUser(name);
       setShowSelector(true);
+      localStorage.setItem('lore_admin', name);
       api.logAccess(name, pin, 'login');
       return true;
     }
@@ -340,7 +344,7 @@ export default function RestaurantePOS() {
         syncError={syncError}
         loading={loading}
         onSelect={handleSelectorLogin}
-        onBack={() => setShowSelector(false)}
+        onBack={() => { setShowSelector(false); setAdminUser(null); localStorage.removeItem('lore_admin'); }}
       />;
     }
     return <PinLoginScreen
