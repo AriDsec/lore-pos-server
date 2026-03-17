@@ -71,6 +71,13 @@ const accessLogSchema = new mongoose.Schema({
 });
 const AccessLog = mongoose.model('AccessLog', accessLogSchema);
 
+const configSchema = new mongoose.Schema({
+  key:   { type: String, unique: true, required: true },
+  value: mongoose.Schema.Types.Mixed,
+  updatedAt: { type: Date, default: Date.now },
+});
+const Config = mongoose.model('Config', configSchema);
+
 // ============ API ROUTES — deben ir ANTES del static ============
 
 app.get('/api/accounts/:zone/open', async (req, res) => {
@@ -193,6 +200,26 @@ app.get('/api/access-log', async (req, res) => {
   try {
     const logs = await AccessLog.find().sort({ timestamp: -1 }).limit(100);
     res.json(logs);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// ── Configuración global ──────────────────────────────────────────
+app.get('/api/config/:key', async (req, res) => {
+  try {
+    const doc = await Config.findOne({ key: req.params.key });
+    res.json(doc ? { value: doc.value } : { value: null });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.post('/api/config/:key', async (req, res) => {
+  try {
+    const { value } = req.body;
+    const doc = await Config.findOneAndUpdate(
+      { key: req.params.key },
+      { value, updatedAt: new Date() },
+      { upsert: true, new: true }
+    );
+    res.json(doc);
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
