@@ -61,6 +61,7 @@ export default function RestaurantePOS() {
   const [billOrder, setBillOrder]           = useState(null);
   const [viewItemsOrder, setViewItemsOrder] = useState(null);
   const [splitOrder, setSplitOrder]         = useState(null);
+  const [mesaConflict, setMesaConflict]     = useState(null); // {existingAcc, onConfirm}
 
   const [isLandscape, setIsLandscape] = useState(
     () => window.matchMedia('(orientation: landscape)').matches
@@ -320,6 +321,42 @@ export default function RestaurantePOS() {
         }
         showToast('Cuenta actualizada');
       } else {
+        // Verificar si ya existe una cuenta en la misma mesa/barra
+        const ubicacion = selectedBarra || (selectedTable ? String(selectedTable) : null);
+        const cuentaExistente = ubicacion ? openAccounts.find(a =>
+          a.status === 'open' && a.type !== 'direct' &&
+          (selectedBarra ? a.barra === selectedBarra : String(a.table) === String(selectedTable))
+        ) : null;
+
+        if (cuentaExistente && !mesaConflict) {
+          // Hay cuenta en esa mesa — preguntar al usuario
+          setLoading(false);
+          setMesaConflict({
+            existingAcc: cuentaExistente,
+            onConfirm: async (createNew) => {
+              setMesaConflict(null);
+              if (!createNew) return; // canceló
+              // Si eligió crear nueva, continuar normalmente
+              setLoading(true);
+              try {
+                await api.createAccount({ id: `acc-${currentZone}-${currentUser}-${Date.now()}`, zone: currentZone, mesera: currentUser, items: [...cartItems], total, type: orderType, table: selectedTable, barra: selectedBarra, clientName, foodItems, drinkItems: cartItems.filter(i => ['alcoholic','beverage','soda'].includes(i.category)), status: 'open', createdAt: new Date() });
+                if (foodItems.length > 0) {
+                  await api.createKitchenOrder({ id: `k-${Date.now()}`, zone: currentZone, mesera: currentUser, items: foodItems, table: selectedTable || null, barra: selectedBarra || null, clientName: clientName || '', locationLabel: selectedBarra ? selectedBarra : (selectedTable ? `Mesa ${selectedTable}` : 'Sin mesa'), status: 'pending', createdAt: new Date() });
+                }
+                const fresh = await api.getOpenAccounts(currentZone);
+                setOpenAccounts(fresh);
+                setCartItems([]); setSelectedTable(null); setSelectedBarra(null); setClientName(''); setOrderType(null); setSelectedAccount(null);
+                showToast('Cuenta registrada');
+              } catch(err) {
+                showToast('Error al guardar: ' + err.message, 'error');
+              } finally {
+                setLoading(false);
+              }
+            }
+          });
+          return;
+        }
+
         await api.createAccount({ id: `acc-${currentZone}-${currentUser}-${Date.now()}`, zone: currentZone, mesera: currentUser, items: [...cartItems], total, type: orderType, table: selectedTable, barra: selectedBarra, clientName, foodItems, drinkItems: cartItems.filter(i => ['alcoholic','beverage','soda'].includes(i.category)), status: 'open', createdAt: new Date() });
         if (foodItems.length > 0) {
           await api.createKitchenOrder({ id: `k-${Date.now()}`, zone: currentZone, mesera: currentUser, items: foodItems, table: selectedTable || null, barra: selectedBarra || null, clientName: clientName || '', locationLabel: selectedBarra ? selectedBarra : (selectedTable ? `Mesa ${selectedTable}` : 'Sin mesa'), status: 'pending', createdAt: new Date() });
@@ -490,6 +527,17 @@ export default function RestaurantePOS() {
           splitOrder={splitOrder} setSplitOrder={setSplitOrder} onSplit={handleSplitAccount}
           onModalChange={(open) => { modalOpenRef.current = open; }}
           aplicaServicio={aplicaServicio}
+          mesaConflict={mesaConflict} setMesaConflict={setMesaConflict}
+          onAddToExisting={(accountId) => {
+            // Solo selecciona la cuenta — NO reemplaza el carrito
+            setSelectedAccount(accountId);
+            const acc = openAccounts.find(a => (a._id === accountId || a.id === accountId));
+            if (acc) {
+              setSelectedTable(acc.table);
+              setSelectedBarra(acc.barra);
+              setOrderType(acc.type || 'dine-in');
+            }
+          }}
         />
       </>
     );
