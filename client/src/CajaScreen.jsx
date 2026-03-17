@@ -68,36 +68,34 @@ export function CajaScreen({
           }
         </div>
 
-        <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-5 shadow-2xl overflow-x-auto">
-          <h3 className="text-[#94cb47] font-bold text-lg mb-4">✅ Historial Pagadas</h3>
+        <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-5 shadow-2xl">
+          <h3 className="text-[#94cb47] font-bold text-lg mb-4">✅ Historial Pagadas ({paid.length})</h3>
           {paid.length === 0 ? <p className="text-slate-500 text-sm">Sin pagos aún</p> : (
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-slate-700">
-                  <th className="text-left py-2 px-3 text-slate-400">Mesera</th>
-                  <th className="text-left py-2 px-3 text-slate-400">Mesa/Barra</th>
-                  <th className="text-left py-2 px-3 text-slate-400">Cliente</th>
-                  <th className="text-center py-2 px-3 text-slate-400">Pago</th>
-                  <th className="text-right py-2 px-3 text-slate-400">Total</th>
-                  <th className="text-center py-2 px-3 text-slate-400">Items</th>
-                </tr>
-              </thead>
-              <tbody>
-                {paid.map(o => (
-                  <tr key={o._id || o.id} className="border-b border-slate-700 hover:bg-slate-700/30">
-                    <td className="py-3 px-3 text-white">{o.mesera}</td>
-                    <td className="py-3 px-3 text-white">{o.locationLabel || o.barra || (o.table != null ? `Mesa ${o.table}` : 'Barra')}</td>
-                    <td className="py-3 px-3 text-white">{o.clientName || '-'}</td>
-                    <td className="text-center py-3 px-3">{payBadge(o.paymentMethod)}</td>
-                    <td className="text-right py-3 px-3 text-[#94cb47] font-bold">₡{o.total.toLocaleString()}</td>
-                    <td className="text-center py-3 px-3">
-                      <button onClick={() => setViewItemsOrder(o)} className="bg-slate-600 hover:bg-slate-500 text-white px-3 py-1 rounded text-xs font-bold">📋 Ver</button>
-                      <button onClick={() => imprimirTiquete(o, zona)} className="bg-blue-700 hover:bg-blue-800 text-white px-3 py-1 rounded text-xs font-bold">🖨️</button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <div className="space-y-3">
+              {paid.map(o => (
+                <div key={o._id || o.id} className="bg-slate-700/40 border border-slate-600/60 rounded-xl p-3">
+                  {/* Fila superior: ubicación + cliente + total */}
+                  <div className="flex justify-between items-start gap-2 mb-2">
+                    <div className="min-w-0">
+                      <div className="text-white font-bold text-sm leading-tight">
+                        {o.locationLabel || o.barra || (o.table != null ? `Mesa ${o.table}` : '—')}
+                        {o.clientName ? <span className="text-slate-300"> — {o.clientName}</span> : ''}
+                      </div>
+                      <div className="text-slate-400 text-xs mt-0.5">👤 {o.mesera}</div>
+                    </div>
+                    <div className="text-[#94cb47] font-bold text-lg whitespace-nowrap">₡{o.total.toLocaleString()}</div>
+                  </div>
+                  {/* Fila inferior: método de pago + botones */}
+                  <div className="flex items-center justify-between gap-2">
+                    <div>{payBadge(o.paymentMethod)}</div>
+                    <div className="flex gap-1.5">
+                      <button onClick={() => setViewItemsOrder(o)} className="bg-slate-600 hover:bg-slate-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold">📋 Ver</button>
+                      <button onClick={() => imprimirTiquete(o, zona)} className="bg-blue-700 hover:bg-blue-800 text-white px-3 py-1.5 rounded-lg text-xs font-bold">🖨️</button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           )}
         </div>
       </div>
