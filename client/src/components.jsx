@@ -17,11 +17,21 @@ export function Spinner() {
 // ─────────────────────────────────────────────
 // TOAST NOTIFICATION
 // ─────────────────────────────────────────────
-export function Toast({ toasts }) {
-  if (!toasts || toasts.length === 0) return null;
+export function Toast({ toasts, offline }) {
+  const hasContent = (toasts && toasts.length > 0) || offline;
+  if (!hasContent) return null;
   return (
     <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-2.5 pointer-events-none" style={{minWidth: '280px', maxWidth: '90vw'}}>
-      {toasts.map(t => (
+      {offline && (
+        <div className="w-full flex items-center gap-3 px-5 py-3.5 rounded-2xl shadow-2xl border-2 bg-slate-900 border-orange-500 text-orange-100">
+          <span className="text-2xl flex-shrink-0 animate-pulse">📡</span>
+          <div>
+            <div className="font-bold text-base leading-tight">Sin conexión al servidor</div>
+            <div className="text-orange-300 text-xs">Reintentando automáticamente...</div>
+          </div>
+        </div>
+      )}
+      {toasts && toasts.map(t => (
         <div key={t.id} className={`w-full flex items-center gap-3 px-5 py-3.5 rounded-2xl shadow-2xl border-2 animate-fade-in
           ${t.type === 'error'   ? 'bg-red-950 border-red-500 text-red-100' :
             t.type === 'warning' ? 'bg-amber-950 border-amber-400 text-amber-100' :
@@ -208,11 +218,13 @@ export function LicoresPanel({ onAddToCart, onModalChange }) {
 function OtroEditModal({ item, onConfirm, onClose }) {
   const [nombre, setNombre] = useState(item.name);
   const [precio, setPrecio] = useState(String(item.price));
+  const [error, setError]   = useState('');
 
   const handleConfirm = () => {
     const p = parseInt(precio.replace(/\D/g, ''), 10);
-    if (!nombre.trim()) { alert('Ingresa un nombre'); return; }
-    if (!p || p <= 0)   { alert('Ingresa un precio válido'); return; }
+    if (!nombre.trim()) { setError('Ingresa un nombre'); return; }
+    if (!p || p <= 0)   { setError('Ingresa un precio válido'); return; }
+    setError('');
     onConfirm({ ...item, name: nombre.trim(), price: p });
   };
 
@@ -224,6 +236,7 @@ function OtroEditModal({ item, onConfirm, onClose }) {
           <h2 className="text-lg font-bold text-white">Confirmar item</h2>
           <p className="text-slate-400 text-xs mt-1">Edita nombre y precio si es necesario</p>
         </div>
+        {error && <div className="bg-red-900/40 border border-red-500/50 text-red-300 text-xs rounded-lg px-3 py-2 mb-3">⚠️ {error}</div>}
         <div className="space-y-3 mb-5">
           <div>
             <label className="text-slate-400 text-xs font-bold uppercase tracking-wide block mb-1">Nombre</label>
@@ -429,6 +442,7 @@ export function ItemsModal({ order, onClose }) {
 // SPLIT MODAL — separar cuenta
 // ─────────────────────────────────────────────
 export function SplitModal({ account, onConfirm, onClose }) {
+  const [splitError, setSplitError] = useState('');
   // splitQty: { itemId -> cantidad que va a la cuenta nueva }
   const [splitQty, setSplitQty] = useState({});
 
@@ -455,8 +469,9 @@ export function SplitModal({ account, onConfirm, onClose }) {
     const remaining = account.items
       .map(i => ({ ...i, quantity: i.quantity - (splitQty[i.id] || 0) }))
       .filter(i => i.quantity > 0);
-    if (newItems.length === 0) { alert('Selecciona al menos un item para separar'); return; }
-    if (remaining.length === 0) { alert('No puedes mover todos los items — mejor cobra la cuenta completa'); return; }
+    if (newItems.length === 0) { setSplitError('Selecciona al menos un item para separar'); return; }
+    if (remaining.length === 0) { setSplitError('No puedes mover todos los items — mejor cobra la cuenta completa'); return; }
+    setSplitError('');
     onConfirm(account, newItems, remaining);
   };
 
@@ -465,6 +480,7 @@ export function SplitModal({ account, onConfirm, onClose }) {
       <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/40 p-5 shadow-2xl w-full max-w-md max-h-[90vh] flex flex-col">
         <div className="mb-4">
           <h2 className="text-xl font-bold text-[#94cb47] flex items-center gap-2">✂️ Separar Cuenta</h2>
+          {splitError && <div className="bg-red-900/40 border border-red-500/50 text-red-300 text-xs rounded-lg px-3 py-2 mt-2">⚠️ {splitError}</div>}
           <p className="text-slate-400 text-xs mt-1">
             {account.clientName || 'Sin nombre'} · {account.locationLabel || account.barra || (account.table != null ? `Mesa ${account.table}` : 'Barra')}
           </p>
