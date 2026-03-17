@@ -136,7 +136,7 @@ export function LicorModal({ licor, onSelect, onClose }) {
 // ─────────────────────────────────────────────
 // LICORES PANEL — lista de licores con modal
 // ─────────────────────────────────────────────
-export function LicoresPanel({ onAddToCart }) {
+export function LicoresPanel({ onAddToCart, onModalChange }) {
   const [selectedLicor, setSelectedLicor] = useState(null);
   const [search, setSearch] = useState('');
 
@@ -153,7 +153,7 @@ export function LicoresPanel({ onAddToCart }) {
       category: 'alcoholic',
       quantity: 1,
     }, false);
-    setSelectedLicor(null);
+    setSelectedLicor(null); onModalChange?.(false);
   };
 
   return (
@@ -176,7 +176,7 @@ export function LicoresPanel({ onAddToCart }) {
           {filtered.map(licor => (
             <button
               key={licor.id}
-              onClick={() => setSelectedLicor(licor)}
+              onClick={() => { setSelectedLicor(licor); onModalChange?.(true); }}
               className="w-full flex items-center justify-between bg-slate-700/60 hover:bg-[#94cb47]/10 border border-slate-600 hover:border-[#94cb47]/50 rounded-lg px-4 py-3 transition-all group text-left"
             >
               <span className="font-bold text-white text-sm group-hover:text-[#94cb47] transition">{licor.name}</span>
@@ -193,7 +193,7 @@ export function LicoresPanel({ onAddToCart }) {
         <LicorModal
           licor={selectedLicor}
           onSelect={handleSelect}
-          onClose={() => setSelectedLicor(null)}
+          onClose={() => { setSelectedLicor(null); onModalChange?.(false); }}
         />
       )}
     </>
@@ -267,12 +267,12 @@ function OtroEditModal({ item, onConfirm, onClose }) {
 // ─────────────────────────────────────────────
 // OTROS PANEL — menudeo con precios editables
 // ─────────────────────────────────────────────
-export function OtrosPanel({ onAddToCart }) {
+export function OtrosPanel({ onAddToCart, onModalChange }) {
   const [editingItem, setEditingItem] = useState(null);
 
   const handleConfirm = (item) => {
     onAddToCart({ ...item, id: `${item.id}_${Date.now()}`, quantity: 1 }, false);
-    setEditingItem(null);
+    setEditingItem(null); onModalChange?.(false);
   };
 
   return (
@@ -286,7 +286,7 @@ export function OtrosPanel({ onAddToCart }) {
           {OTROS.map(item => (
             <button
               key={item.id}
-              onClick={() => setEditingItem(item)}
+              onClick={() => { setEditingItem(item); onModalChange?.(true); }}
               className="flex flex-col items-start bg-slate-700/60 hover:bg-slate-600/60 border border-slate-600 hover:border-slate-400 rounded-xl px-3 py-2.5 transition-all text-left group"
             >
               <span className="font-bold text-white text-sm leading-tight group-hover:text-[#94cb47] transition">{item.name}</span>
