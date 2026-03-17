@@ -128,8 +128,15 @@ export default function RestaurantePOS() {
     return true;
   };
 
+  // Entradas del selector que no tienen PIN propio (solo accesibles via admin)
+  const SELECTOR_EXTRAS = {
+    'Tablet Restaurante': { role: 'mesera', zone: 'restaurante' },
+    'Cocina':             { role: 'cocina', zone: 'restaurante' },
+  };
+
   const handleSelectorLogin = async (name) => {
-    const user = PINES[name];
+    const user = PINES[name] || SELECTOR_EXTRAS[name];
+    if (!user) return;
     api.logAccess(adminUser || 'Admin', '', 'select', name);
     await handleLogin(name, user.role, user.zone);
     setShowSelector(false);
