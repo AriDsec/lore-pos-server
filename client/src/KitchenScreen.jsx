@@ -29,7 +29,10 @@ function KitchenCard({ order, colorScheme, onReady, onDelivered }) {
           <span className={`px-4 py-2 rounded-full text-sm font-bold ${order.status === 'ready' ? readyBadge : badgeColor}`}>
             {order.status === 'ready' ? '✓ LISTO' : '⏳ PREP'}
           </span>
-          {order.status === 'pending' && order.createdAt && (Date.now() - new Date(order.createdAt).getTime()) < 120000 && (
+          {order.esActualizacion && order.status === 'pending' && (
+            <span className="bg-orange-500 text-white text-xs font-bold px-2 py-0.5 rounded-full animate-pulse">+ADICIONAL</span>
+          )}
+          {!order.esActualizacion && order.status === 'pending' && order.createdAt && (Date.now() - new Date(order.createdAt).getTime()) < 120000 && (
             <span className="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full animate-pulse">NUEVO</span>
           )}
         </div>
