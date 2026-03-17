@@ -20,9 +20,13 @@ export default function RestaurantePOS() {
   const [toasts, setToasts]             = useState([]);
   const modalOpenRef = useRef(false); // pausa el sync cuando hay modal abierto
 
-  // Servicio 10% sábados — solo zona bar
-  const esSabado = new Date().getDay() === 6;
-  const aplicaServicio = esSabado && currentZone === 'bar';
+  // Servicio 10% — lee el estado guardado por Admin en localStorage
+  const aplicaServicio = (() => {
+    const saved = localStorage.getItem('lore_servicio');
+    // Si no hay valor guardado, default = sábado
+    const activo = saved !== null ? saved === 'true' : new Date().getDay() === 6;
+    return activo && currentZone === 'bar';
+  })();
   const conServicio = (precio) => aplicaServicio ? Math.ceil(precio * 1.10 / 100) * 100 : precio;
 
   const showToast = (message, type = 'success') => {
