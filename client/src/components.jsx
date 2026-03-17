@@ -285,7 +285,7 @@ function OtroEditModal({ item, onConfirm, onClose }) {
 export function OtrosPanel({ onAddToCart, onModalChange }) {
   const [editingItem, setEditingItem] = useState(null);
 
-  const handleConfirm = (item) => {
+  const otrosHandleConfirm = (item) => {
     onAddToCart({ ...item, id: `${item.id}_${Date.now()}`, quantity: 1 }, false);
     setEditingItem(null); onModalChange?.(false);
   };
@@ -315,7 +315,7 @@ export function OtrosPanel({ onAddToCart, onModalChange }) {
       {editingItem && (
         <OtroEditModal
           item={editingItem}
-          onConfirm={handleConfirm}
+          onConfirm={otrosHandleConfirm}
           onClose={() => setEditingItem(null)}
         />
       )}
@@ -460,7 +460,7 @@ export function SplitModal({ account, onConfirm, onClose }) {
 
   const hasSplit = Object.values(splitQty).some(q => q > 0);
 
-  const handleConfirm = () => {
+  const splitHandleConfirm = () => {
     // items que van a la nueva cuenta
     const newItems = account.items
       .map(i => ({ ...i, quantity: splitQty[i.id] || 0 }))
@@ -537,7 +537,7 @@ export function SplitModal({ account, onConfirm, onClose }) {
 
         <div className="flex gap-2 mt-4">
           <button
-            onClick={handleConfirm}
+            onClick={splitHandleConfirm}
             disabled={!hasSplit}
             className={`flex-1 font-bold py-3 rounded-xl transition ${hasSplit ? 'bg-[#94cb47] hover:bg-[#7ab035] text-black' : 'bg-slate-700 text-slate-500 cursor-not-allowed'}`}
           >✂️ Separar</button>
@@ -581,8 +581,8 @@ export function imprimirTiquete(order, zona) {
   let itemsText = '';
   (order.items || []).forEach(item => {
     const subtotal = `₡${(item.price * item.quantity).toLocaleString()}`;
-    const nombre = item.name.length > 22 ? item.name.substring(0, 22) : item.name;
-    const izq = `${item.quantity}x ${nombre}`;
+    const nombreLocal = item.name.length > 22 ? item.name.substring(0, 22) : item.name;
+    const izq = `${item.quantity}x ${nombreLocal}`;
     itemsText += `${izq.padEnd(28)}${subtotal.padStart(12)}
 `;
     if (item.notes) itemsText += `   * ${item.notes}
@@ -821,20 +821,20 @@ export function PinModal({ userName, onSuccess, onCancel }) {
 // PIN LOGIN SCREEN
 // ─────────────────────────────────────────────
 export function PinLoginScreen({ isLandscape, syncError, loading, onLogin }) {
-  const [pin, setPin] = useState('');
+  const [loginPin, setPin] = useState('');
   const [loginError, setLoginError] = useState(false);
   const [attempting, setAttempting] = useState(false);
 
-  const handleDigit = async (d) => {
-    if (pin.length >= 4 || attempting) return;
-    const next = pin + d;
-    setPin(next);
+  const loginHandleDigit = async (d) => {
+    if (loginPin.length >= 4 || attempting) return;
+    const loginNext = loginPin + d;
+    setPin(loginNext);
     setError(false);
-    if (next.length === 4) {
+    if (loginNext.length === 4) {
       setAttempting(true);
       setTimeout(async () => {
-        const ok = await onLogin(next);
-        if (!ok) {
+        const loginOk = await onLogin(loginNext);
+        if (!loginOk) {
           setLoginError(true);
           setPin('');
         }
@@ -843,9 +843,9 @@ export function PinLoginScreen({ isLandscape, syncError, loading, onLogin }) {
     }
   };
 
-  const handleDelete = () => { setPin(p => p.slice(0, -1)); setLoginError(false); };
+  const loginHandleDelete = () => { setPin(p => p.slice(0, -1)); setLoginError(false); };
 
-  const keypad = (
+  const loginKeypad = (
     <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-5 shadow-2xl w-full max-w-xs">
       <div className="text-center mb-4">
         <div className="text-2xl mb-1">🔐</div>
@@ -854,7 +854,7 @@ export function PinLoginScreen({ isLandscape, syncError, loading, onLogin }) {
       <div className="flex justify-center gap-4 mb-4">
         {[0,1,2,3].map(i => (
           <div key={i} className={`w-4 h-4 rounded-full border-2 transition-all ${
-            i < pin.length
+            i < loginPin.length
               ? loginError ? 'bg-red-500 border-red-500' : 'bg-[#94cb47] border-[#94cb47]'
               : 'border-slate-500'
           }`} />
@@ -863,16 +863,16 @@ export function PinLoginScreen({ isLandscape, syncError, loading, onLogin }) {
       {loginError && <p className="text-red-400 text-center text-xs mb-3">PIN incorrecto</p>}
       <div className="grid grid-cols-3 gap-2">
         {[1,2,3,4,5,6,7,8,9].map(d => (
-          <button key={d} onClick={() => handleDigit(String(d))}
+          <button key={d} onClick={() => loginHandleDigit(String(d))}
             className="bg-slate-700 hover:bg-slate-600 active:bg-[#94cb47]/60 text-white font-bold text-xl py-3 rounded-xl transition select-none">
             {d}
           </button>
         ))}
-        <button onClick={handleDelete}
+        <button onClick={loginHandleDelete}
           className="bg-slate-700 hover:bg-slate-600 text-slate-300 font-bold text-lg py-3 rounded-xl transition select-none">
           ⌫
         </button>
-        <button onClick={() => handleDigit('0')}
+        <button onClick={() => loginHandleDigit('0')}
           className="bg-slate-700 hover:bg-slate-600 active:bg-[#94cb47]/60 text-white font-bold text-xl py-3 rounded-xl transition select-none">
           0
         </button>
@@ -893,9 +893,9 @@ export function PinLoginScreen({ isLandscape, syncError, loading, onLogin }) {
               Sistema de Pedidos
             </div>
           </div>
-          {/* Derecha: keypad */}
+          {/* Derecha: loginKeypad */}
           <div className="flex-1 flex justify-center">
-            {keypad}
+            {loginKeypad}
           </div>
         </div>
       ) : (
@@ -907,7 +907,7 @@ export function PinLoginScreen({ isLandscape, syncError, loading, onLogin }) {
               Sistema de Pedidos
             </div>
           </div>
-          {keypad}
+          {loginKeypad}
         </div>
       )}
       {syncError && (
