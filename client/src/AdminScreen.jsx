@@ -176,12 +176,13 @@ ${restPaid.length > 0 ? `<div class="section-title">📋 Detalle — Restaurante
           </button>
           <button
             onClick={() => {
-              if (window.confirm('⚠️ ¿Seguro? Esto borrará todas las cuentas pagadas del día. Descarga el cierre primero.')) {
-                fetch('/api/admin/clear-day', { method: 'DELETE' })
-                  .then(r => r.json())
-                  .then(() => { setPaidOrders([]); showToast && showToast('Datos del día eliminados'); })
-                  .catch(e => showToast && showToast('Error: ' + e.message, 'error'));
-              }
+              if (!window.confirm('⚠️ ADVERTENCIA\n\n¿Descargaste el cierre del día?\n\nEsta acción borrará TODOS los pagos del día y no se puede deshacer.')) return;
+              const confirmText = window.prompt('Para confirmar escribe: LIMPIAR');
+              if (confirmText !== 'LIMPIAR') { showToast && showToast('Cancelado — texto incorrecto', 'warning'); return; }
+              fetch('/api/admin/clear-day', { method: 'DELETE' })
+                .then(r => r.json())
+                .then(() => { setPaidOrders([]); showToast && showToast('Datos del día eliminados'); })
+                .catch(e => showToast && showToast('Error: ' + e.message, 'error'));
             }}
             className="bg-red-900/40 hover:bg-red-900/70 text-red-300 font-bold px-6 py-3 rounded-xl transition flex items-center gap-2 border border-red-500/40"
           >
