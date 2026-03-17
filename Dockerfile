@@ -1,5 +1,4 @@
 FROM node:18-alpine
-
 WORKDIR /app
 
 # Instalar dependencias del servidor
@@ -12,12 +11,14 @@ RUN cd client && npm install
 
 # Copiar cliente y construir
 COPY client/ ./client/
+
+# Forzar rebuild sin caché
+ARG CACHEBUST=1
 RUN cd client && npm run build
 
-# Copiar servidor (sin pisar el public ya construido)
+# Copiar servidor
 COPY server.js .
 COPY railway.toml .
 
 EXPOSE 8080
-
 CMD ["node", "server.js"]
