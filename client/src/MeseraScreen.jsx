@@ -72,8 +72,8 @@ export function MeseraScreen({
       </div>
 
       {menuTab === 'menu'    && <MenuDropdown menu={menu} onSelectItem={addToCart} />}
-      {menuTab === 'licores' && <LicoresPanel onAddToCart={addToCart} />}
-      {menuTab === 'otros'   && <OtrosPanel onAddToCart={addToCart} />}
+      {menuTab === 'licores' && <LicoresPanel onAddToCart={addToCart} onModalChange={onModalChange} />}
+      {menuTab === 'otros'   && <OtrosPanel onAddToCart={addToCart} onModalChange={onModalChange} />}
 
       <ReadyOrdersPanel kitchenOrders={kitchenOrders} mesera={currentUser} />
     </div>
@@ -120,8 +120,8 @@ export function MeseraScreen({
               </div>
 
               {menuTab === 'menu'    && <MenuDropdown menu={menu} onSelectItem={addToCart} />}
-              {menuTab === 'licores' && <LicoresPanel onAddToCart={addToCart} />}
-              {menuTab === 'otros'   && <OtrosPanel onAddToCart={addToCart} />}
+              {menuTab === 'licores' && <LicoresPanel onAddToCart={addToCart} onModalChange={onModalChange} />}
+              {menuTab === 'otros'   && <OtrosPanel onAddToCart={addToCart} onModalChange={onModalChange} />}
 
               <ReadyOrdersPanel kitchenOrders={kitchenOrders} mesera={currentUser} />
             </div>
