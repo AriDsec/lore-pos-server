@@ -1,19 +1,19 @@
 import { useState, useEffect, useCallback } from "react";
 import * as api from "./api.js";
 import { MENU, LICORES, PINES, meseras, barras } from './constants.js';
-import { Spinner, PinModal } from './components.jsx';
+import { Spinner, PinLoginScreen } from './components.jsx';
 import { MeseraScreen } from './MeseraScreen.jsx';
 import { KitchenScreen } from './KitchenScreen.jsx';
 import { CajaScreen } from './CajaScreen.jsx';
 import { AdminScreen } from './AdminScreen.jsx';
 
 export default function RestaurantePOS() {
-  const [currentUser, setCurrentUser] = useState(null);
-  const [userRole, setUserRole]       = useState(null);
-  const [currentZone, setCurrentZone] = useState(null);
+  const savedSession = (() => { try { return JSON.parse(localStorage.getItem('lore_session')); } catch { return null; } })();
+  const [currentUser, setCurrentUser] = useState(savedSession?.user || null);
+  const [userRole, setUserRole]       = useState(savedSession?.role || null);
+  const [currentZone, setCurrentZone] = useState(savedSession?.zone || null);
   const [loading, setLoading]         = useState(false);
   const [syncError, setSyncError]     = useState(null);
-  const [pendingUser, setPendingUser] = useState(null);
 
   const [cartItems, setCartItems]         = useState([]);
   const [selectedTable, setSelectedTable] = useState(null);
@@ -40,6 +40,13 @@ export default function RestaurantePOS() {
     window.addEventListener('resize', check);
     return () => { mq.removeEventListener('change', check); window.removeEventListener('resize', check); };
   }, []);
+
+  // Auto-cargar datos si hay sesión guardada
+  useEffect(() => {
+    if (savedSession?.user && savedSession?.role && savedSession?.zone) {
+      loadData(savedSession.zone, savedSession.role);
+    }
+  }, []); // eslint-disable-line
 
   const loadData = useCallback(async (zone, role, silent = false) => {
     if (!silent) setLoading(true);
@@ -83,10 +90,12 @@ export default function RestaurantePOS() {
 
   const handleLogin = async (name, role, zone) => {
     setCurrentUser(name); setUserRole(role); setCurrentZone(zone);
+    localStorage.setItem('lore_session', JSON.stringify({ user: name, role, zone }));
     await loadData(zone, role);
   };
 
   const handleLogout = () => {
+    localStorage.removeItem('lore_session');
     setCurrentUser(null); setUserRole(null); setCurrentZone(null);
     setCartItems([]); setSelectedTable(null); setSelectedBarra(null);
     setClientName(''); setOrderType(null); setSelectedAccount(null);
@@ -94,11 +103,12 @@ export default function RestaurantePOS() {
     setSyncError(null);
   };
 
-  const requestLogin = (name) => setPendingUser(name);
-  const confirmPin = async () => {
-    const user = PINES[pendingUser];
-    setPendingUser(null);
-    await handleLogin(pendingUser, user.role, user.zone);
+  const loginWithPin = async (pin) => {
+    const entry = Object.entries(PINES).find(([, v]) => v.pin === pin);
+    if (!entry) return false;
+    const [name, { role, zone }] = entry;
+    await handleLogin(name, role, zone);
+    return true;
   };
 
   const handleSelectAccount = (accountId) => {
@@ -286,58 +296,12 @@ export default function RestaurantePOS() {
 
   // ── LOGIN ─────────────────────────────────────
   if (!currentUser) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-black via-slate-900 to-black flex flex-col items-center justify-center p-4 overflow-y-auto">
-
-        {/* ── Header: landscape = logo izq + texto der / portrait = centrado ── */}
-        {isLandscape ? (
-          <div className="flex items-center gap-5 mb-6 w-full max-w-3xl">
-            <img src="/logo.png" alt="LORE" className="w-28 h-28 object-contain drop-shadow-2xl flex-shrink-0" />
-            <div style={{ fontFamily: "'Cinzel', serif", letterSpacing: '0.14em' }}
-              className="text-white/75 text-2xl font-normal drop-shadow-lg">
-              Sistema de Pedidos
-            </div>
-          </div>
-        ) : (
-          <div className="flex flex-col items-center mb-6">
-            <img src="/logo.png" alt="LORE" className="w-40 h-40 object-contain drop-shadow-2xl mb-3" />
-            <div style={{ fontFamily: "'Cinzel', serif", letterSpacing: '0.12em' }}
-              className="text-white/70 text-xl font-normal mt-1">
-              Sistema de Pedidos
-            </div>
-          </div>
-        )}
-        {syncError && (
-          <div className="bg-red-900/60 border border-red-500 rounded-xl p-3 mb-3 text-red-200 text-sm text-center w-full max-w-2xl">
-            ⚠️ {syncError}
-          </div>
-        )}
-        <div className={`w-full ${isLandscape ? 'grid grid-cols-3 gap-3 max-w-3xl' : 'space-y-3 max-w-md'}`}>
-          <div className="bg-slate-800/80 backdrop-blur border border-[#94cb47]/40 rounded-2xl p-4 shadow-2xl">
-            <h2 className="text-[#94cb47] font-bold text-base mb-3">🍺 ZONA BAR</h2>
-            <button onClick={() => requestLogin('Caja Bar')} className="w-full bg-[#94cb47] hover:bg-[#7ab035] text-white font-bold py-2.5 rounded-xl transition shadow-lg mb-2">💰 Caja Bar</button>
-            <div className="space-y-2">
-              {meseras.map(m => (
-                <button key={m} onClick={() => requestLogin(m)} className="w-full bg-slate-700/60 hover:bg-slate-600 text-[#94cb47] py-2 rounded-lg transition font-medium text-sm">{m}</button>
-              ))}
-            </div>
-          </div>
-          <div className="bg-slate-800/80 backdrop-blur border border-[#94cb47]/40 rounded-2xl p-4 shadow-2xl">
-            <h2 className="text-[#94cb47] font-bold text-base mb-3">🍽️ ZONA RESTAURANTE</h2>
-            <button onClick={() => requestLogin('Caja Restaurante')} className="w-full bg-[#94cb47] hover:bg-[#7ab035] text-white font-bold py-2.5 rounded-xl transition shadow-lg mb-2">💰 Caja</button>
-            <button onClick={() => requestLogin('Tablet Restaurante')} className="w-full bg-[#94cb47]/90 hover:bg-[#7ab035] text-white font-bold py-2.5 rounded-xl transition shadow-lg mb-2">📱 Tomar Pedidos</button>
-            <button onClick={() => requestLogin('Cocina')} className="w-full bg-[#94cb47]/90 hover:bg-[#7ab035] text-white font-bold py-2.5 rounded-xl transition shadow-lg">👨‍🍳 Cocina</button>
-          </div>
-          <div className="bg-slate-800/80 backdrop-blur border border-[#94cb47]/40 rounded-2xl p-4 shadow-2xl flex items-center">
-            <button onClick={() => requestLogin('Admin')} className="w-full bg-[#94cb47]/90 hover:bg-[#7ab035] text-white font-bold py-2.5 rounded-xl transition shadow-lg">📊 Panel Admin</button>
-          </div>
-        </div>
-        {loading && <Spinner />}
-        {pendingUser && (
-          <PinModal userName={pendingUser} onSuccess={confirmPin} onCancel={() => setPendingUser(null)} />
-        )}
-      </div>
-    );
+    return <PinLoginScreen
+      isLandscape={isLandscape}
+      syncError={syncError}
+      loading={loading}
+      onLogin={loginWithPin}
+    />;
   }
 
   if (userRole === 'mesera') {
