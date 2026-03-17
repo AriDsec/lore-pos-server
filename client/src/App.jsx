@@ -82,6 +82,33 @@ export default function RestaurantePOS() {
     }
   }, []); // eslint-disable-line
 
+  // Timeout de sesión — 8 horas, aviso 10 min antes
+  useEffect(() => {
+    if (!currentUser || userRole === 'admin') return; // admin no expira
+    const OCHO_HORAS = 8 * 60 * 60 * 1000;
+    const AVISO = 10 * 60 * 1000; // 10 min antes
+
+    const avisoTimer = setTimeout(() => {
+      showToast('⏰ La sesión cierra en 10 minutos', 'warning');
+    }, OCHO_HORAS - AVISO);
+
+    const logoutTimer = setTimeout(() => {
+      showToast('Sesión cerrada por inactividad', 'warning');
+      setTimeout(handleLogout, 2000);
+    }, OCHO_HORAS);
+
+    return () => { clearTimeout(avisoTimer); clearTimeout(logoutTimer); };
+  }, [currentUser, userRole]); // eslint-disable-line
+
+  // Reintento automático cuando hay error de conexión
+  useEffect(() => {
+    if (!syncError || !currentUser) return;
+    const retry = setTimeout(() => {
+      if (currentZone && userRole) loadData(currentZone, userRole, true);
+    }, 10000); // reintenta cada 10s cuando hay error
+    return () => clearTimeout(retry);
+  }, [syncError, currentUser, currentZone, userRole, loadData]);
+
   const loadData = useCallback(async (zone, role, silent = false) => {
     if (!silent) setLoading(true);
     setSyncError(null);
@@ -429,7 +456,7 @@ export default function RestaurantePOS() {
   if (userRole === 'mesera') {
     return (
       <>
-        <Toast toasts={toasts} />
+        <Toast toasts={toasts} offline={!!syncError} />
         {loading && <Spinner />}
         <MeseraScreen
           currentUser={currentUser} zona={currentZone === 'bar' ? 'Bar' : 'Restaurante'}
@@ -457,16 +484,16 @@ export default function RestaurantePOS() {
   }
 
   if (userRole === 'cocina') {
-    return <><Toast toasts={toasts} /><KitchenScreen kitchenOrders={kitchenOrders} loading={loading} onLogout={handleLogout} onReady={markOrderReady} onDelivered={markOrderDelivered} /></>;
+    return <><Toast toasts={toasts} offline={!!syncError} /><KitchenScreen kitchenOrders={kitchenOrders} loading={loading} onLogout={handleLogout} onReady={markOrderReady} onDelivered={markOrderDelivered} /></>;
   }
 
   if (userRole === 'caja' && currentZone === 'bar') {
-    return <><Toast toasts={toasts} /><CajaScreen zona="bar" zonaNombre="Bar" accounts={barAccounts} paid={barPaid} loading={loading} billOrder={billOrder} setBillOrder={setBillOrder} viewItemsOrder={viewItemsOrder} setViewItemsOrder={setViewItemsOrder} splitOrder={splitOrder} setSplitOrder={setSplitOrder} onSplit={handleSplitAccount} onLogout={handleLogout} onPay={payAccount} /></>;
+    return <><Toast toasts={toasts} offline={!!syncError} /><CajaScreen zona="bar" zonaNombre="Bar" accounts={barAccounts} paid={barPaid} loading={loading} billOrder={billOrder} setBillOrder={setBillOrder} viewItemsOrder={viewItemsOrder} setViewItemsOrder={setViewItemsOrder} splitOrder={splitOrder} setSplitOrder={setSplitOrder} onSplit={handleSplitAccount} onLogout={handleLogout} onPay={payAccount} /></>;
   }
 
   if (userRole === 'caja' && currentZone === 'restaurante') {
-    return <><Toast toasts={toasts} /><CajaScreen zona="restaurante" zonaNombre="Restaurante" accounts={restAccounts} paid={restPaid} loading={loading} billOrder={billOrder} setBillOrder={setBillOrder} viewItemsOrder={viewItemsOrder} setViewItemsOrder={setViewItemsOrder} splitOrder={splitOrder} setSplitOrder={setSplitOrder} onSplit={handleSplitAccount} onLogout={handleLogout} onPay={payAccount} /></>;
+    return <><Toast toasts={toasts} offline={!!syncError} /><CajaScreen zona="restaurante" zonaNombre="Restaurante" accounts={restAccounts} paid={restPaid} loading={loading} billOrder={billOrder} setBillOrder={setBillOrder} viewItemsOrder={viewItemsOrder} setViewItemsOrder={setViewItemsOrder} splitOrder={splitOrder} setSplitOrder={setSplitOrder} onSplit={handleSplitAccount} onLogout={handleLogout} onPay={payAccount} /></>;
   }
 
-  return <><Toast toasts={toasts} /><AdminScreen barPaid={barPaid} restPaid={restPaid} loading={loading} onLogout={handleLogout} setPaidOrders={setPaidOrders} showToast={showToast} /></>;
+  return <><Toast toasts={toasts} offline={!!syncError} /><AdminScreen barPaid={barPaid} restPaid={restPaid} loading={loading} onLogout={handleLogout} setPaidOrders={setPaidOrders} showToast={showToast} /></>;
 }
