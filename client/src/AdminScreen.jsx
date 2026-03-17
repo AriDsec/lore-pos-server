@@ -11,7 +11,7 @@ function StatRow({ label, value }) {
   );
 }
 
-export function AdminScreen({ barPaid, restPaid, loading, onLogout, setPaidOrders }) {
+export function AdminScreen({ barPaid, restPaid, loading, onLogout, setPaidOrders, showToast }) {
   const [viewItemsOrder, setViewItemsOrder] = useState(null);
   const [accessLog, setAccessLog] = useState([]);
 
@@ -153,8 +153,8 @@ ${restPaid.length > 0 ? `<div class="section-title">📋 Detalle — Restaurante
               if (window.confirm('⚠️ ¿Seguro? Esto borrará todas las cuentas pagadas del día. Descarga el cierre primero.')) {
                 fetch('/api/admin/clear-day', { method: 'DELETE' })
                   .then(r => r.json())
-                  .then(() => { setPaidOrders([]); alert('✅ Datos del día eliminados'); })
-                  .catch(e => alert('❌ Error: ' + e.message));
+                  .then(() => { setPaidOrders([]); showToast && showToast('Datos del día eliminados'); })
+                  .catch(e => showToast && showToast('Error: ' + e.message, 'error'));
               }
             }}
             className="bg-red-900/40 hover:bg-red-900/70 text-red-300 font-bold px-6 py-3 rounded-xl transition flex items-center gap-2 border border-red-500/40"
