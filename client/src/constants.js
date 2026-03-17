@@ -505,8 +505,8 @@ export const PINES = {
   'Caja Bar':           { pin: '1970', role: 'caja',   zone: 'bar' },
   'Caja Restaurante':   { pin: '1969', role: 'caja',   zone: 'restaurante' },
   // ── Meseras Bar ──
-  'Mari':              { pin: '5456', role: 'mesera', zone: 'bar' },
-  'Mile':             { pin: '8995', role: 'mesera', zone: 'bar' },
+  'María':              { pin: '5456', role: 'mesera', zone: 'bar' },
+  'Milena':             { pin: '8995', role: 'mesera', zone: 'bar' },
   'Lin':                { pin: '7777', role: 'mesera', zone: 'bar' },
   'Temp Bar':           { pin: '1221', role: 'mesera', zone: 'bar' },
   // ── Admins (selector completo + registro de acceso) ──
