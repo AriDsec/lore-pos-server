@@ -20,6 +20,11 @@ export default function RestaurantePOS() {
   const [toasts, setToasts]             = useState([]);
   const modalOpenRef = useRef(false); // pausa el sync cuando hay modal abierto
 
+  // Servicio 10% sábados — solo zona bar
+  const esSabado = new Date().getDay() === 6;
+  const aplicaServicio = esSabado && currentZone === 'bar';
+  const conServicio = (precio) => aplicaServicio ? Math.ceil(precio * 1.10 / 100) * 100 : precio;
+
   const showToast = (message, type = 'success') => {
     const id = Date.now();
     setToasts(prev => [...prev, { id, message, type }]);
@@ -182,7 +187,8 @@ export default function RestaurantePOS() {
 
   const addToCart = (item, withPotatoes = false) => {
     const itemId = `${item.id}${withPotatoes ? '_cp' : ''}`;
-    const price = item.price + (withPotatoes && item.canHavePapas ? 500 : 0);
+    const basePrice = item.price + (withPotatoes && item.canHavePapas ? 500 : 0);
+    const price = conServicio(basePrice);
     const displayName = withPotatoes && item.canHavePapas ? `${item.name} + Papas` : item.name;
     setCartItems(prev => {
       const idx = prev.findIndex(i => i.id === itemId);
@@ -191,7 +197,7 @@ export default function RestaurantePOS() {
         updated[idx] = { ...updated[idx], quantity: updated[idx].quantity + 1 };
         return updated;
       }
-      return [...prev, { ...item, id: itemId, price, name: displayName, quantity: 1, notes: '', addedBy: currentUser }];
+      return [...prev, { ...item, id: itemId, price, name: displayName, quantity: 1, notes: '', addedBy: currentUser, conServicio: aplicaServicio }];
     });
   };
 
@@ -390,6 +396,7 @@ export default function RestaurantePOS() {
           isBar={currentZone === 'bar'} onDirectPay={handleDirectPay}
           splitOrder={splitOrder} setSplitOrder={setSplitOrder} onSplit={handleSplitAccount}
           onModalChange={(open) => { modalOpenRef.current = open; }}
+          aplicaServicio={aplicaServicio}
         />
       </>
     );
