@@ -286,7 +286,7 @@ export default function RestaurantePOS() {
     if (!clientName.trim()) { showToast('Ingresa un nombre o seña', 'warning'); return; }
     if (clientName.trim().toLowerCase() === 'cliente general') { showToast('Usa un nombre real, no "Cliente General"', 'warning'); return; }
     const total = cartItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
-    const foodItems = cartItems.filter(i => i.category === 'food');
+    const foodItems = cartItems.filter(i => i.category === 'food' || i.category === 'otro');
     setLoading(true);
     try {
       if (selectedAccount) {
@@ -376,7 +376,7 @@ export default function RestaurantePOS() {
   const handleDirectPay = async () => {
     if (cartItems.length === 0) { showToast('El carrito está vacío', 'warning'); return; }
     const total = cartItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
-    const foodItems = cartItems.filter(i => i.category === 'food');
+    const foodItems = cartItems.filter(i => i.category === 'food' || i.category === 'otro');
     const location = selectedBarra ? selectedBarra : (selectedTable ? `Mesa ${selectedTable}` : 'Barra');
     setLoading(true);
     try {
@@ -407,6 +407,14 @@ export default function RestaurantePOS() {
   };
 
   const payAccount = async (account, paymentMethod = 'efectivo') => {
+    // Verificar que la cuenta sigue abierta antes de cobrar
+    const stillOpen = openAccounts.find(a => (a._id === account._id || a.id === account.id) && a.status === 'open');
+    if (!stillOpen) {
+      showToast('Esta cuenta ya fue cobrada', 'warning');
+      const [open, paid] = await Promise.all([api.getOpenAccounts(currentZone), api.getPaidAccounts(currentZone)]);
+      setOpenAccounts(open); setPaidOrders(paid); setBillOrder(null);
+      return;
+    }
     setLoading(true);
     try {
       await api.closeAccount(account.id || account._id, paymentMethod);
