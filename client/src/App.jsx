@@ -39,9 +39,6 @@ export default function RestaurantePOS() {
     }).catch(() => {}); // si falla usa localStorage
   }, []);
 
-  const aplicaServicio = servicioActivoGlobal && currentZone === 'bar';
-  const conServicio = (precio) => aplicaServicio ? Math.ceil(precio * 1.10 / 100) * 100 : precio;
-
   const showToast = (message, type = 'success') => {
     const id = Date.now();
     setToasts(prev => [...prev, { id, message, type }]);
@@ -239,6 +236,9 @@ export default function RestaurantePOS() {
     setClientName(acc.clientName || '');
     setOrderType(acc.type || 'dine-in');
   };
+
+  const aplicaServicio = servicioActivoGlobal && currentZone === 'bar';
+  const conServicio = (precio) => aplicaServicio ? Math.ceil(precio * 1.10 / 100) * 100 : precio;
 
   const addToCart = (item, withPotatoes = false) => {
     const itemId = `${item.id}${withPotatoes ? '_cp' : ''}`;
