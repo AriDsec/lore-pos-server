@@ -759,7 +759,7 @@ export function PinModal({ userName, onSuccess, onCancel }) {
     if (pin.length >= 4) return;
     const next = pin + d;
     setPin(next);
-    setError(false);
+    setPinError(false);
     if (next.length === 4) {
       setTimeout(() => {
         if (next === PINES[userName]?.pin) {
@@ -829,7 +829,7 @@ export function PinLoginScreen({ isLandscape, syncError, loading, onLogin }) {
     if (loginPin.length >= 4 || attempting) return;
     const loginNext = loginPin + d;
     setPin(loginNext);
-    setError(false);
+    setLoginError(false);
     if (loginNext.length === 4) {
       setAttempting(true);
       setTimeout(async () => {
