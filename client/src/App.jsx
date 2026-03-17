@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
+import { sonidoPedidoNuevo, sonidoPedidoListo, sonidoCobro } from "./sounds.js";
 import * as api from "./api.js";
 import { MENU, LICORES, PINES, meseras, barras } from './constants.js';
 import { Spinner, Toast, PinLoginScreen, SelectorScreen } from './components.jsx';
@@ -19,6 +20,8 @@ export default function RestaurantePOS() {
   const [adminUser, setAdminUser]       = useState(savedAdmin || null);
   const [toasts, setToasts]             = useState([]);
   const modalOpenRef = useRef(false); // pausa el sync cuando hay modal abierto
+  const prevKitchenIds = useRef(new Set()); // para detectar pedidos nuevos en cocina
+  const prevReadyIds   = useRef(new Set()); // para detectar pedidos listos para meseras
 
   // Servicio 10% — lee el estado guardado por Admin en localStorage
   const aplicaServicio = (() => {
@@ -79,10 +82,23 @@ export default function RestaurantePOS() {
       }
       if (role === 'cocina') {
         const [kr, kb] = await Promise.all([api.getKitchenOrders('restaurante'), api.getKitchenOrders('bar')]);
-        setKitchenOrders([...kr, ...kb]);
+        const allOrders = [...kr, ...kb];
+        if (silent) {
+          const newOrders = allOrders.filter(o => !prevKitchenIds.current.has(o.id));
+          if (newOrders.length > 0) sonidoPedidoNuevo();
+          prevKitchenIds.current = new Set(allOrders.map(o => o.id));
+        }
+        setKitchenOrders(allOrders);
       }
       if (role === 'mesera') {
         const kitchen = await api.getKitchenOrders(zone);
+        if (silent) {
+          // Detectar pedidos recién marcados como listos
+          const readyNow = kitchen.filter(o => o.status === 'ready');
+          const newReady = readyNow.filter(o => !prevReadyIds.current.has(o.id));
+          if (newReady.length > 0) sonidoPedidoListo();
+          prevReadyIds.current = new Set(readyNow.map(o => o.id));
+        }
         setKitchenOrders(kitchen);
       }
       if (role === 'caja') {
@@ -288,6 +304,8 @@ export default function RestaurantePOS() {
       await api.closeAccount(account.id || account._id, paymentMethod);
       const [open, paid] = await Promise.all([api.getOpenAccounts(currentZone), api.getPaidAccounts(currentZone)]);
       setOpenAccounts(open); setPaidOrders(paid); setBillOrder(null);
+      sonidoCobro();
+      showToast('Cuenta cobrada ✓');
     } catch (err) {
       showToast('Error al cobrar: ' + err.message, 'error');
     } finally {
