@@ -15,6 +15,7 @@ export default function RestaurantePOS() {
   const [loading, setLoading]         = useState(false);
   const [syncError, setSyncError]     = useState(null);
   const [showSelector, setShowSelector] = useState(false);
+  const [adminUser, setAdminUser]         = useState(null);  // nombre del admin activo en el selector
 
   const [cartItems, setCartItems]         = useState([]);
   const [selectedTable, setSelectedTable] = useState(null);
@@ -97,12 +98,18 @@ export default function RestaurantePOS() {
 
   const handleLogout = () => {
     localStorage.removeItem('lore_session');
-    setShowSelector(false);
+    const wasAdmin = adminUser !== null;
     setCurrentUser(null); setUserRole(null); setCurrentZone(null);
     setCartItems([]); setSelectedTable(null); setSelectedBarra(null);
     setClientName(''); setOrderType(null); setSelectedAccount(null);
     setOpenAccounts([]); setPaidOrders([]); setKitchenOrders([]);
     setSyncError(null);
+    if (wasAdmin) {
+      setShowSelector(true); // Admin vuelve al selector, no al PIN
+    } else {
+      setShowSelector(false);
+      setAdminUser(null);
+    }
   };
 
   const loginWithPin = async (pin) => {
@@ -110,17 +117,20 @@ export default function RestaurantePOS() {
     if (!entry) return false;
     const [name, { role }] = entry;
     if (role === 'admin') {
-      // Admin ve la pantalla de selección completa
+      setAdminUser(name);
       setShowSelector(true);
+      api.logAccess(name, pin, 'login');
       return true;
     }
     const [, { zone }] = entry;
+    api.logAccess(name, pin, 'login');
     await handleLogin(name, role, zone);
     return true;
   };
 
   const handleSelectorLogin = async (name) => {
     const user = PINES[name];
+    api.logAccess(adminUser || 'Admin', '', 'select', name);
     await handleLogin(name, user.role, user.zone);
     setShowSelector(false);
   };
