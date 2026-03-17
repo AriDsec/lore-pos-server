@@ -533,7 +533,120 @@ export function SplitModal({ account, onConfirm, onClose }) {
 // ─────────────────────────────────────────────
 // BILL MODAL (cobrar)
 // ─────────────────────────────────────────────
-export function BillModal({ order, onClose, onPay }) {
+// ─────────────────────────────────────────────
+// FUNCIÓN TIQUETE DE CAJA
+// ─────────────────────────────────────────────
+export function imprimirTiquete(order, zona) {
+  const esBar = zona === 'bar';
+  const nombreLocal = esBar
+    ? 'CENTRO SOCIAL EL HIGUERÓN'
+    : 'RESTAURANTE JALE DONDE LORE';
+  const propietario = 'Guido Marvin Fernández Herrera';
+  const cedula      = 'Cédula: 1-0526-0613';
+  const telefono    = 'Tel: 2416-4453';
+
+  const now   = new Date();
+  const fecha = now.toLocaleDateString('es-CR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  const hora  = now.toLocaleTimeString('es-CR', { hour: '2-digit', minute: '2-digit' });
+
+  const metodoPago = order.paymentMethod === 'sinpe'   ? 'SINPE Móvil'
+                   : order.paymentMethod === 'tarjeta' ? 'Tarjeta'
+                   : 'Efectivo';
+
+  const ubicacion = order.locationLabel || order.barra
+    || (order.table != null ? `Mesa ${order.table}` : '');
+
+  const linea = (texto = '', ancho = 40) => texto.padEnd(ancho, ' ');
+  const separador = '-'.repeat(40);
+  const separadorDoble = '='.repeat(40);
+
+  let itemsText = '';
+  (order.items || []).forEach(item => {
+    const subtotal = `₡${(item.price * item.quantity).toLocaleString()}`;
+    const nombre = item.name.length > 22 ? item.name.substring(0, 22) : item.name;
+    const izq = `${item.quantity}x ${nombre}`;
+    itemsText += `${izq.padEnd(28)}${subtotal.padStart(12)}
+`;
+    if (item.notes) itemsText += `   * ${item.notes}
+`;
+  });
+
+  const totalStr = `₡${order.total.toLocaleString()}`;
+
+  const contenido = `
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Tiquete</title>
+<style>
+  @page { margin: 4mm; size: 80mm auto; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 11px;
+    width: 72mm;
+    color: #000;
+    line-height: 1.4;
+  }
+  .centro { text-align: center; }
+  .derecha { text-align: right; }
+  .bold { font-weight: bold; }
+  .grande { font-size: 15px; font-weight: bold; }
+  .separador { border-top: 1px dashed #000; margin: 4px 0; }
+  .separador-doble { border-top: 2px solid #000; margin: 4px 0; }
+  pre { font-family: inherit; font-size: inherit; white-space: pre-wrap; }
+  .total-box { border: 2px solid #000; padding: 4px; margin: 6px 0; text-align: center; }
+  .total-num { font-size: 20px; font-weight: bold; }
+</style>
+</head>
+<body>
+
+<div class="centro bold">${nombreLocal}</div>
+<div class="centro">${propietario}</div>
+<div class="centro">${cedula}</div>
+<div class="centro">${telefono}</div>
+<div class="separador-doble"></div>
+
+<div class="centro bold">TIQUETE DE VENTA</div>
+<div class="separador"></div>
+
+<table style="width:100%;font-size:11px">
+  <tr><td>Fecha:</td><td class="derecha">${fecha}</td></tr>
+  <tr><td>Hora:</td><td class="derecha">${hora}</td></tr>
+  ${ubicacion ? `<tr><td>Mesa/Barra:</td><td class="derecha">${ubicacion}</td></tr>` : ''}
+  ${order.clientName ? `<tr><td>Cliente:</td><td class="derecha">${order.clientName}</td></tr>` : ''}
+  ${order.mesera ? `<tr><td>Atendió:</td><td class="derecha">${order.mesera}</td></tr>` : ''}
+</table>
+
+<div class="separador"></div>
+<div class="bold">DESCRIPCIÓN</div>
+<div class="separador"></div>
+
+<pre>${itemsText}</pre>
+
+<div class="separador-doble"></div>
+<div class="total-box">
+  <div>TOTAL A PAGAR</div>
+  <div class="total-num">${totalStr}</div>
+  <div>Forma de pago: ${metodoPago}</div>
+</div>
+
+<div class="separador"></div>
+<div class="centro" style="font-size:10px">¡Gracias por su visita!</div>
+<div class="centro" style="font-size:9px;margin-top:4px">Este tiquete es su comprobante de compra</div>
+<br><br>
+
+</body>
+</html>`;
+
+  const ventana = window.open('', '_blank', 'width=300,height=600');
+  ventana.document.write(contenido);
+  ventana.document.close();
+  ventana.focus();
+  setTimeout(() => { ventana.print(); }, 400);
+}
+
+export function BillModal({ order, onClose, onPay, zona }) {
   const [payMethod, setPayMethod] = useState(null);
   if (!order) return null;
   const methods = [
@@ -582,12 +695,12 @@ export function BillModal({ order, onClose, onPay }) {
         <div className="flex gap-2">
           {onPay && (
             <button
-              onClick={() => payMethod ? onPay(order, payMethod) : alert('Selecciona el método de pago')}
+              onClick={() => { if (!payMethod) return; onPay(order, payMethod); }}
               className={`flex-1 font-bold py-3 rounded-lg transition ${payMethod ? 'bg-[#94cb47] hover:bg-[#7ab035] text-black' : 'bg-slate-700 text-slate-500 cursor-not-allowed'}`}>
               ✅ Cobrar
             </button>
           )}
-          <button onClick={() => window.print()} className="bg-blue-700 hover:bg-blue-800 text-white font-bold px-4 py-3 rounded-lg transition">🖨️</button>
+          <button onClick={() => imprimirTiquete(order, zona)} className="bg-blue-700 hover:bg-blue-800 text-white font-bold px-4 py-3 rounded-lg transition">🖨️ Tiquete</button>
           <button onClick={onClose} className="bg-slate-700 hover:bg-slate-600 text-white font-bold px-4 py-3 rounded-lg transition">✕</button>
         </div>
       </div>
