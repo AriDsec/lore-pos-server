@@ -14,6 +14,8 @@ function StatRow({ label, value }) {
 export function AdminScreen({ barPaid, restPaid, loading, onLogout, setPaidOrders, showToast }) {
   const [viewItemsOrder, setViewItemsOrder] = useState(null);
   const [accessLog, setAccessLog] = useState([]);
+  const [showConfirmLimpiar, setShowConfirmLimpiar] = useState(false);
+  const [confirmInput, setConfirmInput] = useState('');
 
   // Servicio 10% — automático los sábados, persiste en localStorage
   const isSabado = new Date().getDay() === 6;
@@ -176,15 +178,7 @@ ${restPaid.length > 0 ? `<div class="section-title">📋 Detalle — Restaurante
             📄 Descargar Cierre del Día
           </button>
           <button
-            onClick={() => {
-              if (!window.confirm('⚠️ ADVERTENCIA\n\n¿Descargaste el cierre del día?\n\nEsta acción borrará TODOS los pagos del día y no se puede deshacer.')) return;
-              const confirmText = window.prompt('Para confirmar escribe: LIMPIAR');
-              if (confirmText !== 'LIMPIAR') { showToast && showToast('Cancelado — texto incorrecto', 'warning'); return; }
-              fetch('/api/admin/clear-day', { method: 'DELETE' })
-                .then(r => r.json())
-                .then(() => { setPaidOrders([]); showToast && showToast('Datos del día eliminados'); })
-                .catch(e => showToast && showToast('Error: ' + e.message, 'error'));
-            }}
+            onClick={() => { setShowConfirmLimpiar(true); setConfirmInput(''); }}
             className="bg-red-900/40 hover:bg-red-900/70 text-red-300 font-bold px-6 py-3 rounded-xl transition flex items-center gap-2 border border-red-500/40"
           >
             🗑️ Limpiar Día
@@ -354,6 +348,53 @@ ${restPaid.length > 0 ? `<div class="section-title">📋 Detalle — Restaurante
 
       </div>
       {viewItemsOrder && <ItemsModal order={viewItemsOrder} onClose={() => setViewItemsOrder(null)} />}
+
+      {/* Modal confirmación limpiar día */}
+      {showConfirmLimpiar && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border-2 border-red-500/60 p-6 shadow-2xl w-full max-w-sm">
+            <div className="text-center mb-5">
+              <div className="text-4xl mb-2">⚠️</div>
+              <h2 className="text-red-300 font-bold text-xl">Limpiar Día</h2>
+              <p className="text-slate-400 text-sm mt-2">Esta acción borrará <span className="text-red-300 font-bold">todos los pagos</span> del día y no se puede deshacer.</p>
+              <p className="text-slate-500 text-xs mt-1">¿Ya descargaste el cierre del día?</p>
+            </div>
+            <div className="mb-4">
+              <label className="text-slate-400 text-xs font-bold uppercase tracking-wide block mb-2">Escribe LIMPIAR para confirmar</label>
+              <input
+                type="text"
+                value={confirmInput}
+                onChange={e => setConfirmInput(e.target.value)}
+                placeholder="LIMPIAR"
+                className="w-full bg-slate-700 border border-red-500/40 text-white rounded-xl p-3 text-center font-bold tracking-widest focus:outline-none focus:border-red-400"
+                autoFocus
+              />
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => { setShowConfirmLimpiar(false); setConfirmInput(''); }}
+                className="flex-1 bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 rounded-xl transition"
+              >
+                Cancelar
+              </button>
+              <button
+                disabled={confirmInput !== 'LIMPIAR'}
+                onClick={() => {
+                  setShowConfirmLimpiar(false);
+                  setConfirmInput('');
+                  fetch('/api/admin/clear-day', { method: 'DELETE' })
+                    .then(r => r.json())
+                    .then(() => { setPaidOrders([]); showToast && showToast('Datos del día eliminados'); })
+                    .catch(e => showToast && showToast('Error: ' + e.message, 'error'));
+                }}
+                className={`flex-1 font-bold py-3 rounded-xl transition ${confirmInput === 'LIMPIAR' ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-slate-700 text-slate-500 cursor-not-allowed'}`}
+              >
+                🗑️ Confirmar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
