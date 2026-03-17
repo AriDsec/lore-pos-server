@@ -13,6 +13,7 @@ export function MeseraScreen({
   onDirectPay, isBar, tables,
   splitOrder, setSplitOrder, onSplit,
   onModalChange, aplicaServicio,
+  mesaConflict, setMesaConflict, onSelectAccount,
 }) {
   const [mobileTab, setMobileTab] = useState('menu');
   const [isLandscape, setIsLandscape] = useState(
@@ -194,6 +195,49 @@ export function MeseraScreen({
       </div>
       {splitOrder && (
         <SplitModal account={splitOrder} onConfirm={onSplit} onClose={() => setSplitOrder(null)} />
+      )}
+
+      {/* Modal conflicto de mesa */}
+      {mesaConflict && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-amber-500/50 p-6 shadow-2xl w-full max-w-sm">
+            <div className="text-center mb-5">
+              <div className="text-4xl mb-2">⚠️</div>
+              <h2 className="text-amber-300 font-bold text-xl">Mesa ocupada</h2>
+              <p className="text-slate-400 text-sm mt-2">
+                {mesaConflict.existingAcc.barra || `Mesa ${mesaConflict.existingAcc.table}`} ya tiene una cuenta abierta
+              </p>
+              <div className="bg-slate-700/60 rounded-xl p-3 mt-3 text-left">
+                <div className="text-white font-bold text-sm">{mesaConflict.existingAcc.clientName || 'Sin nombre'}</div>
+                <div className="text-slate-400 text-xs mt-0.5">👤 {mesaConflict.existingAcc.mesera} · ₡{(mesaConflict.existingAcc.total || 0).toLocaleString()}</div>
+              </div>
+            </div>
+            <p className="text-slate-300 text-sm text-center mb-4">¿Qué deseas hacer?</p>
+            <div className="space-y-2">
+              <button
+                onClick={() => {
+                  onSelectAccount && onSelectAccount(mesaConflict.existingAcc._id || mesaConflict.existingAcc.id);
+                  setMesaConflict(null);
+                }}
+                className="w-full bg-[#94cb47] hover:bg-[#7ab035] text-black font-bold py-3 rounded-xl transition"
+              >
+                ✏️ Agregar a la cuenta existente
+              </button>
+              <button
+                onClick={() => mesaConflict.onConfirm(true)}
+                className="w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 rounded-xl transition border border-slate-500"
+              >
+                👤 Nueva cuenta (persona diferente)
+              </button>
+              <button
+                onClick={() => { mesaConflict.onConfirm(false); setMesaConflict(null); }}
+                className="w-full text-slate-500 hover:text-slate-300 text-sm py-2 transition"
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
