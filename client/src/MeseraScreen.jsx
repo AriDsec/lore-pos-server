@@ -4,7 +4,7 @@ import { Header, MenuDropdown, ReadyOrdersPanel, LicoresPanel, OtrosPanel, Split
 import { ShoppingCart } from './Cart.jsx';
 
 export function MeseraScreen({
-  currentUser, zona, menu, maxTables, onLogout, addToCart,
+  currentUser, zona, menu, licores, maxTables, onLogout, addToCart,
   cartItems, updateQuantity, removeFromCart, updateNotes,
   completeOrder, orderType, setOrderType,
   selectedTable, setSelectedTable, selectedBarra, setSelectedBarra,
@@ -12,6 +12,7 @@ export function MeseraScreen({
   openAccounts, selectedAccount, onSelectAccount,
   onDirectPay, isBar, tables,
   splitOrder, setSplitOrder, onSplit,
+  onModalChange, aplicaServicio,
 }) {
   const [mobileTab, setMobileTab] = useState('menu');
   const [isLandscape, setIsLandscape] = useState(
