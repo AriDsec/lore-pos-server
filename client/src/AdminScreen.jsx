@@ -1,5 +1,6 @@
 import { Header, payBadge, ItemsModal, Spinner } from './components.jsx';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import * as api from './api.js';
 
 function StatRow({ label, value }) {
   return (
@@ -12,6 +13,11 @@ function StatRow({ label, value }) {
 
 export function AdminScreen({ barPaid, restPaid, loading, onLogout, setPaidOrders }) {
   const [viewItemsOrder, setViewItemsOrder] = useState(null);
+  const [accessLog, setAccessLog] = useState([]);
+
+  useEffect(() => {
+    api.getAccessLog().then(setAccessLog).catch(() => {});
+  }, []);
 
   const totalBarCobrado  = barPaid.reduce((s, o) => s + o.total, 0);
   const totalRestCobrado = restPaid.reduce((s, o) => s + o.total, 0);
@@ -241,6 +247,30 @@ ${restPaid.length > 0 ? `<div class="section-title">📋 Detalle — Restaurante
             </div>
           ))}
         </div>
+
+      </div>
+      {/* ── Registro de acceso admin ── */}
+        {accessLog.length > 0 && (
+          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-slate-700 p-4 shadow-xl">
+            <h3 className="text-slate-300 font-bold text-base mb-3">🔑 Registro de Accesos</h3>
+            <div className="space-y-1.5 max-h-64 overflow-y-auto">
+              {accessLog.map((log, i) => (
+                <div key={i} className="flex justify-between items-center p-2 bg-slate-700/40 rounded-lg text-xs gap-2">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span className="text-[#94cb47] font-bold flex-shrink-0">{log.user}</span>
+                    {log.action === 'select' && log.selected && (
+                      <span className="text-slate-400">→ <span className="text-white">{log.selected}</span></span>
+                    )}
+                    {log.action === 'login' && <span className="text-slate-500">inició sesión</span>}
+                  </div>
+                  <span className="text-slate-500 flex-shrink-0">
+                    {new Date(log.timestamp).toLocaleString('es-CR', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' })}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
       </div>
       {viewItemsOrder && <ItemsModal order={viewItemsOrder} onClose={() => setViewItemsOrder(null)} />}
