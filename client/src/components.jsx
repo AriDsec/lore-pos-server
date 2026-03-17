@@ -735,7 +735,7 @@ export function BillModal({ order, onClose, onPay, zona }) {
         <div className="flex gap-2">
           {onPay && (
             <button
-              onClick={() => { if (!payMethod) return; onPay(order, payMethod); }}
+              onClick={() => { if (!payMethod || !order?.total || order.total <= 0) return; onPay(order, payMethod); }}
               className={`flex-1 font-bold py-3 rounded-lg transition ${payMethod ? 'bg-[#94cb47] hover:bg-[#7ab035] text-black' : 'bg-slate-700 text-slate-500 cursor-not-allowed'}`}>
               ✅ Cobrar
             </button>
