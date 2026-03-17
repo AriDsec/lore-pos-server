@@ -73,22 +73,6 @@ export default function RestaurantePOS() {
     return () => { mq.removeEventListener('change', check); window.removeEventListener('resize', check); };
   }, []);
 
-  // Auto-cargar datos si hay sesión guardada
-  useEffect(() => {
-    if (savedSession?.user && savedSession?.role && savedSession?.zone) {
-      loadData(savedSession.zone, savedSession.role);
-    }
-  }, []); // eslint-disable-line
-
-  // Reintento automático cuando hay error de conexión
-  useEffect(() => {
-    if (!syncError || !currentUser) return;
-    const retry = setTimeout(() => {
-      if (currentZone && userRole) loadData(currentZone, userRole, true);
-    }, 10000); // reintenta cada 10s cuando hay error
-    return () => clearTimeout(retry);
-  }, [syncError, currentUser, currentZone, userRole, loadData]);
-
   const loadData = useCallback(async (zone, role, silent = false) => {
     if (!silent) setLoading(true);
     setSyncError(null);
@@ -144,6 +128,22 @@ export default function RestaurantePOS() {
     }, 15000);
     return () => clearInterval(interval);
   }, [currentUser, userRole, currentZone, loadData]);
+
+  // Auto-cargar datos si hay sesión guardada
+  useEffect(() => {
+    if (savedSession?.user && savedSession?.role && savedSession?.zone) {
+      loadData(savedSession.zone, savedSession.role);
+    }
+  }, []); // eslint-disable-line
+
+  // Reintento automático cuando hay error de conexión
+  useEffect(() => {
+    if (!syncError || !currentUser) return;
+    const retry = setTimeout(() => {
+      if (currentZone && userRole) loadData(currentZone, userRole, true);
+    }, 10000);
+    return () => clearTimeout(retry);
+  }, [syncError, currentUser, currentZone, userRole, loadData]);
 
   const handleLogin = async (name, role, zone) => {
     setCurrentUser(name); setUserRole(role); setCurrentZone(zone);
