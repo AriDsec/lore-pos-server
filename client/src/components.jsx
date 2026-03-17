@@ -934,7 +934,7 @@ export function SelectorScreen({ isLandscape, syncError, loading, onSelect, onBa
             className="text-white/75 text-2xl font-normal drop-shadow-lg flex-1">
             Sistema de Pedidos
           </div>
-          <button onClick={onBack} className="text-slate-400 hover:text-white text-sm underline flex-shrink-0">← Volver</button>
+          <button onClick={onBack} className="flex items-center gap-1.5 bg-slate-700/60 hover:bg-slate-600 text-slate-300 hover:text-white text-sm font-medium px-3 py-1.5 rounded-lg transition border border-slate-600 flex-shrink-0">← PIN</button>
         </div>
       ) : (
         <div className="flex flex-col items-center mb-5 w-full max-w-md">
@@ -968,7 +968,7 @@ export function SelectorScreen({ isLandscape, syncError, loading, onSelect, onBa
         </div>
         <div className="bg-slate-800/80 backdrop-blur border border-[#94cb47]/40 rounded-2xl p-4 shadow-2xl flex flex-col justify-between gap-3">
           <button onClick={() => onSelect('__admin__')} className="w-full bg-[#94cb47]/90 hover:bg-[#7ab035] text-white font-bold py-2.5 rounded-xl transition shadow-lg">📊 Panel Admin</button>
-          {!isLandscape && <button onClick={onBack} className="w-full text-slate-400 hover:text-white text-sm py-2 underline">← Volver al PIN</button>}
+          {!isLandscape && <button onClick={onBack} className="w-full flex items-center justify-center gap-2 bg-slate-700/60 hover:bg-slate-600 text-slate-300 hover:text-white font-medium py-2.5 rounded-xl transition border border-slate-600 text-sm">← Volver al PIN</button>}
         </div>
       </div>
       {loading && <Spinner />}
