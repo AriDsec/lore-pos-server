@@ -218,13 +218,13 @@ export function LicoresPanel({ onAddToCart, onModalChange }) {
 function OtroEditModal({ item, onConfirm, onClose }) {
   const [nombre, setNombre] = useState(item.name);
   const [precio, setPrecio] = useState(String(item.price));
-  const [error, setError]   = useState('');
+  const [inputError, setInputError] = useState('');
 
   const handleConfirm = () => {
     const p = parseInt(precio.replace(/\D/g, ''), 10);
-    if (!nombre.trim()) { setError('Ingresa un nombre'); return; }
-    if (!p || p <= 0)   { setError('Ingresa un precio válido'); return; }
-    setError('');
+    if (!nombre.trim()) { setInputError('Ingresa un nombre'); return; }
+    if (!p || p <= 0)   { setInputError('Ingresa un precio válido'); return; }
+    setInputError('');
     onConfirm({ ...item, name: nombre.trim(), price: p });
   };
 
@@ -236,7 +236,7 @@ function OtroEditModal({ item, onConfirm, onClose }) {
           <h2 className="text-lg font-bold text-white">Confirmar item</h2>
           <p className="text-slate-400 text-xs mt-1">Edita nombre y precio si es necesario</p>
         </div>
-        {error && <div className="bg-red-900/40 border border-red-500/50 text-red-300 text-xs rounded-lg px-3 py-2 mb-3">⚠️ {error}</div>}
+        {inputError && <div className="bg-red-900/40 border border-red-500/50 text-red-300 text-xs rounded-lg px-3 py-2 mb-3">⚠️ {inputError}</div>}
         <div className="space-y-3 mb-5">
           <div>
             <label className="text-slate-400 text-xs font-bold uppercase tracking-wide block mb-1">Nombre</label>
@@ -753,7 +753,7 @@ export function BillModal({ order, onClose, onPay, zona }) {
 // ─────────────────────────────────────────────
 export function PinModal({ userName, onSuccess, onCancel }) {
   const [pin, setPin] = useState('');
-  const [error, setError] = useState(false);
+  const [pinError, setPinError] = useState(false);
 
   const handleDigit = (d) => {
     if (pin.length >= 4) return;
@@ -765,14 +765,14 @@ export function PinModal({ userName, onSuccess, onCancel }) {
         if (next === PINES[userName]?.pin) {
           onSuccess();
         } else {
-          setError(true);
+          setPinError(true);
           setPin('');
         }
       }, 200);
     }
   };
 
-  const handleDelete = () => { setPin(p => p.slice(0, -1)); setError(false); };
+  const handleDelete = () => { setPin(p => p.slice(0, -1)); setPinError(false); };
 
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-2 overflow-y-auto">
@@ -786,12 +786,12 @@ export function PinModal({ userName, onSuccess, onCancel }) {
           {[0,1,2,3].map(i => (
             <div key={i} className={`w-4 h-4 rounded-full border-2 transition-all ${
               i < pin.length
-                ? error ? 'bg-red-500 border-red-500' : 'bg-[#94cb47] border-[#94cb47]'
+                ? pinError ? 'bg-red-500 border-red-500' : 'bg-[#94cb47] border-[#94cb47]'
                 : 'border-slate-500'
             }`} />
           ))}
         </div>
-        {error && <p className="text-red-400 text-center text-xs mb-3">PIN incorrecto, intenta de nuevo</p>}
+        {pinError && <p className="text-red-400 text-center text-xs mb-3">PIN incorrecto, intenta de nuevo</p>}
         <div className="grid grid-cols-3 gap-2 mb-2">
           {[1,2,3,4,5,6,7,8,9].map(d => (
             <button key={d} onClick={() => handleDigit(String(d))}
@@ -822,7 +822,7 @@ export function PinModal({ userName, onSuccess, onCancel }) {
 // ─────────────────────────────────────────────
 export function PinLoginScreen({ isLandscape, syncError, loading, onLogin }) {
   const [pin, setPin] = useState('');
-  const [error, setError] = useState(false);
+  const [loginError, setLoginError] = useState(false);
   const [attempting, setAttempting] = useState(false);
 
   const handleDigit = async (d) => {
@@ -835,7 +835,7 @@ export function PinLoginScreen({ isLandscape, syncError, loading, onLogin }) {
       setTimeout(async () => {
         const ok = await onLogin(next);
         if (!ok) {
-          setError(true);
+          setLoginError(true);
           setPin('');
         }
         setAttempting(false);
@@ -843,7 +843,7 @@ export function PinLoginScreen({ isLandscape, syncError, loading, onLogin }) {
     }
   };
 
-  const handleDelete = () => { setPin(p => p.slice(0, -1)); setError(false); };
+  const handleDelete = () => { setPin(p => p.slice(0, -1)); setLoginError(false); };
 
   const keypad = (
     <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-5 shadow-2xl w-full max-w-xs">
@@ -855,12 +855,12 @@ export function PinLoginScreen({ isLandscape, syncError, loading, onLogin }) {
         {[0,1,2,3].map(i => (
           <div key={i} className={`w-4 h-4 rounded-full border-2 transition-all ${
             i < pin.length
-              ? error ? 'bg-red-500 border-red-500' : 'bg-[#94cb47] border-[#94cb47]'
+              ? loginError ? 'bg-red-500 border-red-500' : 'bg-[#94cb47] border-[#94cb47]'
               : 'border-slate-500'
           }`} />
         ))}
       </div>
-      {error && <p className="text-red-400 text-center text-xs mb-3">PIN incorrecto</p>}
+      {loginError && <p className="text-red-400 text-center text-xs mb-3">PIN incorrecto</p>}
       <div className="grid grid-cols-3 gap-2">
         {[1,2,3,4,5,6,7,8,9].map(d => (
           <button key={d} onClick={() => handleDigit(String(d))}
