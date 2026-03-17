@@ -8,3 +8,8 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     <App />
   </React.StrictMode>
 )
+
+// Ocultar splash screen una vez que React montó
+setTimeout(() => {
+  if (window.__hideSplash) window.__hideSplash();
+}, 300);
