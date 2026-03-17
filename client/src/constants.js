@@ -325,17 +325,17 @@ export const MENU = {
 // PINES DE ACCESO
 // ─────────────────────────────────────────────
 export const PINES = {
-  // ── Caja / operaciones ──
+  // ── Caja ──
   'Caja Bar':           { pin: '1970', role: 'caja',   zone: 'bar' },
   'Caja Restaurante':   { pin: '1969', role: 'caja',   zone: 'restaurante' },
-  'Tablet Restaurante': { pin: '4321', role: 'mesera', zone: 'restaurante' },
-  'Cocina':             { pin: '9988', role: 'cocina', zone: 'restaurante' },
   // ── Meseras Bar ──
   'María':              { pin: '5456', role: 'mesera', zone: 'bar' },
   'Milena':             { pin: '8995', role: 'mesera', zone: 'bar' },
   'Lin':                { pin: '7777', role: 'mesera', zone: 'bar' },
   'Temp Bar':           { pin: '1221', role: 'mesera', zone: 'bar' },
-  // ── Admins (acceso al selector completo + registro de acceso) ──
+  // ── Admins (selector completo + registro de acceso) ──
+  // Guido, Lindsey, Ariel: admin general
+  // Aaron: también usa Tablet Restaurante y Cocina desde su selector
   'Guido':              { pin: '0000', role: 'admin',  zone: 'admin' },
   'Lindsey':            { pin: '1324', role: 'admin',  zone: 'admin' },
   'Ariel':              { pin: '3306', role: 'admin',  zone: 'admin' },
