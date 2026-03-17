@@ -248,8 +248,7 @@ ${restPaid.length > 0 ? `<div class="section-title">📋 Detalle — Restaurante
           ))}
         </div>
 
-      </div>
-      {/* ── Registro de acceso admin ── */}
+        {/* ── Registro de acceso admin ── */}
         {accessLog.length > 0 && (
           <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-slate-700 p-4 shadow-xl">
             <h3 className="text-slate-300 font-bold text-base mb-3">🔑 Registro de Accesos</h3>
