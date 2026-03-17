@@ -135,9 +135,16 @@ export default function RestaurantePOS() {
   };
 
   const handleSelectorLogin = async (name) => {
+    // '__admin__' significa entrar al Panel Admin con el usuario admin actual
+    if (name === '__admin__') {
+      api.logAccess(adminUser, '', 'select', 'Panel Admin');
+      await handleLogin(adminUser, 'admin', 'admin');
+      setShowSelector(false);
+      return;
+    }
     const user = PINES[name] || SELECTOR_EXTRAS[name];
     if (!user) return;
-    api.logAccess(adminUser || 'Admin', '', 'select', name);
+    api.logAccess(adminUser, '', 'select', name);
     await handleLogin(name, user.role, user.zone);
     setShowSelector(false);
   };
