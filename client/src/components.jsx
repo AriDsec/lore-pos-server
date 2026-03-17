@@ -579,27 +579,49 @@ export function imprimirTiquete(order, zona) {
 <meta charset="UTF-8">
 <title>Tiquete</title>
 <style>
-  @page { margin: 4mm; size: 80mm auto; }
+  /* Para impresora térmica: seleccionar tamaño 80mm o 58mm en el diálogo */
+  @page {
+    size: 80mm auto;
+    margin: 3mm 2mm;
+  }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
     font-family: 'Courier New', Courier, monospace;
-    font-size: 11px;
-    width: 72mm;
+    font-size: 10.5px;
+    width: 76mm;
     color: #000;
-    line-height: 1.4;
+    line-height: 1.45;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
   }
   .centro { text-align: center; }
   .derecha { text-align: right; }
   .bold { font-weight: bold; }
-  .grande { font-size: 15px; font-weight: bold; }
-  .separador { border-top: 1px dashed #000; margin: 4px 0; }
+  .separador { border-top: 1px dashed #000; margin: 3px 0; }
   .separador-doble { border-top: 2px solid #000; margin: 4px 0; }
   pre { font-family: inherit; font-size: inherit; white-space: pre-wrap; }
-  .total-box { border: 2px solid #000; padding: 4px; margin: 6px 0; text-align: center; }
-  .total-num { font-size: 20px; font-weight: bold; }
+  .total-box { border: 2px solid #000; padding: 4px 6px; margin: 5px 0; text-align: center; }
+  .total-num { font-size: 18px; font-weight: bold; }
+  /* Instrucción solo visible en pantalla, no al imprimir */
+  .instruccion {
+    background: #fff3cd;
+    border: 1px solid #ffc107;
+    padding: 6px;
+    margin-bottom: 8px;
+    font-size: 10px;
+    text-align: center;
+    border-radius: 4px;
+  }
+  @media print { .instruccion { display: none; } }
 </style>
 </head>
 <body>
+
+<div class="instruccion">
+  ⚙️ En el diálogo de impresión:<br>
+  Seleccione tamaño <b>80mm</b> (o 58mm según su impresora)<br>
+  Márgenes: <b>Mínimo</b> · Sin encabezado/pie de página
+</div>
 
 <div class="centro bold">${nombreLocal}</div>
 <div class="centro">${propietario}</div>
