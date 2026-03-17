@@ -794,7 +794,7 @@ export function SelectorScreen({ isLandscape, syncError, loading, onSelect, onBa
           <button onClick={() => onSelect('Cocina')} className="w-full bg-[#94cb47]/90 hover:bg-[#7ab035] text-white font-bold py-2.5 rounded-xl transition shadow-lg">👨‍🍳 Cocina</button>
         </div>
         <div className="bg-slate-800/80 backdrop-blur border border-[#94cb47]/40 rounded-2xl p-4 shadow-2xl flex flex-col justify-between gap-3">
-          <button onClick={() => onSelect('Admin')} className="w-full bg-[#94cb47]/90 hover:bg-[#7ab035] text-white font-bold py-2.5 rounded-xl transition shadow-lg">📊 Panel Admin</button>
+          <button onClick={() => onSelect('__admin__')} className="w-full bg-[#94cb47]/90 hover:bg-[#7ab035] text-white font-bold py-2.5 rounded-xl transition shadow-lg">📊 Panel Admin</button>
           {!isLandscape && <button onClick={onBack} className="w-full text-slate-400 hover:text-white text-sm py-2 underline">← Volver al PIN</button>}
         </div>
       </div>
