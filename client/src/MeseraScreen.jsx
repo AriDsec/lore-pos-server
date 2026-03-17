@@ -43,6 +43,7 @@ export function MeseraScreen({
     tables,
     onSplit: (acc) => setSplitOrder(acc),
     currentUser,
+    aplicaServicio,
   };
 
   // Panel central en landscape: Menú + Licores + Otros con tabs
@@ -82,6 +83,13 @@ export function MeseraScreen({
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-slate-900 to-black flex flex-col">
       <Header mesera={currentUser} zona={zona} onLogout={onLogout} />
+
+      {/* Indicador servicio sábado */}
+      {aplicaServicio && (
+        <div className="bg-purple-900/60 border-b border-purple-500/40 px-4 py-1.5 flex items-center gap-2">
+          <span className="text-purple-300 text-xs font-bold">💜 Sábado — Servicio 10% incluido en todos los precios</span>
+        </div>
+      )}
 
       {/* ── Landscape: flex — menú flexible / carrito ancho fijo ── */}
       <div className={`${isLandscape ? "flex" : "hidden"} gap-3 p-3 w-full overflow-hidden`} style={{height: "calc(100vh - 64px)"}}>
