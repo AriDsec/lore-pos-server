@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import * as api from "./api.js";
 import { MENU, LICORES, PINES, meseras, barras } from './constants.js';
-import { Spinner, PinLoginScreen, SelectorScreen } from './components.jsx';
+import { Spinner, Toast, PinLoginScreen, SelectorScreen } from './components.jsx';
 import { MeseraScreen } from './MeseraScreen.jsx';
 import { KitchenScreen } from './KitchenScreen.jsx';
 import { CajaScreen } from './CajaScreen.jsx';
@@ -192,11 +192,11 @@ export default function RestaurantePOS() {
   const updateNotes = (id, notes) => setCartItems(prev => prev.map(i => i.id === id ? { ...i, notes } : i));
 
   const completeOrder = async () => {
-    if (cartItems.length === 0) { alert('El carrito está vacío'); return; }
-    if (!orderType) { alert('Selecciona el tipo de pedido (Local o Llevar)'); return; }
-    if (orderType === 'dine-in' && !selectedTable && !selectedBarra) { alert('Selecciona una mesa o barra'); return; }
-    if (!clientName.trim()) { alert('Ingresa un nombre o seña del cliente'); return; }
-    if (clientName.trim().toLowerCase() === 'cliente general') { alert('"Cliente General" es solo para cobros directos. Ingresa un nombre real.'); return; }
+    if (cartItems.length === 0) { showToast('El carrito está vacío', 'warning'); return; }
+    if (!orderType) { showToast('Selecciona el tipo de pedido', 'warning'); return; }
+    if (orderType === 'dine-in' && !selectedTable && !selectedBarra) { showToast('Selecciona una mesa o barra', 'warning'); return; }
+    if (!clientName.trim()) { showToast('Ingresa un nombre o seña', 'warning'); return; }
+    if (clientName.trim().toLowerCase() === 'cliente general') { showToast('Usa un nombre real, no "Cliente General"', 'warning'); return; }
     const total = cartItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
     const foodItems = cartItems.filter(i => i.category === 'food');
     setLoading(true);
@@ -210,26 +210,26 @@ export default function RestaurantePOS() {
         if (newFood.length > 0) {
           await api.createKitchenOrder({ id: `k-${Date.now()}`, zone: currentZone, mesera: currentUser, items: newFood, table: selectedTable || null, barra: selectedBarra || null, clientName: clientName || '', locationLabel: selectedBarra ? selectedBarra : (selectedTable ? `Mesa ${selectedTable}` : 'Sin mesa'), status: 'pending', createdAt: new Date() });
         }
-        alert('✅ Cuenta actualizada');
+        showToast('Cuenta actualizada');
       } else {
         await api.createAccount({ id: `acc-${currentZone}-${currentUser}-${Date.now()}`, zone: currentZone, mesera: currentUser, items: [...cartItems], total, type: orderType, table: selectedTable, barra: selectedBarra, clientName, foodItems, drinkItems: cartItems.filter(i => ['alcoholic','beverage','soda'].includes(i.category)), status: 'open', createdAt: new Date() });
         if (foodItems.length > 0) {
           await api.createKitchenOrder({ id: `k-${Date.now()}`, zone: currentZone, mesera: currentUser, items: foodItems, table: selectedTable || null, barra: selectedBarra || null, clientName: clientName || '', locationLabel: selectedBarra ? selectedBarra : (selectedTable ? `Mesa ${selectedTable}` : 'Sin mesa'), status: 'pending', createdAt: new Date() });
         }
-        alert('✅ Cuenta abierta registrada');
+        showToast('Cuenta registrada');
       }
       const fresh = await api.getOpenAccounts(currentZone);
       setOpenAccounts(fresh);
       setCartItems([]); setSelectedTable(null); setSelectedBarra(null); setClientName(''); setOrderType(null); setSelectedAccount(null);
     } catch (err) {
-      alert('❌ Error al guardar: ' + err.message);
+      showToast('Error al guardar: ' + err.message, 'error');
     } finally {
       setLoading(false);
     }
   };
 
   const handleDirectPay = async () => {
-    if (cartItems.length === 0) { alert('El carrito está vacío'); return; }
+    if (cartItems.length === 0) { showToast('El carrito está vacío', 'warning'); return; }
     const total = cartItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
     const foodItems = cartItems.filter(i => i.category === 'food');
     const location = selectedBarra ? selectedBarra : (selectedTable ? `Mesa ${selectedTable}` : 'Barra');
@@ -253,9 +253,9 @@ export default function RestaurantePOS() {
         });
       }
       setCartItems([]); setSelectedTable(null); setSelectedBarra(null); setClientName(''); setOrderType(null); setSelectedAccount(null);
-      alert('✅ Pedido enviado. La caja lo cobra.');
+      showToast('Pedido enviado a caja');
     } catch (err) {
-      alert('❌ Error: ' + err.message);
+      showToast('Error: ' + err.message, 'error');
     } finally {
       setLoading(false);
     }
@@ -268,7 +268,7 @@ export default function RestaurantePOS() {
       const [open, paid] = await Promise.all([api.getOpenAccounts(currentZone), api.getPaidAccounts(currentZone)]);
       setOpenAccounts(open); setPaidOrders(paid); setBillOrder(null);
     } catch (err) {
-      alert('❌ Error al cobrar: ' + err.message);
+      showToast('Error al cobrar: ' + err.message, 'error');
     } finally {
       setLoading(false);
     }
@@ -302,9 +302,9 @@ export default function RestaurantePOS() {
       const [open, paid] = await Promise.all([api.getOpenAccounts(currentZone), api.getPaidAccounts(currentZone)]);
       setOpenAccounts(open); setPaidOrders(paid);
       setSplitOrder(null);
-      alert('✅ Cuenta separada correctamente');
+      showToast('Cuenta separada');
     } catch (err) {
-      alert('❌ Error al separar: ' + err.message);
+      showToast('Error al separar: ' + err.message, 'error');
     } finally {
       setLoading(false);
     }
@@ -315,14 +315,14 @@ export default function RestaurantePOS() {
     try {
       await api.updateKitchenOrder(orderId, 'ready');
       setKitchenOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: 'ready' } : o));
-    } catch (err) { alert('Error: ' + err.message); }
+    } catch (err) { showToast('Error: ' + err.message, 'error'); }
   };
 
   const markOrderDelivered = async (orderId) => {
     try {
       await api.deleteKitchenOrder(orderId);
       setKitchenOrders(prev => prev.filter(o => o.id !== orderId));
-    } catch (err) { alert('Error: ' + err.message); }
+    } catch (err) { showToast('Error: ' + err.message, 'error'); }
   };
 
   const barAccounts      = openAccounts.filter(a => a.zone === 'bar');
@@ -358,6 +358,7 @@ export default function RestaurantePOS() {
   if (userRole === 'mesera') {
     return (
       <>
+        <Toast toasts={toasts} />
         {loading && <Spinner />}
         <MeseraScreen
           currentUser={currentUser} zona={currentZone === 'bar' ? 'Bar' : 'Restaurante'}
@@ -383,16 +384,16 @@ export default function RestaurantePOS() {
   }
 
   if (userRole === 'cocina') {
-    return <KitchenScreen kitchenOrders={kitchenOrders} loading={loading} onLogout={handleLogout} onReady={markOrderReady} onDelivered={markOrderDelivered} />;
+    return <><Toast toasts={toasts} /><KitchenScreen kitchenOrders={kitchenOrders} loading={loading} onLogout={handleLogout} onReady={markOrderReady} onDelivered={markOrderDelivered} /></>;
   }
 
   if (userRole === 'caja' && currentZone === 'bar') {
-    return <CajaScreen zona="bar" zonaNombre="Bar" accounts={barAccounts} paid={barPaid} loading={loading} billOrder={billOrder} setBillOrder={setBillOrder} viewItemsOrder={viewItemsOrder} setViewItemsOrder={setViewItemsOrder} splitOrder={splitOrder} setSplitOrder={setSplitOrder} onSplit={handleSplitAccount} onLogout={handleLogout} onPay={payAccount} />;
+    return <><Toast toasts={toasts} /><CajaScreen zona="bar" zonaNombre="Bar" accounts={barAccounts} paid={barPaid} loading={loading} billOrder={billOrder} setBillOrder={setBillOrder} viewItemsOrder={viewItemsOrder} setViewItemsOrder={setViewItemsOrder} splitOrder={splitOrder} setSplitOrder={setSplitOrder} onSplit={handleSplitAccount} onLogout={handleLogout} onPay={payAccount} /></>;
   }
 
   if (userRole === 'caja' && currentZone === 'restaurante') {
-    return <CajaScreen zona="restaurante" zonaNombre="Restaurante" accounts={restAccounts} paid={restPaid} loading={loading} billOrder={billOrder} setBillOrder={setBillOrder} viewItemsOrder={viewItemsOrder} setViewItemsOrder={setViewItemsOrder} splitOrder={splitOrder} setSplitOrder={setSplitOrder} onSplit={handleSplitAccount} onLogout={handleLogout} onPay={payAccount} />;
+    return <><Toast toasts={toasts} /><CajaScreen zona="restaurante" zonaNombre="Restaurante" accounts={restAccounts} paid={restPaid} loading={loading} billOrder={billOrder} setBillOrder={setBillOrder} viewItemsOrder={viewItemsOrder} setViewItemsOrder={setViewItemsOrder} splitOrder={splitOrder} setSplitOrder={setSplitOrder} onSplit={handleSplitAccount} onLogout={handleLogout} onPay={payAccount} /></>;
   }
 
-  return <AdminScreen barPaid={barPaid} restPaid={restPaid} loading={loading} onLogout={handleLogout} setPaidOrders={setPaidOrders} />;
+  return <><Toast toasts={toasts} /><AdminScreen barPaid={barPaid} restPaid={restPaid} loading={loading} onLogout={handleLogout} setPaidOrders={setPaidOrders} showToast={showToast} /></>;
 }
