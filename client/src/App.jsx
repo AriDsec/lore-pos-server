@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import * as api from "./api.js";
 import { MENU, LICORES, PINES, meseras, barras } from './constants.js';
-import { Spinner, PinLoginScreen } from './components.jsx';
+import { Spinner, PinLoginScreen, SelectorScreen } from './components.jsx';
 import { MeseraScreen } from './MeseraScreen.jsx';
 import { KitchenScreen } from './KitchenScreen.jsx';
 import { CajaScreen } from './CajaScreen.jsx';
@@ -14,6 +14,7 @@ export default function RestaurantePOS() {
   const [currentZone, setCurrentZone] = useState(savedSession?.zone || null);
   const [loading, setLoading]         = useState(false);
   const [syncError, setSyncError]     = useState(null);
+  const [showSelector, setShowSelector] = useState(false);
 
   const [cartItems, setCartItems]         = useState([]);
   const [selectedTable, setSelectedTable] = useState(null);
@@ -96,6 +97,7 @@ export default function RestaurantePOS() {
 
   const handleLogout = () => {
     localStorage.removeItem('lore_session');
+    setShowSelector(false);
     setCurrentUser(null); setUserRole(null); setCurrentZone(null);
     setCartItems([]); setSelectedTable(null); setSelectedBarra(null);
     setClientName(''); setOrderType(null); setSelectedAccount(null);
@@ -106,9 +108,21 @@ export default function RestaurantePOS() {
   const loginWithPin = async (pin) => {
     const entry = Object.entries(PINES).find(([, v]) => v.pin === pin);
     if (!entry) return false;
-    const [name, { role, zone }] = entry;
+    const [name, { role }] = entry;
+    if (role === 'admin') {
+      // Admin ve la pantalla de selección completa
+      setShowSelector(true);
+      return true;
+    }
+    const [, { zone }] = entry;
     await handleLogin(name, role, zone);
     return true;
+  };
+
+  const handleSelectorLogin = async (name) => {
+    const user = PINES[name];
+    await handleLogin(name, user.role, user.zone);
+    setShowSelector(false);
   };
 
   const handleSelectAccount = (accountId) => {
@@ -296,6 +310,15 @@ export default function RestaurantePOS() {
 
   // ── LOGIN ─────────────────────────────────────
   if (!currentUser) {
+    if (showSelector) {
+      return <SelectorScreen
+        isLandscape={isLandscape}
+        syncError={syncError}
+        loading={loading}
+        onSelect={handleSelectorLogin}
+        onBack={() => setShowSelector(false)}
+      />;
+    }
     return <PinLoginScreen
       isLandscape={isLandscape}
       syncError={syncError}
