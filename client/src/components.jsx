@@ -643,3 +643,106 @@ export function PinModal({ userName, onSuccess, onCancel }) {
     </div>
   );
 }
+
+// ─────────────────────────────────────────────
+// PIN LOGIN SCREEN
+// ─────────────────────────────────────────────
+export function PinLoginScreen({ isLandscape, syncError, loading, onLogin }) {
+  const [pin, setPin] = useState('');
+  const [error, setError] = useState(false);
+  const [attempting, setAttempting] = useState(false);
+
+  const handleDigit = async (d) => {
+    if (pin.length >= 4 || attempting) return;
+    const next = pin + d;
+    setPin(next);
+    setError(false);
+    if (next.length === 4) {
+      setAttempting(true);
+      setTimeout(async () => {
+        const ok = await onLogin(next);
+        if (!ok) {
+          setError(true);
+          setPin('');
+        }
+        setAttempting(false);
+      }, 200);
+    }
+  };
+
+  const handleDelete = () => { setPin(p => p.slice(0, -1)); setError(false); };
+
+  const keypad = (
+    <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-5 shadow-2xl w-full max-w-xs">
+      <div className="text-center mb-4">
+        <div className="text-2xl mb-1">🔐</div>
+        <p className="text-slate-400 text-sm">Ingresa tu PIN</p>
+      </div>
+      <div className="flex justify-center gap-4 mb-4">
+        {[0,1,2,3].map(i => (
+          <div key={i} className={`w-4 h-4 rounded-full border-2 transition-all ${
+            i < pin.length
+              ? error ? 'bg-red-500 border-red-500' : 'bg-[#94cb47] border-[#94cb47]'
+              : 'border-slate-500'
+          }`} />
+        ))}
+      </div>
+      {error && <p className="text-red-400 text-center text-xs mb-3">PIN incorrecto</p>}
+      <div className="grid grid-cols-3 gap-2">
+        {[1,2,3,4,5,6,7,8,9].map(d => (
+          <button key={d} onClick={() => handleDigit(String(d))}
+            className="bg-slate-700 hover:bg-slate-600 active:bg-[#94cb47]/60 text-white font-bold text-xl py-3 rounded-xl transition select-none">
+            {d}
+          </button>
+        ))}
+        <button onClick={handleDelete}
+          className="bg-slate-700 hover:bg-slate-600 text-slate-300 font-bold text-lg py-3 rounded-xl transition select-none">
+          ⌫
+        </button>
+        <button onClick={() => handleDigit('0')}
+          className="bg-slate-700 hover:bg-slate-600 active:bg-[#94cb47]/60 text-white font-bold text-xl py-3 rounded-xl transition select-none">
+          0
+        </button>
+        <div className="py-3 rounded-xl" />
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-black via-slate-900 to-black flex flex-col items-center justify-center p-4 overflow-y-auto">
+      {isLandscape ? (
+        <div className="flex items-center gap-10 w-full max-w-2xl">
+          {/* Izquierda: logo + título */}
+          <div className="flex flex-col items-center gap-3 flex-shrink-0">
+            <img src="/logo.png" alt="LORE" className="w-28 h-28 object-contain drop-shadow-2xl" />
+            <div style={{ fontFamily: "'Cinzel', serif", letterSpacing: '0.14em' }}
+              className="text-white/75 text-xl font-normal">
+              Sistema de Pedidos
+            </div>
+          </div>
+          {/* Derecha: keypad */}
+          <div className="flex-1 flex justify-center">
+            {keypad}
+          </div>
+        </div>
+      ) : (
+        <div className="flex flex-col items-center gap-6 w-full">
+          <div className="flex flex-col items-center">
+            <img src="/logo.png" alt="LORE" className="w-36 h-36 object-contain drop-shadow-2xl mb-2" />
+            <div style={{ fontFamily: "'Cinzel', serif", letterSpacing: '0.12em' }}
+              className="text-white/70 text-lg font-normal">
+              Sistema de Pedidos
+            </div>
+          </div>
+          {keypad}
+        </div>
+      )}
+      {syncError && (
+        <div className="bg-red-900/60 border border-red-500 rounded-xl p-3 mt-4 text-red-200 text-sm text-center w-full max-w-xs">
+          ⚠️ {syncError}
+        </div>
+      )}
+      {loading && <Spinner />}
+    </div>
+  );
+}
