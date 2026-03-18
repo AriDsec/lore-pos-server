@@ -505,8 +505,8 @@ export const PINES = {
   'Caja Bar':           { pin: '1970', role: 'caja',   zone: 'bar' },
   'Caja Restaurante':   { pin: '1969', role: 'caja',   zone: 'restaurante' },
   // ── Meseras Bar ──
-  'María':              { pin: '5456', role: 'mesera', zone: 'bar' },
-  'Milena':             { pin: '8995', role: 'mesera', zone: 'bar' },
+  'Mari':               { pin: '5456', role: 'mesera', zone: 'bar' },
+  'Mile':               { pin: '8995', role: 'mesera', zone: 'bar' },
   'Lin':                { pin: '7777', role: 'mesera', zone: 'bar' },
   'Temp Bar':           { pin: '1221', role: 'mesera', zone: 'bar' },
   // ── Admins (selector completo + registro de acceso) ──
@@ -518,5 +518,5 @@ export const PINES = {
   'Aaron':              { pin: '7878', role: 'admin',  zone: 'admin' },
 };
 
-export const meseras = ['María', 'Milena', 'Lin', 'Temp Bar'];
+export const meseras = ['Mari', 'Mile', 'Lin', 'Temp Bar', 'Guido Bar'];
 export const barras  = ['Barra 1', 'Barra 2', 'Barra 3', 'Barra Grande'];
