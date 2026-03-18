@@ -134,8 +134,6 @@ export default function RestaurantePOS() {
 
   useEffect(() => {
     if (!currentUser || !userRole) return;
-    // Meseras y cocina sincronizan cada 5s para notificaciones rápidas
-    // Caja y admin cada 15s
     const interval_ms = (userRole === 'mesera' || userRole === 'cocina') ? 5000 : 15000;
     const interval = setInterval(() => {
       const anyModalOpen = modalOpenRef.current || !!splitOrder || !!billOrder || !!viewItemsOrder;
@@ -143,6 +141,18 @@ export default function RestaurantePOS() {
     }, interval_ms);
     return () => clearInterval(interval);
   }, [currentUser, userRole, currentZone, loadData]);
+
+  // Si la cuenta seleccionada fue cobrada por otra persona, limpiar selección
+  useEffect(() => {
+    if (!selectedAccount || openAccounts.length === 0) return;
+    const stillOpen = openAccounts.find(a => (a._id === selectedAccount || a.id === selectedAccount) && a.status === 'open');
+    if (!stillOpen) {
+      setSelectedAccount(null);
+      setCartItems([]); setSelectedTable(null); setSelectedBarra(null);
+      setClientName(''); setOrderType(null);
+      showToast('La cuenta fue cobrada por otra persona', 'warning');
+    }
+  }, [openAccounts, selectedAccount]);
 
   // Auto-cargar datos si hay sesión guardada
   useEffect(() => {
@@ -216,8 +226,13 @@ export default function RestaurantePOS() {
       showToast('⏰ La sesión cierra en 10 minutos', 'warning');
     }, OCHO_HORAS - AVISO);
     const logoutTimer = setTimeout(() => {
-      showToast('Sesión cerrada por inactividad', 'warning');
-      setTimeout(handleLogout, 2000);
+      // Si hay carrito lleno, avisar más claramente
+      if (cartItems.length > 0) {
+        showToast('⚠️ Sesión expirada — guarda o pierde el carrito', 'error');
+      } else {
+        showToast('Sesión cerrada por inactividad', 'warning');
+      }
+      setTimeout(handleLogout, 3000);
     }, OCHO_HORAS);
     return () => { clearTimeout(avisoTimer); clearTimeout(logoutTimer); };
   }, [currentUser, userRole]); // eslint-disable-line
@@ -467,6 +482,8 @@ export default function RestaurantePOS() {
 
 
   const markOrderReady = async (orderId) => {
+    const order = kitchenOrders.find(o => o.id === orderId);
+    if (!order || order.status === 'ready') return;
     try {
       await api.updateKitchenOrder(orderId, 'ready');
       setKitchenOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: 'ready' } : o));
@@ -474,6 +491,8 @@ export default function RestaurantePOS() {
   };
 
   const markOrderDelivered = async (orderId) => {
+    const order = kitchenOrders.find(o => o.id === orderId);
+    if (!order) return;
     try {
       await api.deleteKitchenOrder(orderId);
       setKitchenOrders(prev => prev.filter(o => o.id !== orderId));
