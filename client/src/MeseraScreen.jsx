@@ -34,6 +34,7 @@ export function MeseraScreen({
   const cartProps = {
     cartItems, updateQuantity, removeFromCart, updateNotes,
     completeOrder, orderType, setOrderType,
+    loading,
     selectedTable, setSelectedTable,
     selectedBarra, setSelectedBarra,
     clientName, setClientName,
