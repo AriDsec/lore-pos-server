@@ -93,7 +93,7 @@ export function ShoppingCart({
                   type="text"
                   placeholder="Notas..."
                   value={item.notes || ''}
-                  onChange={(e) => updateNotes(item.id, e.target.value)}
+                  onChange={(e) => updateNotes(item.id, e.target.value.slice(0, 80))} maxLength={80}
                   className="w-full bg-slate-900/50 border border-[#94cb47]/20 text-white text-xs rounded p-1 focus:outline-none focus:border-[#94cb47] placeholder-slate-600"
                 />
               </div>
