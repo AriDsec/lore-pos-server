@@ -7,7 +7,7 @@ export function ShoppingCart({
   barras, maxTables, tables,
   openAccounts, selectedAccount, onSelectAccount,
   mobileVisible, onDirectPay, isBar, onSplit,
-  currentUser, aplicaServicio,
+  currentUser, aplicaServicio, loading,
 }) {
   // Si la cuenta seleccionada pertenece a otra mesera, solo se pueden agregar items (no borrar/editar los existentes)
   const selectedAcc = selectedAccount ? openAccounts.find(a => a.id === selectedAccount || a._id === selectedAccount) : null;
@@ -151,9 +151,9 @@ export function ShoppingCart({
             </div>
 
             {/* Botones */}
-            <button onClick={completeOrder}
-              className="w-full bg-[#94cb47] hover:bg-[#7ab035] text-black font-bold py-2.5 rounded-xl transition text-sm">
-              ✓ Guardar Cuenta
+            <button onClick={completeOrder} disabled={loading}
+              className={`w-full font-bold py-2.5 rounded-xl transition text-sm ${loading ? 'bg-slate-600 text-slate-400 cursor-not-allowed' : 'bg-[#94cb47] hover:bg-[#7ab035] text-black'}`}>
+              {loading ? '⏳ Guardando...' : '✓ Guardar Cuenta'}
             </button>
             {selectedAccount && cartItems.length > 1 && onSplit && (
               <button
@@ -165,7 +165,7 @@ export function ShoppingCart({
                 ✂️ Separar Cuenta
               </button>
             )}
-            {isBar && onDirectPay && (
+            {isBar && onDirectPay && !selectedAccount && (
               <button onClick={onDirectPay}
                 className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl transition text-sm">
                 💵 Cobro Directo
