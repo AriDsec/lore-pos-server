@@ -560,7 +560,7 @@ export default function RestaurantePOS() {
           isBar={currentZone === 'bar'} onDirectPay={handleDirectPay}
           splitOrder={splitOrder} setSplitOrder={setSplitOrder} onSplit={handleSplitAccount}
           onModalChange={(open) => { modalOpenRef.current = open; }}
-          aplicaServicio={aplicaServicio}
+          aplicaServicio={aplicaServicio} loading={loading}
           mesaConflict={mesaConflict} setMesaConflict={setMesaConflict}
           onAddToExisting={(accountId) => {
             // Solo selecciona la cuenta — NO reemplaza el carrito
