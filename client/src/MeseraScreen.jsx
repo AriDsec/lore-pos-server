@@ -12,7 +12,7 @@ export function MeseraScreen({
   openAccounts, selectedAccount, onSelectAccount,
   onDirectPay, isBar, tables,
   splitOrder, setSplitOrder, onSplit,
-  onModalChange, aplicaServicio,
+  onModalChange, aplicaServicio, loading,
   mesaConflict, setMesaConflict, onAddToExisting,
 }) {
   const [mobileTab, setMobileTab] = useState('menu');
