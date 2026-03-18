@@ -215,6 +215,7 @@ export default function RestaurantePOS() {
   const SELECTOR_EXTRAS = {
     'Tablet Restaurante': { role: 'mesera', zone: 'restaurante' },
     'Cocina':             { role: 'cocina', zone: 'restaurante' },
+    'Guido Bar':          { role: 'mesera', zone: 'bar' },
   };
 
   // Timeout de sesión — 8 horas, aviso 10 min antes (debe ir después de handleLogout)
