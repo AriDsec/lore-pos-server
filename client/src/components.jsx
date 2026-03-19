@@ -724,7 +724,7 @@ export function BillModal({ order, onClose, onPay, zona }) {
 
   const handlePay = () => {
     if (!payMethod || montoFinal <= 0) return;
-    // Pasar el monto ajustado al order para que quede en el historial
+    if (aplicandoDescuento && montoPersonalizado && montoFinal >= totalOriginal) return;
     const orderConDescuento = hayDescuento
       ? { ...order, total: montoFinal, totalOriginal, descuento }
       : order;
@@ -792,11 +792,19 @@ export function BillModal({ order, onClose, onPay, zona }) {
                     value={montoPersonalizado}
                     onChange={e => setMontoPersonalizado(e.target.value)}
                     onWheel={e => e.target.blur()}
+                    step={500}
+                    min={0}
+                    max={totalOriginal}
                     placeholder={String(Math.floor(totalOriginal / 1000) * 1000)}
-                    className="w-full bg-slate-800 border border-amber-500/40 text-white text-2xl font-bold rounded-xl p-3 text-center focus:outline-none focus:border-amber-400 placeholder-slate-600"
+                    className={`w-full bg-slate-800 text-white text-2xl font-bold rounded-xl p-3 text-center focus:outline-none placeholder-slate-600 border ${montoPersonalizado && montoFinal >= totalOriginal ? 'border-red-500/70' : 'border-amber-500/40 focus:border-amber-400'}`}
                     autoFocus
                   />
-                  {hayDescuento && (
+                  {montoPersonalizado && montoFinal >= totalOriginal && (
+                    <p className="text-center text-red-400 text-xs mt-2 font-bold">
+                      ⚠️ El monto debe ser menor al total original (₡{totalOriginal.toLocaleString()})
+                    </p>
+                  )}
+                  {hayDescuento && montoFinal < totalOriginal && (
                     <p className="text-center text-amber-400/70 text-xs mt-2">
                       Descuento de ₡{descuento.toLocaleString()} aplicado
                     </p>
@@ -822,8 +830,8 @@ export function BillModal({ order, onClose, onPay, zona }) {
           {onPay && (
             <button
               onClick={handlePay}
-              disabled={!payMethod || montoFinal <= 0}
-              className={`flex-1 font-bold py-3 rounded-lg transition ${payMethod && montoFinal > 0 ? 'bg-[#94cb47] hover:bg-[#7ab035] text-black' : 'bg-slate-700 text-slate-500 cursor-not-allowed'}`}>
+              disabled={!payMethod || montoFinal <= 0 || (aplicandoDescuento && montoPersonalizado && montoFinal >= totalOriginal)}
+              className={`flex-1 font-bold py-3 rounded-lg transition ${payMethod && montoFinal > 0 && !(aplicandoDescuento && montoPersonalizado && montoFinal >= totalOriginal) ? 'bg-[#94cb47] hover:bg-[#7ab035] text-black' : 'bg-slate-700 text-slate-500 cursor-not-allowed'}`}>
               ✅ Cobrar {hayDescuento ? `₡${montoFinal.toLocaleString()}` : ''}
             </button>
           )}
