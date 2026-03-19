@@ -344,10 +344,10 @@ export default function RestaurantePOS() {
         showToast('Cuenta actualizada');
       } else {
         // Verificar si ya existe una cuenta en la misma mesa/barra
-        const ubicacion = selectedBarra || (selectedTable ? String(selectedTable) : null);
-        const cuentaExistente = ubicacion ? openAccounts.find(a =>
+        // Solo preguntar conflicto en mesas — en barra es normal tener varias cuentas
+        const cuentaExistente = selectedTable ? openAccounts.find(a =>
           a.status === 'open' && a.type !== 'direct' &&
-          (selectedBarra ? a.barra === selectedBarra : String(a.table) === String(selectedTable))
+          String(a.table) === String(selectedTable)
         ) : null;
 
         if (cuentaExistente && !mesaConflict) {
