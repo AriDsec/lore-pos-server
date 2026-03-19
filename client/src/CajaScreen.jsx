@@ -86,7 +86,12 @@ export function CajaScreen({
                         {o.closedAt && <span className="ml-2 text-slate-500">· {new Date(o.closedAt).toLocaleTimeString('es-CR', { hour: '2-digit', minute: '2-digit' })}</span>}
                       </div>
                     </div>
-                    <div className="text-[#94cb47] font-bold text-lg whitespace-nowrap">₡{o.total.toLocaleString()}</div>
+                    <div className="text-right">
+                      <div className="text-[#94cb47] font-bold text-lg whitespace-nowrap">₡{o.total.toLocaleString()}</div>
+                      {o.descuento > 0 && (
+                        <div className="text-amber-400 text-xs whitespace-nowrap">-₡{o.descuento.toLocaleString()} desc.</div>
+                      )}
+                    </div>
                   </div>
                   {/* Fila inferior: método de pago + botones */}
                   <div className="flex items-center justify-between gap-2">
