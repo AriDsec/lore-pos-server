@@ -791,6 +791,7 @@ export function BillModal({ order, onClose, onPay, zona }) {
                     type="number"
                     value={montoPersonalizado}
                     onChange={e => setMontoPersonalizado(e.target.value)}
+                    onWheel={e => e.target.blur()}
                     placeholder={String(Math.floor(totalOriginal / 1000) * 1000)}
                     className="w-full bg-slate-800 border border-amber-500/40 text-white text-2xl font-bold rounded-xl p-3 text-center focus:outline-none focus:border-amber-400 placeholder-slate-600"
                     autoFocus
@@ -826,7 +827,10 @@ export function BillModal({ order, onClose, onPay, zona }) {
               ✅ Cobrar {hayDescuento ? `₡${montoFinal.toLocaleString()}` : ''}
             </button>
           )}
-          <button onClick={() => imprimirTiquete(order, zona)} className="bg-blue-700 hover:bg-blue-800 text-white font-bold px-4 py-3 rounded-lg transition">🖨️ Tiquete</button>
+          <button onClick={() => imprimirTiquete(
+            hayDescuento ? { ...order, total: montoFinal, totalOriginal, descuento } : order,
+            zona
+          )} className="bg-blue-700 hover:bg-blue-800 text-white font-bold px-4 py-3 rounded-lg transition">🖨️ Tiquete</button>
           <button onClick={onClose} className="bg-slate-700 hover:bg-slate-600 text-white font-bold px-4 py-3 rounded-lg transition">✕</button>
         </div>
       </div>
