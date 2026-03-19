@@ -440,7 +440,12 @@ export default function RestaurantePOS() {
     }
     setLoading(true);
     try {
-      await api.closeAccount(account.id || account._id, paymentMethod);
+      // Si la cuenta tiene descuento aplicado, enviarlo al servidor
+      const descuentoData = account.descuento ? {
+        totalCobrado: account.total,
+        descuento: account.descuento,
+      } : null;
+      await api.closeAccount(account.id || account._id, paymentMethod, descuentoData);
       const [open, paid] = await Promise.all([api.getOpenAccounts(currentZone), api.getPaidAccounts(currentZone)]);
       setOpenAccounts(open); setPaidOrders(paid); setBillOrder(null);
       sonidoCobro();
