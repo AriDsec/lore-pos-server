@@ -43,6 +43,8 @@ const accountSchema = new mongoose.Schema({
     category: String, notes: String, addedBy: String,
   }],
   total: Number,
+  totalOriginal: Number,
+  descuento: { type: Number, default: 0 },
   createdAt: Date,
   lastUpdated: Date,
   status: { type: String, default: 'open' },
