@@ -128,6 +128,12 @@ app.post('/api/accounts/:id/close', async (req, res) => {
     account.status = 'paid';
     account.closedAt = new Date();
     account.paymentMethod = req.body.paymentMethod || 'efectivo';
+    // Si hay descuento, guardar total real cobrado y original
+    if (req.body.totalCobrado !== undefined) {
+      account.totalOriginal = account.total;
+      account.total = req.body.totalCobrado;
+      account.descuento = req.body.descuento || 0;
+    }
     await account.save();
     res.json(account);
   } catch (error) { res.status(500).json({ error: error.message }); }
