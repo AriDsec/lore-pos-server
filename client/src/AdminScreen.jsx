@@ -46,6 +46,9 @@ export function AdminScreen({ barPaid, restPaid, loading, onLogout, setPaidOrder
   const totalBarCobrado  = barPaid.reduce((s, o) => s + o.total, 0);
   const totalRestCobrado = restPaid.reduce((s, o) => s + o.total, 0);
   const grandTotal = totalBarCobrado + totalRestCobrado;
+  const totalDescuentosBar  = barPaid.reduce((s, o) => s + (o.descuento || 0), 0);
+  const totalDescuentosRest = restPaid.reduce((s, o) => s + (o.descuento || 0), 0);
+  const totalDescuentos = totalDescuentosBar + totalDescuentosRest;
 
   // Comida que el Bar vendió → el Restaurante la cocinó → Bar le debe al Restaurante
   const barFoodTotal = barPaid.reduce((s, o) =>
@@ -81,8 +84,8 @@ export function AdminScreen({ barPaid, restPaid, loading, onLogout, setPaidOrder
 
     const methodLabel = (m) => m === 'sinpe' ? '📱 Sinpe' : m === 'tarjeta' ? '💳 Tarjeta' : '💵 Efectivo';
 
-    const cuentasBarHTML  = barPaid.map(o => `<tr><td>${o.mesera}</td><td>${o.locationLabel || o.barra || 'Mesa ' + o.table}${o.clientName ? ' — ' + o.clientName : ''}</td><td style="text-align:center">${methodLabel(o.paymentMethod)}</td><td style="text-align:right">₡${o.total.toLocaleString()}</td></tr>`).join('');
-    const cuentasRestHTML = restPaid.map(o => `<tr><td>${o.mesera}</td><td>${o.locationLabel || o.barra || 'Mesa ' + o.table}${o.clientName ? ' — ' + o.clientName : ''}</td><td style="text-align:center">${methodLabel(o.paymentMethod)}</td><td style="text-align:right">₡${o.total.toLocaleString()}</td></tr>`).join('');
+    const cuentasBarHTML  = barPaid.map(o => `<tr><td>${o.mesera}</td><td>${o.locationLabel || o.barra || 'Mesa ' + o.table}${o.clientName ? ' — ' + o.clientName : ''}</td><td style="text-align:center">${methodLabel(o.paymentMethod)}</td><td style="text-align:right">₡${o.total.toLocaleString()}${o.descuento > 0 ? ` <span style="color:#d97706;font-size:10px">(-₡${o.descuento.toLocaleString()})</span>` : ''}</td></tr>`).join('');
+    const cuentasRestHTML = restPaid.map(o => `<tr><td>${o.mesera}</td><td>${o.locationLabel || o.barra || 'Mesa ' + o.table}${o.clientName ? ' — ' + o.clientName : ''}</td><td style="text-align:center">${methodLabel(o.paymentMethod)}</td><td style="text-align:right">₡${o.total.toLocaleString()}${o.descuento > 0 ? ` <span style="color:#d97706;font-size:10px">(-₡${o.descuento.toLocaleString()})</span>` : ''}</td></tr>`).join('');
 
     const html = `<!DOCTYPE html>
 <html lang="es">
@@ -120,7 +123,7 @@ td { padding:6px 8px;border-bottom:1px solid #f0f0f0; }
 </head>
 <body>
 <div class="header"><h1>🍽️ LORE</h1><p class="fecha">${fecha}</p><p style="color:#999;font-size:12px">Generado a las ${hora}</p></div>
-<div class="total-box"><div>💰 Total del Día</div><div class="monto">₡${grandTotal.toLocaleString()}</div></div>
+<div class="total-box"><div>💰 Total del Día</div><div class="monto">₡${grandTotal.toLocaleString()}</div>${totalDescuentos > 0 ? `<div style="font-size:12px;margin-top:4px;color:#fcd34d">Descuentos: -₡${totalDescuentos.toLocaleString()}</div>` : ''}</div>
 <div class="grid">
   <div class="card"><h2>🍺 Bar</h2>
     <div class="row"><span class="label">Cuentas cobradas</span><span class="val">${barPaid.length}</span></div>
@@ -173,6 +176,11 @@ ${restPaid.length > 0 ? `<div class="section-title">📋 Detalle — Restaurante
           <div>
             <div className="text-white/80 text-base">💰 Total del Día</div>
             <div className="text-4xl md:text-6xl font-bold text-white mt-1">₡{grandTotal.toLocaleString()}</div>
+            {totalDescuentos > 0 && (
+              <div className="text-amber-400 text-sm mt-1">
+                Descuentos aplicados: -₡{totalDescuentos.toLocaleString()}
+              </div>
+            )}
           </div>
           <button onClick={descargarCierrePDF} className="bg-white/20 hover:bg-white/30 text-white font-bold px-6 py-3 rounded-xl transition flex items-center gap-2 border border-white/30">
             📄 Descargar Cierre del Día
