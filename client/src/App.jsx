@@ -269,7 +269,8 @@ export default function RestaurantePOS() {
     setOrderType(acc.type || 'dine-in');
   };
 
-  const aplicaServicio = servicioActivoGlobal && currentZone === 'bar';
+  // Servicio 10% solo aplica en mesas (no en barras — ahí el cliente se sirve solo)
+  const aplicaServicio = servicioActivoGlobal && currentZone === 'bar' && !!selectedTable && !selectedBarra;
   const conServicio = (precio) => aplicaServicio ? Math.ceil(precio * 1.10 / 100) * 100 : precio;
 
   const addToCart = (item, withPotatoes = false) => {
