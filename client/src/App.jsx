@@ -142,6 +142,20 @@ export default function RestaurantePOS() {
     return () => clearInterval(interval);
   }, [currentUser, userRole, currentZone, loadData]);
 
+  // Recalcular precios del carrito cuando cambia mesa/barra (servicio 10%)
+  useEffect(() => {
+    if (cartItems.length === 0 || currentZone !== 'bar' || !servicioActivoGlobal) return;
+    const esmesa = !!selectedTable && !selectedBarra;
+    setCartItems(prev => prev.map(item => {
+      // Recalcular desde el precio base original
+      const basePrice = item.conServicio
+        ? Math.round(item.price / 1.10 / 100) * 100  // revertir el 10% si ya lo tenía
+        : item.price;
+      const newPrice = esmesa ? Math.ceil(basePrice * 1.10 / 100) * 100 : basePrice;
+      return { ...item, price: newPrice, conServicio: esmesa };
+    }));
+  }, [selectedTable, selectedBarra]); // eslint-disable-line
+
   // Si la cuenta seleccionada fue cobrada por otra persona, limpiar selección
   useEffect(() => {
     if (!selectedAccount || openAccounts.length === 0) return;
