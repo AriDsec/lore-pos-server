@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { Plus, Minus, Trash2, LogOut, Utensils, ChevronDown, Search, Clock, Package } from 'lucide-react';
-import { PINES, LICORES, OTROS } from './constants.js';
+import { PINES, LICORES, OTROS, ADICIONALES_COCINA } from './constants.js';
 
 // ─────────────────────────────────────────────
 // SPINNER
@@ -290,25 +290,46 @@ export function OtrosPanel({ onAddToCart, onModalChange }) {
     setEditingItem(null); onModalChange?.(false);
   };
 
+  const ItemBtn = ({ item }) => (
+    <button
+      key={item.id}
+      onClick={() => { setEditingItem(item); onModalChange?.(true); }}
+      className="flex flex-col items-start bg-slate-700/60 hover:bg-slate-600/60 border border-slate-600 hover:border-slate-400 rounded-xl px-3 py-2.5 transition-all text-left group"
+    >
+      <span className="font-bold text-white text-sm leading-tight group-hover:text-[#94cb47] transition">{item.name}</span>
+      <span className="text-[#94cb47] font-bold text-xs mt-1">{item.price > 0 ? `₡${item.price.toLocaleString()}` : 'precio libre'}</span>
+    </button>
+  );
+
   return (
     <>
-      <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-slate-500/30 overflow-hidden shadow-2xl">
-        <div className="bg-gradient-to-r from-slate-700 to-slate-800 p-5">
-          <h2 className="text-white font-bold text-xl flex items-center gap-2"><Package size={20} /> Otros</h2>
-          <p className="text-slate-400 text-xs mt-1">Toca para editar nombre y precio antes de agregar</p>
+      <div className="space-y-3">
+        {/* Adicionales de cocina */}
+        <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-orange-500/30 overflow-hidden shadow-2xl">
+          <div className="bg-gradient-to-r from-orange-900/40 to-slate-800 px-4 py-3 flex items-center gap-2">
+            <span className="text-lg">🍳</span>
+            <div>
+              <h2 className="text-orange-300 font-bold text-sm">Adicionales Cocina</h2>
+              <p className="text-slate-500 text-xs">Van directo a pantalla de cocina</p>
+            </div>
+          </div>
+          <div className="p-3 grid grid-cols-2 gap-2">
+            {ADICIONALES_COCINA.map(item => <ItemBtn key={item.id} item={item} />)}
+          </div>
         </div>
-        <div className="p-4 grid grid-cols-2 gap-2">
-          {OTROS.map(item => (
-            <button
-              key={item.id}
-              onClick={() => { setEditingItem(item); onModalChange?.(true); }}
-              className="flex flex-col items-start bg-slate-700/60 hover:bg-slate-600/60 border border-slate-600 hover:border-slate-400 rounded-xl px-3 py-2.5 transition-all text-left group"
-            >
-              <span className="font-bold text-white text-sm leading-tight group-hover:text-[#94cb47] transition">{item.name}</span>
-              <span className="text-[#94cb47] font-bold text-xs mt-1">₡{item.price.toLocaleString()}</span>
-              <span className="text-slate-500 text-xs mt-0.5">✏️ editable</span>
-            </button>
-          ))}
+
+        {/* Menudeo / Bar */}
+        <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-slate-500/30 overflow-hidden shadow-2xl">
+          <div className="bg-gradient-to-r from-slate-700 to-slate-800 px-4 py-3 flex items-center gap-2">
+            <span className="text-lg">🛒</span>
+            <div>
+              <h2 className="text-white font-bold text-sm">Menudeo / Bar</h2>
+              <p className="text-slate-500 text-xs">No van a cocina</p>
+            </div>
+          </div>
+          <div className="p-3 grid grid-cols-2 gap-2">
+            {OTROS.map(item => <ItemBtn key={item.id} item={item} />)}
+          </div>
         </div>
       </div>
 
