@@ -86,7 +86,7 @@ export function MeseraScreen({
       {/* Indicador servicio sábado */}
       {aplicaServicio && (
         <div className="bg-purple-900/60 border-b border-purple-500/40 px-4 py-1.5 flex items-center gap-2">
-          <span className="text-purple-300 text-xs font-bold">💜 Servicio 10% activo — incluido en todos los precios</span>
+          <span className="text-purple-300 text-xs font-bold">💜 Servicio 10% activo — aplica en mesas</span>
         </div>
       )}
 
