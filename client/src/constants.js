@@ -281,20 +281,34 @@ export const LICORES = [
 ];
 
 // ─────────────────────────────────────────────
-// MENUDEO / OTROS
+// ADICIONALES COCINA — van a pantalla de cocina
+// ─────────────────────────────────────────────
+export const ADICIONALES_COCINA = [
+  { id: 'ac_mayo',          name: 'Mayonesa extra',        price: 300,  category: 'otro', kitchen: true },
+  { id: 'ac_ketchup',       name: 'Salsa de tomate extra', price: 300,  category: 'otro', kitchen: true },
+  { id: 'ac_arroz',         name: 'Arroz extra',           price: 500,  category: 'otro', kitchen: true },
+  { id: 'ac_yuca',          name: 'Yuca extra',            price: 1000, category: 'otro', kitchen: true },
+  { id: 'ac_papas',         name: 'Papas extra',           price: 500,  category: 'otro', kitchen: true },
+  { id: 'ac_tortilla_1',    name: 'Tortillas tostadas',    price: 1000, category: 'otro', kitchen: true },
+  { id: 'ac_tortilla_2',    name: 'Tortillas tostadas x2', price: 2000, category: 'otro', kitchen: true },
+  { id: 'ac_chile',         name: 'Chile extra',           price: 300,  category: 'otro', kitchen: true },
+  { id: 'ac_escabeche',     name: 'Escabeche de banano',   price: 300,  category: 'otro', kitchen: true },
+  { id: 'ac_salsa_alitas',  name: 'Salsa para alitas',     price: 300,  category: 'otro', kitchen: true },
+  { id: 'ac_otro_cocina',   name: 'Otro (comida)',         price: 0,    category: 'otro', kitchen: true },
+];
+
+// ─────────────────────────────────────────────
+// MENUDEO / OTROS — solo bar, NO van a cocina
 // ─────────────────────────────────────────────
 export const OTROS = [
   { id: 'o_cigarro',        name: 'Cigarro suelto',       price: 500,  category: 'otro' },
   { id: 'o_cigarros_caja',  name: 'Caja cigarros',        price: 3000, category: 'otro' },
   { id: 'o_paquetitos',     name: 'Paquetitos',           price: 500,  category: 'otro' },
   { id: 'o_mani',           name: 'Maní',                 price: 500,  category: 'otro' },
-  { id: 'o_mayo_sobre',     name: 'Mayo (sobre)',          price: 300,  category: 'otro' },
-  { id: 'o_ketchup_sobre',  name: 'Ketchup (sobre)',       price: 300,  category: 'otro' },
-  { id: 'o_porcion_arroz',  name: 'Porción de arroz',     price: 500,  category: 'otro', kitchen: true },
   { id: 'o_confites',       name: 'Confites',             price: 100,  category: 'otro' },
   { id: 'o_chicle',         name: 'Chicle',               price: 100,  category: 'otro' },
   { id: 'o_agua_botella',   name: 'Agua botella',         price: 800,  category: 'otro' },
-  { id: 'o_otro',           name: 'Otro',                 price: 0,    category: 'otro', kitchen: true },
+  { id: 'o_otro_bar',       name: 'Otro (bar)',           price: 0,    category: 'otro' },
 ];
 
 // ─────────────────────────────────────────────
