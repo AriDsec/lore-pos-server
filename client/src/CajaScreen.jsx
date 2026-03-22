@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Header, payBadge, BillModal, ItemsModal, SplitModal, Spinner, imprimirTiquete } from './components.jsx';
 
 function CajaStats({ paid, zona }) {
@@ -14,6 +15,7 @@ export function CajaScreen({
   onLogout, onPay, onDelete,
 }) {
   const { totalCobrado, foodCobrado, drinkCobrado } = CajaStats({ paid });
+  const [deleteConfirm, setDeleteConfirm] = useState(null);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-slate-900 to-black">
@@ -61,11 +63,8 @@ export function CajaScreen({
                       )}
                       <button onClick={() => setBillOrder(acc)} className="bg-[#94cb47] hover:bg-[#7ab035] text-black px-2.5 py-1 rounded text-xs font-bold">Cobrar</button>
                       {onDelete && (
-                        <button onClick={() => {
-                          if (window.confirm(`¿Eliminar cuenta de ${acc.clientName || 'este cliente'}?`)) {
-                            onDelete(acc);
-                          }
-                        }} className="bg-red-800/60 hover:bg-red-700 text-red-300 hover:text-white px-2 py-1 rounded text-xs font-bold border border-red-700/50">🗑️</button>
+                        <button onClick={() => setDeleteConfirm(acc)}
+                          className="bg-red-800/60 hover:bg-red-700 text-red-300 hover:text-white px-2 py-1 rounded text-xs font-bold border border-red-700/50">🗑️</button>
                       )}
                     </div>
                   </div>
@@ -116,6 +115,42 @@ export function CajaScreen({
       </div>
 
       {billOrder && <BillModal order={billOrder} onClose={() => setBillOrder(null)} onPay={onPay} zona={zona} />}
+
+      {deleteConfirm && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border-2 border-red-500/50 p-6 shadow-2xl w-full max-w-sm">
+            <div className="text-center mb-5">
+              <div className="text-4xl mb-2">🗑️</div>
+              <h2 className="text-red-300 font-bold text-xl">Eliminar Cuenta</h2>
+              <p className="text-slate-400 text-sm mt-2">
+                ¿Seguro que deseas eliminar esta cuenta?
+              </p>
+              <div className="bg-slate-700/60 rounded-xl p-3 mt-3 text-left">
+                <div className="text-white font-bold text-sm">
+                  {deleteConfirm.barra || (deleteConfirm.table != null ? `Mesa ${deleteConfirm.table}` : '—')}
+                  {deleteConfirm.clientName ? ` — ${deleteConfirm.clientName}` : ''}
+                </div>
+                <div className="text-slate-400 text-xs mt-0.5">
+                  👤 {deleteConfirm.mesera} · {deleteConfirm.items.length} items · ₡{deleteConfirm.total.toLocaleString()}
+                </div>
+              </div>
+              <p className="text-red-400/70 text-xs mt-3">Esta acción no se puede deshacer</p>
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setDeleteConfirm(null)}
+                className="flex-1 bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 rounded-xl transition">
+                Cancelar
+              </button>
+              <button
+                onClick={() => { onDelete(deleteConfirm); setDeleteConfirm(null); }}
+                className="flex-1 bg-red-700 hover:bg-red-600 text-white font-bold py-3 rounded-xl transition">
+                Eliminar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {viewItemsOrder && <ItemsModal order={viewItemsOrder} onClose={() => setViewItemsOrder(null)} />}
       {splitOrder && <SplitModal account={splitOrder} onConfirm={onSplit} onClose={() => setSplitOrder(null)} />}
     </div>
