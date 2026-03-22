@@ -71,6 +71,9 @@ export const deleteKitchenOrder = (id) =>
 
 // ── REPORTES ──────────────────────────────────
 
+export const deleteAccount = (id) =>
+  fetch(`${BASE}/accounts/${id}`, { method: 'DELETE' }).then(handleResponse);
+
 export const getReport = (zone) =>
   fetch(`${BASE}/reports/${zone}`).then(handleResponse);
 
