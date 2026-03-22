@@ -149,9 +149,9 @@ export default function RestaurantePOS() {
     setCartItems(prev => prev.map(item => {
       // Recalcular desde el precio base original
       const basePrice = item.conServicio
-        ? Math.round(item.price / 1.10 / 100) * 100  // revertir el 10% si ya lo tenía
+        ? Math.round(item.price / 1.10)  // revertir el 10% si ya lo tenía
         : item.price;
-      const newPrice = esmesa ? Math.ceil(basePrice * 1.10 / 100) * 100 : basePrice;
+      const newPrice = esmesa ? Math.round(basePrice * 1.10) : basePrice;
       return { ...item, price: newPrice, conServicio: esmesa };
     }));
   }, [selectedTable, selectedBarra]); // eslint-disable-line
@@ -285,7 +285,7 @@ export default function RestaurantePOS() {
 
   // Servicio 10% solo aplica en mesas (no en barras — ahí el cliente se sirve solo)
   const aplicaServicio = servicioActivoGlobal && currentZone === 'bar' && !!selectedTable && !selectedBarra;
-  const conServicio = (precio) => aplicaServicio ? Math.ceil(precio * 1.10 / 100) * 100 : precio;
+  const conServicio = (precio) => aplicaServicio ? Math.round(precio * 1.10) : precio;
 
   const addToCart = (item, withPotatoes = false) => {
     const itemId = `${item.id}${withPotatoes ? '_cp' : ''}`;
