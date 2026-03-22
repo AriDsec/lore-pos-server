@@ -53,19 +53,19 @@ export function CajaScreen({
                       <div className="text-white font-bold">{acc.barra || (acc.table != null ? `Mesa ${acc.table}` : acc.locationLabel || 'Barra')}{acc.clientName ? ` — ${acc.clientName}` : ''}</div>
                       <div className="text-slate-400 text-xs">👤 {acc.mesera} · {acc.items.length} items</div>
                     </div>
-                    <div className="flex items-center gap-2 flex-wrap justify-end">
-                      <span className="text-[#94cb47] font-bold">₡{acc.total.toLocaleString()}</span>
-                      <button onClick={() => setViewItemsOrder(acc)} className="bg-slate-600 hover:bg-slate-500 text-white px-3 py-1 rounded text-xs font-bold">📋 Items</button>
+                    <div className="flex items-center gap-1.5 flex-wrap justify-end">
+                      <span className="text-[#94cb47] font-bold text-sm">₡{acc.total.toLocaleString()}</span>
+                      <button onClick={() => setViewItemsOrder(acc)} className="bg-slate-600 hover:bg-slate-500 text-white px-2.5 py-1 rounded text-xs font-bold">Items</button>
                       {acc.items.length > 1 && (
-                        <button onClick={() => setSplitOrder(acc)} className="bg-orange-700 hover:bg-orange-600 text-white px-3 py-1 rounded text-xs font-bold">✂️ Separar</button>
+                        <button onClick={() => setSplitOrder(acc)} className="bg-orange-700 hover:bg-orange-600 text-white px-2.5 py-1 rounded text-xs font-bold">Separar</button>
                       )}
-                      <button onClick={() => setBillOrder(acc)} className="bg-[#94cb47] hover:bg-[#7ab035] text-black px-3 py-1 rounded text-xs font-bold">💳 Cobrar</button>
+                      <button onClick={() => setBillOrder(acc)} className="bg-[#94cb47] hover:bg-[#7ab035] text-black px-2.5 py-1 rounded text-xs font-bold">Cobrar</button>
                       {onDelete && (
                         <button onClick={() => {
                           if (window.confirm(`¿Eliminar cuenta de ${acc.clientName || 'este cliente'}?`)) {
                             onDelete(acc);
                           }
-                        }} className="bg-red-800/60 hover:bg-red-700 text-red-300 hover:text-white px-3 py-1 rounded text-xs font-bold border border-red-700/50">🗑️</button>
+                        }} className="bg-red-800/60 hover:bg-red-700 text-red-300 hover:text-white px-2 py-1 rounded text-xs font-bold border border-red-700/50">🗑️</button>
                       )}
                     </div>
                   </div>
