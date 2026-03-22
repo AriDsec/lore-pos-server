@@ -167,6 +167,13 @@ app.put('/api/kitchen/:id', async (req, res) => {
   } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
+app.delete('/api/accounts/:id', async (req, res) => {
+  try {
+    await Account.deleteOne({ id: req.params.id });
+    res.json({ deleted: true });
+  } catch (error) { res.status(500).json({ error: error.message }); }
+});
+
 app.delete('/api/kitchen/:id', async (req, res) => {
   try {
     await KitchenOrder.deleteOne({ id: req.params.id });
