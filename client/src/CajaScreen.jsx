@@ -78,7 +78,7 @@ export function CajaScreen({
           <h3 className="text-[#94cb47] font-bold text-lg mb-4">✅ Historial Pagadas ({paid.length})</h3>
           {paid.length === 0 ? <p className="text-slate-500 text-sm">Sin pagos aún</p> : (
             <div className="space-y-3">
-              {paid.map(o => (
+              {[...paid].sort((a, b) => new Date(b.closedAt) - new Date(a.closedAt)).map(o => (
                 <div key={o._id || o.id} className="bg-slate-700/40 border border-slate-600/60 rounded-xl p-3">
                   {/* Fila superior: ubicación + cliente + total */}
                   <div className="flex justify-between items-start gap-2 mb-2">
