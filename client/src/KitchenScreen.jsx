@@ -80,9 +80,8 @@ export function KitchenScreen({ kitchenOrders, loading, onLogout, onReady, onDel
         {totalPending === 0 && (
           <div className="flex flex-col items-center justify-center" style={{minHeight: 'calc(100vh - 120px)'}}>
             <div className="text-center space-y-4">
-              <div style={{fontFamily:"'Cinzel', serif", letterSpacing: '0.2em'}}
-                className="text-[#94cb47]/20 font-bold select-none"
-                style={{fontSize: 'clamp(80px, 20vw, 160px)', lineHeight: 1}}>
+              <div style={{fontFamily:"'Cinzel', serif", letterSpacing: '0.2em', fontSize: 'clamp(80px, 20vw, 160px)', lineHeight: 1}}
+                className="text-[#94cb47]/20 font-bold select-none">
                 LORE
               </div>
               <p style={{fontFamily:"'Cinzel', serif", letterSpacing: '0.3em'}}
