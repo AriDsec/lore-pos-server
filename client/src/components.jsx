@@ -624,7 +624,7 @@ export function ItemsModal({ order, onClose }) {
         </div>
         <div className="bg-gradient-to-r from-[#94cb47]/30 to-[#7ab035]/30 rounded-xl p-4 border border-[#94cb47]/50 mb-4">
           <div className="text-slate-300 text-sm">TOTAL</div>
-          <div className="text-3xl font-bold text-[#94cb47]">C/{order.total.toLocaleString()}</div>
+          <div className="text-3xl font-bold text-[#94cb47]">₡{order.total.toLocaleString()}</div>
         </div>
         <button onClick={onClose} className="w-full bg-gradient-to-r from-slate-600 to-slate-700 hover:from-slate-700 hover:to-slate-800 text-white font-bold py-3 rounded-lg transition">Cerrar</button>
       </div>
