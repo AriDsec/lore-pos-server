@@ -134,7 +134,7 @@ export default function RestaurantePOS() {
 
   useEffect(() => {
     if (!currentUser || !userRole) return;
-    const interval_ms = (userRole === 'mesera' || userRole === 'cocina') ? 5000 : 15000;
+    const interval_ms = (userRole === 'mesera' || userRole === 'cocina' || userRole === 'caja') ? 5000 : 15000;
     const interval = setInterval(() => {
       const anyModalOpen = modalOpenRef.current || !!splitOrder || !!billOrder || !!viewItemsOrder;
       if (!anyModalOpen) loadData(currentZone, userRole, true);
