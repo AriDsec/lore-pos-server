@@ -74,7 +74,9 @@ export function Header({ mesera, zona, onLogout }) {
 export const payBadge = (m) => {
   if (m === 'sinpe')   return <span style={{whiteSpace:'nowrap'}} className="inline-flex items-center gap-1 bg-blue-900/50 text-blue-300 border border-blue-600 px-2 py-0.5 rounded-full text-xs font-bold">📱 Sinpe</span>;
   if (m === 'tarjeta') return <span style={{whiteSpace:'nowrap'}} className="inline-flex items-center gap-1 bg-purple-900/50 text-purple-300 border border-purple-600 px-2 py-0.5 rounded-full text-xs font-bold">💳 Tarjeta</span>;
-  if (m === 'mixto')   return <span style={{whiteSpace:'nowrap'}} className="inline-flex items-center gap-1 bg-amber-900/50 text-amber-300 border border-amber-600 px-2 py-0.5 rounded-full text-xs font-bold">Efectivo + Tarjeta</span>;
+  if (m === 'mixto')          return <span style={{whiteSpace:'nowrap'}} className="inline-flex items-center gap-1 bg-amber-900/50 text-amber-300 border border-amber-600 px-2 py-0.5 rounded-full text-xs font-bold">Efectivo + Tarjeta</span>;
+  if (m === 'efectivo_sinpe') return <span style={{whiteSpace:'nowrap'}} className="inline-flex items-center gap-1 bg-teal-900/50 text-teal-300 border border-teal-600 px-2 py-0.5 rounded-full text-xs font-bold">Efectivo + Sinpe</span>;
+  if (m === 'tarjeta_sinpe')  return <span style={{whiteSpace:'nowrap'}} className="inline-flex items-center gap-1 bg-indigo-900/50 text-indigo-300 border border-indigo-600 px-2 py-0.5 rounded-full text-xs font-bold">Tarjeta + Sinpe</span>;
   return <span style={{whiteSpace:'nowrap'}} className="inline-flex items-center gap-1 bg-green-900/50 text-green-300 border border-green-600 px-2 py-0.5 rounded-full text-xs font-bold">💵 Efectivo</span>;
 };
 
@@ -921,10 +923,12 @@ export function BillModal({ order, onClose, onPay, zona }) {
   const mixtoValido = efectivoMixto > 0 && efectivoMixto < montoFinal;
 
   const methods = [
-    { id: 'efectivo', label: 'Efectivo',        color: 'border-green-500 bg-green-900/30 text-green-300' },
-    { id: 'sinpe',    label: 'Sinpe',            color: 'border-blue-500 bg-blue-900/30 text-blue-300' },
-    { id: 'tarjeta',  label: 'Tarjeta',          color: 'border-purple-500 bg-purple-900/30 text-purple-300' },
-    { id: 'mixto',    label: 'Efectivo + Tarjeta', color: 'border-amber-500 bg-amber-900/30 text-amber-300' },
+    { id: 'efectivo',          label: 'Efectivo',          color: 'border-green-500 bg-green-900/30 text-green-300' },
+    { id: 'sinpe',             label: 'Sinpe',             color: 'border-blue-500 bg-blue-900/30 text-blue-300' },
+    { id: 'tarjeta',           label: 'Tarjeta',           color: 'border-purple-500 bg-purple-900/30 text-purple-300' },
+    { id: 'mixto',             label: 'Efectivo + Tarjeta', color: 'border-amber-500 bg-amber-900/30 text-amber-300' },
+    { id: 'efectivo_sinpe',    label: 'Efectivo + Sinpe',  color: 'border-teal-500 bg-teal-900/30 text-teal-300' },
+    { id: 'tarjeta_sinpe',     label: 'Tarjeta + Sinpe',   color: 'border-indigo-500 bg-indigo-900/30 text-indigo-300' },
   ];
 
   const handlePay = () => {
@@ -1028,16 +1032,24 @@ export function BillModal({ order, onClose, onPay, zona }) {
         <div className="mb-4">
           <p className="text-slate-400 text-xs mb-2 font-bold uppercase tracking-wide">Método de pago</p>
           <div className="grid grid-cols-3 gap-2">
-            {methods.map(m => (
+            {methods.slice(0,3).map(m => (
               <button key={m.id} onClick={() => { setPayMethod(m.id); setMontoRecibido(''); setMontoEfectivoMixto(''); }}
-                className={`border-2 rounded-xl py-3 font-bold text-sm transition ${payMethod === m.id ? m.color : 'border-slate-600 text-slate-400 hover:border-slate-500'}`}>
+                className={`border-2 rounded-xl py-2.5 font-bold text-sm transition ${payMethod === m.id ? m.color : 'border-slate-600 text-slate-400 hover:border-slate-500'}`}>
+                {m.label}
+              </button>
+            ))}
+          </div>
+          <div className="grid grid-cols-3 gap-2 mt-2">
+            {methods.slice(3).map(m => (
+              <button key={m.id} onClick={() => { setPayMethod(m.id); setMontoRecibido(''); setMontoEfectivoMixto(''); }}
+                className={`border-2 rounded-xl py-2.5 font-bold text-xs transition ${payMethod === m.id ? m.color : 'border-slate-600 text-slate-400 hover:border-slate-500'}`}>
                 {m.label}
               </button>
             ))}
           </div>
         </div>
         {/* Sección de vuelto — solo cuando es efectivo */}
-        {payMethod === 'efectivo' && (
+        {(payMethod === 'efectivo') && (
           <div className="mb-4 rounded-xl border border-slate-600 overflow-hidden">
             <div className="bg-slate-700/40 px-4 py-2.5">
               <p className="text-slate-300 text-xs font-bold uppercase tracking-wide">Efectivo recibido</p>
@@ -1046,8 +1058,8 @@ export function BillModal({ order, onClose, onPay, zona }) {
               {/* Denominaciones rápidas */}
               <div className="grid grid-cols-5 gap-1.5">
                 {[1000, 2000, 5000, 10000, 20000].map(b => {
-                  // Calcular el billete mínimo que cubre el total
                   const esSugerido = b >= montoFinal && (b < parseInt(montoRecibido) || !montoRecibido);
+                  const label = b === 1000 ? '₡1.000' : b === 2000 ? '₡2.000' : b === 5000 ? '₡5.000' : b === 10000 ? '₡10.000' : '₡20.000';
                   return (
                     <button
                       key={b}
@@ -1060,7 +1072,7 @@ export function BillModal({ order, onClose, onPay, zona }) {
                           : 'bg-slate-700/50 border-slate-600 text-slate-300 hover:border-slate-500'
                       }`}
                     >
-                      {b >= 1000 ? `${b/1000}k` : b}
+                      {label}
                     </button>
                   );
                 })}
@@ -1095,26 +1107,32 @@ export function BillModal({ order, onClose, onPay, zona }) {
         )}
 
         {/* Sección mixto */}
-        {payMethod === 'mixto' && (
+        {['mixto', 'efectivo_sinpe', 'tarjeta_sinpe'].includes(payMethod) && (
           <div className="mb-4 rounded-xl border border-amber-500/40 overflow-hidden">
             <div className="bg-amber-900/20 px-4 py-2.5">
-              <p className="text-amber-300 text-xs font-bold uppercase tracking-wide">¿Cuánto pone en efectivo?</p>
+              <p className="text-amber-300 text-xs font-bold uppercase tracking-wide">
+                {payMethod === 'tarjeta_sinpe' ? '¿Cuánto va en Tarjeta?' : '¿Cuánto pone en Efectivo?'}
+              </p>
             </div>
             <div className="p-3 space-y-3">
               <div className="grid grid-cols-5 gap-1.5">
-                {[1000, 2000, 5000, 10000, 20000].map(b => (
-                  <button
-                    key={b}
-                    onClick={() => setMontoEfectivoMixto(String(Math.min(b, montoFinal - 1)))}
-                    className={`py-2 rounded-lg font-bold text-xs transition border ${
-                      montoEfectivoMixto === String(Math.min(b, montoFinal - 1))
-                        ? 'bg-amber-700 border-amber-500 text-white'
-                        : 'bg-slate-700/50 border-slate-600 text-slate-300 hover:border-amber-500/40'
-                    }`}
-                  >
-                    {b >= 1000 ? `${b/1000}k` : b}
-                  </button>
-                ))}
+                {[1000, 2000, 5000, 10000, 20000].map(b => {
+                  const val = String(Math.min(b, montoFinal - 1));
+                  const label = b === 1000 ? '₡1.000' : b === 2000 ? '₡2.000' : b === 5000 ? '₡5.000' : b === 10000 ? '₡10.000' : '₡20.000';
+                  return (
+                    <button
+                      key={b}
+                      onClick={() => setMontoEfectivoMixto(val)}
+                      className={`py-2 rounded-lg font-bold text-xs transition border ${
+                        montoEfectivoMixto === val
+                          ? 'bg-amber-700 border-amber-500 text-white'
+                          : 'bg-slate-700/50 border-slate-600 text-slate-300 hover:border-amber-500/40'
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  );
+                })}
               </div>
               <input
                 type="number"
@@ -1129,11 +1147,11 @@ export function BillModal({ order, onClose, onPay, zona }) {
                   {mixtoValido ? (
                     <>
                       <div className="flex justify-between text-sm">
-                        <span className="text-slate-400">Efectivo</span>
+                        <span className="text-slate-400">{payMethod === 'tarjeta_sinpe' ? 'Tarjeta' : 'Efectivo'}</span>
                         <span className="text-green-300 font-bold">₡{efectivoMixto.toLocaleString()}</span>
                       </div>
                       <div className="flex justify-between text-sm border-t border-slate-600 pt-2">
-                        <span className="text-slate-400">Tarjeta</span>
+                        <span className="text-slate-400">{payMethod === 'mixto' ? 'Tarjeta' : 'Sinpe'}</span>
                         <span className="text-purple-300 font-bold">₡{tarjetaMixto.toLocaleString()}</span>
                       </div>
                       <div className="flex justify-between text-sm border-t border-slate-600 pt-2">
