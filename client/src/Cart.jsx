@@ -115,9 +115,9 @@ export function ShoppingCart({
               </select>
             </div>
 
-            {/* Mesa + Barra */}
+            {/* Mesa + Barra — Barra solo en bar */}
             {orderType === 'dine-in' && (
-              <div className="grid grid-cols-2 gap-2">
+              <div className={isBar ? "grid grid-cols-2 gap-2" : "grid grid-cols-1"}>
                 <div>
                   <label className="text-slate-400 text-xs mb-0.5 block">Mesa</label>
                   <select value={selectedTable || ''} onChange={(e) => { setSelectedTable(e.target.value); setSelectedBarra(null); }}
@@ -128,14 +128,16 @@ export function ShoppingCart({
                     ))}
                   </select>
                 </div>
-                <div>
-                  <label className="text-slate-400 text-xs mb-0.5 block">Barra</label>
-                  <select value={selectedBarra || ''} onChange={(e) => { setSelectedBarra(e.target.value); setSelectedTable(null); }}
-                    className="w-full bg-slate-700 border border-[#94cb47]/30 text-white rounded-lg p-1.5 text-xs focus:outline-none">
-                    <option value="">—</option>
-                    {barras.map(b => <option key={b} value={b}>{b}</option>)}
-                  </select>
-                </div>
+                {isBar && (
+                  <div>
+                    <label className="text-slate-400 text-xs mb-0.5 block">Barra</label>
+                    <select value={selectedBarra || ''} onChange={(e) => { setSelectedBarra(e.target.value); setSelectedTable(null); }}
+                      className="w-full bg-slate-700 border border-[#94cb47]/30 text-white rounded-lg p-1.5 text-xs focus:outline-none">
+                      <option value="">—</option>
+                      {barras.map(b => <option key={b} value={b}>{b}</option>)}
+                    </select>
+                  </div>
+                )}
               </div>
             )}
 
