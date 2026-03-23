@@ -94,11 +94,11 @@ export function AdminScreen({ barPaid, restPaid, loading, onLogout, setPaidOrder
     const sortedRest = [...restPaid].sort((a,b) => new Date(a.closedAt) - new Date(b.closedAt));
     const cuentasBarHTML  = sortedBar.map(o => {
       const hora = o.closedAt ? new Date(o.closedAt).toLocaleTimeString('es-CR',{hour:'2-digit',minute:'2-digit'}) : '';
-      return `<tr><td>${hora}</td><td>${o.mesera}</td><td>${o.locationLabel || o.barra || 'Mesa ' + o.table}${o.clientName ? ' — ' + o.clientName : ''}</td><td style="text-align:center">${methodLabel(o.paymentMethod)}</td><td style="text-align:right">C/${o.total.toLocaleString()}${o.descuento > 0 ? ` <span style="color:#d97706;font-size:10px">(-C/${o.descuento.toLocaleString()})</span>` : ''}</td></tr>`;
+      return `<tr><td>${hora}</td><td>${o.mesera}</td><td>${o.locationLabel || o.barra || 'Mesa ' + o.table}${o.clientName ? ' — ' + o.clientName : ''}</td><td style="text-align:center">${methodLabel(o.paymentMethod)}</td><td style="text-align:right">&#x20A1;${o.total.toLocaleString()}${o.descuento > 0 ? ` <span style="color:#d97706;font-size:10px">(-&#x20A1;${o.descuento.toLocaleString()})</span>` : ''}</td></tr>`;
     }).join('');
     const cuentasRestHTML = sortedRest.map(o => {
       const hora = o.closedAt ? new Date(o.closedAt).toLocaleTimeString('es-CR',{hour:'2-digit',minute:'2-digit'}) : '';
-      return `<tr><td>${hora}</td><td>${o.mesera}</td><td>${o.locationLabel || o.barra || 'Mesa ' + o.table}${o.clientName ? ' — ' + o.clientName : ''}</td><td style="text-align:center">${methodLabel(o.paymentMethod)}</td><td style="text-align:right">C/${o.total.toLocaleString()}${o.descuento > 0 ? ` <span style="color:#d97706;font-size:10px">(-C/${o.descuento.toLocaleString()})</span>` : ''}</td></tr>`;
+      return `<tr><td>${hora}</td><td>${o.mesera}</td><td>${o.locationLabel || o.barra || 'Mesa ' + o.table}${o.clientName ? ' — ' + o.clientName : ''}</td><td style="text-align:center">${methodLabel(o.paymentMethod)}</td><td style="text-align:right">&#x20A1;${o.total.toLocaleString()}${o.descuento > 0 ? ` <span style="color:#d97706;font-size:10px">(-&#x20A1;${o.descuento.toLocaleString()})</span>` : ''}</td></tr>`;
     }).join('');
 
     const html = `<!DOCTYPE html>
@@ -137,53 +137,73 @@ td { padding:6px 8px;border-bottom:1px solid #f0f0f0; }
 </head>
 <body>
 <div class="header"><h1>🍽️ LORE</h1><p class="fecha">${fecha}</p><p style="color:#999;font-size:12px">Generado a las ${hora}</p></div>
-<div class="total-box"><div>💰 Total del Día</div><div class="monto">C/${grandTotal.toLocaleString()}</div>${totalDescuentos > 0 ? `<div style="font-size:12px;margin-top:4px;color:#fcd34d">Descuentos: -C/${totalDescuentos.toLocaleString()}</div>` : ''}</div>
+<div class="total-box"><div>💰 Total del Día</div><div class="monto">&#x20A1;${grandTotal.toLocaleString()}</div>${totalDescuentos > 0 ? `<div style="font-size:12px;margin-top:4px;color:#fcd34d">Descuentos: -&#x20A1;${totalDescuentos.toLocaleString()}</div>` : ''}</div>
 <div class="grid">
   <div class="card"><h2>🍺 Bar</h2>
     <div class="row"><span class="label">Cuentas cobradas</span><span class="val">${barPaid.length}</span></div>
-    <div class="row"><span class="label">Comida</span><span class="val">C/${barFoodTotal2.toLocaleString()}</span></div>
-    <div class="row"><span class="label">Bebidas</span><span class="val">C/${barDrinkTotal.toLocaleString()}</span></div>
-    <div class="total-row"><span>Total Bar</span><span class="val">C/${totalBarCobrado.toLocaleString()}</span></div>
+    <div class="row"><span class="label">Comida</span><span class="val">&#x20A1;${barFoodTotal2.toLocaleString()}</span></div>
+    <div class="row"><span class="label">Bebidas</span><span class="val">&#x20A1;${barDrinkTotal.toLocaleString()}</span></div>
+    <div class="total-row"><span>Total Bar</span><span class="val">&#x20A1;${totalBarCobrado.toLocaleString()}</span></div>
   </div>
   <div class="card"><h2>🍽️ Restaurante</h2>
     <div class="row"><span class="label">Cuentas cobradas</span><span class="val">${restPaid.length}</span></div>
-    <div class="row"><span class="label">Comida</span><span class="val">C/${restFoodTotal.toLocaleString()}</span></div>
-    <div class="row"><span class="label">Bebidas</span><span class="val">C/${restDrinkTotal.toLocaleString()}</span></div>
-    <div class="total-row"><span>Total Restaurante</span><span class="val">C/${totalRestCobrado.toLocaleString()}</span></div>
+    <div class="row"><span class="label">Comida</span><span class="val">&#x20A1;${restFoodTotal.toLocaleString()}</span></div>
+    <div class="row"><span class="label">Bebidas</span><span class="val">&#x20A1;${restDrinkTotal.toLocaleString()}</span></div>
+    <div class="total-row"><span>Total Restaurante</span><span class="val">&#x20A1;${totalRestCobrado.toLocaleString()}</span></div>
   </div>
 </div>
 <div class="liquidacion"><h2>🍺 Liquidación con Bar</h2>
-  <div class="row"><span class="label">Comida vendida por Bar (cocinada por Restaurante)</span><span class="val">C/${barFoodTotal.toLocaleString()}</span></div>
-  <div class="row"><span class="label">Licores y cervezas vendidos por Restaurante (inventario Bar)</span><span class="val">C/${restAlcoholTotal.toLocaleString()}</span></div>
-  <div class="saldo-final"><div><div style="font-weight:bold">SALDO FINAL</div><div style="font-size:11px;color:#666">${deudaBar >= 0 ? '📤 Bar nos paga' : '📥 Nosotros le pagamos al Bar'}</div></div><div class="saldo-monto">C/${Math.abs(deudaBar).toLocaleString()}</div></div>
+  <div class="row"><span class="label">Comida vendida por Bar (cocinada por Restaurante)</span><span class="val">&#x20A1;${barFoodTotal.toLocaleString()}</span></div>
+  <div class="row"><span class="label">Licores y cervezas vendidos por Restaurante (inventario Bar)</span><span class="val">&#x20A1;${restAlcoholTotal.toLocaleString()}</span></div>
+  <div class="saldo-final"><div><div style="font-weight:bold">SALDO FINAL</div><div style="font-size:11px;color:#666">${deudaBar >= 0 ? '📤 Bar nos paga' : '📥 Nosotros le pagamos al Bar'}</div></div><div class="saldo-monto">&#x20A1;${Math.abs(deudaBar).toLocaleString()}</div></div>
 </div>
 ${barPaid.length > 0 ? `<div class="section-title">📋 Detalle — Bar (${barPaid.length})</div>
 <div style="display:flex;gap:12px;margin-bottom:8px;font-size:12px">
-<span style="background:#14532d;color:#86efac;padding:3px 10px;border-radius:20px">Efectivo: ${countMethod(barPaid,'efectivo')} — C/${sumMethod(barPaid,'efectivo').toLocaleString()}</span>
-${countMethod(barPaid,'sinpe')>0?`<span style="background:#1e3a5f;color:#93c5fd;padding:3px 10px;border-radius:20px">Sinpe: ${countMethod(barPaid,'sinpe')} — C/${sumMethod(barPaid,'sinpe').toLocaleString()}</span>`:''}
-${countMethod(barPaid,'tarjeta')>0?`<span style="background:#3b1f6e;color:#d8b4fe;padding:3px 10px;border-radius:20px">Tarjeta: ${countMethod(barPaid,'tarjeta')} — C/${sumMethod(barPaid,'tarjeta').toLocaleString()}</span>`:''}
-${countMethod(barPaid,'mixto')>0?`<span style="background:#78350f;color:#fcd34d;padding:3px 10px;border-radius:20px">Efectivo+Tarjeta: ${countMethod(barPaid,'mixto')} — C/${sumMethod(barPaid,'mixto').toLocaleString()}</span>`:''}
-${countMethod(barPaid,'efectivo_sinpe')>0?`<span style="background:#134e4a;color:#5eead4;padding:3px 10px;border-radius:20px">Efectivo+Sinpe: ${countMethod(barPaid,'efectivo_sinpe')} — C/${sumMethod(barPaid,'efectivo_sinpe').toLocaleString()}</span>`:''}
-${countMethod(barPaid,'tarjeta_sinpe')>0?`<span style="background:#1e1b4b;color:#a5b4fc;padding:3px 10px;border-radius:20px">Tarjeta+Sinpe: ${countMethod(barPaid,'tarjeta_sinpe')} — C/${sumMethod(barPaid,'tarjeta_sinpe').toLocaleString()}</span>`:''}
+<span style="background:#14532d;color:#86efac;padding:3px 10px;border-radius:20px">Efectivo: ${countMethod(barPaid,'efectivo')} — &#x20A1;${sumMethod(barPaid,'efectivo').toLocaleString()}</span>
+${countMethod(barPaid,'sinpe')>0?`<span style="background:#1e3a5f;color:#93c5fd;padding:3px 10px;border-radius:20px">Sinpe: ${countMethod(barPaid,'sinpe')} — &#x20A1;${sumMethod(barPaid,'sinpe').toLocaleString()}</span>`:''}
+${countMethod(barPaid,'tarjeta')>0?`<span style="background:#3b1f6e;color:#d8b4fe;padding:3px 10px;border-radius:20px">Tarjeta: ${countMethod(barPaid,'tarjeta')} — &#x20A1;${sumMethod(barPaid,'tarjeta').toLocaleString()}</span>`:''}
+${countMethod(barPaid,'mixto')>0?`<span style="background:#78350f;color:#fcd34d;padding:3px 10px;border-radius:20px">Efectivo+Tarjeta: ${countMethod(barPaid,'mixto')} — &#x20A1;${sumMethod(barPaid,'mixto').toLocaleString()}</span>`:''}
+${countMethod(barPaid,'efectivo_sinpe')>0?`<span style="background:#134e4a;color:#5eead4;padding:3px 10px;border-radius:20px">Efectivo+Sinpe: ${countMethod(barPaid,'efectivo_sinpe')} — &#x20A1;${sumMethod(barPaid,'efectivo_sinpe').toLocaleString()}</span>`:''}
+${countMethod(barPaid,'tarjeta_sinpe')>0?`<span style="background:#1e1b4b;color:#a5b4fc;padding:3px 10px;border-radius:20px">Tarjeta+Sinpe: ${countMethod(barPaid,'tarjeta_sinpe')} — &#x20A1;${sumMethod(barPaid,'tarjeta_sinpe').toLocaleString()}</span>`:''}
 </div>
 <table><thead><tr><th>Hora</th><th>Mesera</th><th>Mesa / Barra</th><th style="text-align:center">Pago</th><th style="text-align:right">Total</th></tr></thead><tbody>${cuentasBarHTML}</tbody></table>` : ''}
 ${restPaid.length > 0 ? `<div class="section-title">📋 Detalle — Restaurante (${restPaid.length})</div>
 <div style="display:flex;gap:12px;margin-bottom:8px;font-size:12px">
-<span style="background:#14532d;color:#86efac;padding:3px 10px;border-radius:20px">Efectivo: ${countMethod(restPaid,'efectivo')} — C/${sumMethod(restPaid,'efectivo').toLocaleString()}</span>
-${countMethod(restPaid,'sinpe')>0?`<span style="background:#1e3a5f;color:#93c5fd;padding:3px 10px;border-radius:20px">Sinpe: ${countMethod(restPaid,'sinpe')} — C/${sumMethod(restPaid,'sinpe').toLocaleString()}</span>`:''}
-${countMethod(restPaid,'tarjeta')>0?`<span style="background:#3b1f6e;color:#d8b4fe;padding:3px 10px;border-radius:20px">Tarjeta: ${countMethod(restPaid,'tarjeta')} — C/${sumMethod(restPaid,'tarjeta').toLocaleString()}</span>`:''}
-${countMethod(restPaid,'mixto')>0?`<span style="background:#78350f;color:#fcd34d;padding:3px 10px;border-radius:20px">Efectivo+Tarjeta: ${countMethod(restPaid,'mixto')} — C/${sumMethod(restPaid,'mixto').toLocaleString()}</span>`:''}
-${countMethod(restPaid,'efectivo_sinpe')>0?`<span style="background:#134e4a;color:#5eead4;padding:3px 10px;border-radius:20px">Efectivo+Sinpe: ${countMethod(restPaid,'efectivo_sinpe')} — C/${sumMethod(restPaid,'efectivo_sinpe').toLocaleString()}</span>`:''}
-${countMethod(restPaid,'tarjeta_sinpe')>0?`<span style="background:#1e1b4b;color:#a5b4fc;padding:3px 10px;border-radius:20px">Tarjeta+Sinpe: ${countMethod(restPaid,'tarjeta_sinpe')} — C/${sumMethod(restPaid,'tarjeta_sinpe').toLocaleString()}</span>`:''}
+<span style="background:#14532d;color:#86efac;padding:3px 10px;border-radius:20px">Efectivo: ${countMethod(restPaid,'efectivo')} — &#x20A1;${sumMethod(restPaid,'efectivo').toLocaleString()}</span>
+${countMethod(restPaid,'sinpe')>0?`<span style="background:#1e3a5f;color:#93c5fd;padding:3px 10px;border-radius:20px">Sinpe: ${countMethod(restPaid,'sinpe')} — &#x20A1;${sumMethod(restPaid,'sinpe').toLocaleString()}</span>`:''}
+${countMethod(restPaid,'tarjeta')>0?`<span style="background:#3b1f6e;color:#d8b4fe;padding:3px 10px;border-radius:20px">Tarjeta: ${countMethod(restPaid,'tarjeta')} — &#x20A1;${sumMethod(restPaid,'tarjeta').toLocaleString()}</span>`:''}
+${countMethod(restPaid,'mixto')>0?`<span style="background:#78350f;color:#fcd34d;padding:3px 10px;border-radius:20px">Efectivo+Tarjeta: ${countMethod(restPaid,'mixto')} — &#x20A1;${sumMethod(restPaid,'mixto').toLocaleString()}</span>`:''}
+${countMethod(restPaid,'efectivo_sinpe')>0?`<span style="background:#134e4a;color:#5eead4;padding:3px 10px;border-radius:20px">Efectivo+Sinpe: ${countMethod(restPaid,'efectivo_sinpe')} — &#x20A1;${sumMethod(restPaid,'efectivo_sinpe').toLocaleString()}</span>`:''}
+${countMethod(restPaid,'tarjeta_sinpe')>0?`<span style="background:#1e1b4b;color:#a5b4fc;padding:3px 10px;border-radius:20px">Tarjeta+Sinpe: ${countMethod(restPaid,'tarjeta_sinpe')} — &#x20A1;${sumMethod(restPaid,'tarjeta_sinpe').toLocaleString()}</span>`:''}
 </div>
 <table><thead><tr><th>Hora</th><th>Mesera</th><th>Mesa / Barra</th><th style="text-align:center">Pago</th><th style="text-align:right">Total</th></tr></thead><tbody>${cuentasRestHTML}</tbody></table>` : ''}
 <div class="footer">LORE POS — Cierre de Caja ${fecha}</div>
 </body></html>`;
 
-    const blob = new Blob([html], { type: 'text/html' });
-    const url  = URL.createObjectURL(blob);
-    const win  = window.open(url, '_blank');
-    setTimeout(() => { win?.print(); URL.revokeObjectURL(url); }, 800);
+    // Imprimir sin abrir ventana nueva — compatible con PWA Android
+    const printDiv = document.createElement('div');
+    printDiv.id = 'lore-admin-print';
+    printDiv.style.cssText = 'display:none;';
+    const iframe = document.createElement('iframe');
+    iframe.style.cssText = 'width:100%;height:800px;border:none;';
+    printDiv.appendChild(iframe);
+    document.body.appendChild(printDiv);
+
+    const style = document.createElement('style');
+    style.id = 'lore-admin-print-style';
+    style.innerHTML = '@media print { body > *:not(#lore-admin-print) { display:none!important; } #lore-admin-print { display:block!important; } } @media screen { #lore-admin-print { display:none!important; } }';
+    document.head.appendChild(style);
+
+    const doc = iframe.contentDocument || iframe.contentWindow.document;
+    doc.open(); doc.write(html); doc.close();
+
+    setTimeout(() => {
+      try { iframe.contentWindow.print(); } catch(e) {}
+      setTimeout(() => {
+        try { document.body.removeChild(printDiv); } catch(e) {}
+        try { document.head.removeChild(style); } catch(e) {}
+      }, 1500);
+    }, 500);
   };
 
   return (
