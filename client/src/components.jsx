@@ -889,36 +889,33 @@ ${hayDescuento ? `
 </body>
 </html>`;
 
-  // Imprimir de forma segura — compatible con PWA y browser normal
-  try {
-    const ventana = window.open('', '_blank', 'width=300,height=600');
-    if (ventana) {
-      ventana.document.write(contenido);
-      ventana.document.close();
-      ventana.focus();
-      setTimeout(() => { try { ventana.print(); } catch(e) {} }, 400);
-    } else {
-      // window.open bloqueado (PWA Android) — usar iframe oculto
-      try {
-        const iframe = document.createElement('iframe');
-        iframe.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;';
-        document.body.appendChild(iframe);
-        const doc = iframe.contentDocument || iframe.contentWindow?.document;
-        if (doc) {
-          doc.write(contenido);
-          doc.close();
-          setTimeout(() => {
-            try { iframe.contentWindow.print(); } catch(e) {}
-            setTimeout(() => { try { document.body.removeChild(iframe); } catch(e) {} }, 2000);
-          }, 600);
-        }
-      } catch(e) {
-        console.warn('No se pudo imprimir:', e);
-      }
+  // Imprimir sin abrir ventana nueva — compatible con PWA Android
+  // Crea un div temporal sobre la app, imprime solo ese contenido y lo elimina
+  const printDiv = document.createElement('div');
+  printDiv.id = 'lore-print-area';
+  printDiv.innerHTML = contenido;
+  printDiv.style.cssText = 'display:none;';
+  document.body.appendChild(printDiv);
+
+  // Agregar estilos de impresión al head
+  const style = document.createElement('style');
+  style.id = 'lore-print-style';
+  style.innerHTML = `
+    @media print {
+      body > *:not(#lore-print-area) { display: none !important; }
+      #lore-print-area { display: block !important; }
     }
-  } catch(e) {
-    console.warn('Error al imprimir:', e);
-  }
+  `;
+  document.head.appendChild(style);
+
+  setTimeout(() => {
+    window.print();
+    // Limpiar después de imprimir
+    setTimeout(() => {
+      try { document.body.removeChild(printDiv); } catch(e) {}
+      try { document.head.removeChild(style); } catch(e) {}
+    }, 1000);
+  }, 300);
 }
 
 export function BillModal({ order, onClose, onPay, zona }) {
