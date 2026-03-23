@@ -132,8 +132,8 @@ app.post('/api/accounts/:id/close', async (req, res) => {
     account.status = 'paid';
     account.closedAt = new Date();
     account.paymentMethod = req.body.paymentMethod || 'efectivo';
-    // Si es pago mixto, guardar desglose
-    if (req.body.paymentMethod === 'mixto') {
+    // Si es pago combinado, guardar desglose
+    if (['mixto', 'efectivo_sinpe', 'tarjeta_sinpe'].includes(req.body.paymentMethod)) {
       account.efectivoMixto = req.body.efectivoMixto || 0;
       account.tarjetaMixto  = req.body.tarjetaMixto  || 0;
     }
