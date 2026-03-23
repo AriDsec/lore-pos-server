@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Utensils, Package } from 'lucide-react';
-import { Header, MenuDropdown, ReadyOrdersPanel, LicoresPanel, OtrosPanel, SplitModal } from './components.jsx';
+import { Header, MenuPanel, OtrosPanel, SplitModal } from './components.jsx';
 import { ShoppingCart } from './Cart.jsx';
 
 export function MeseraScreen({
@@ -49,16 +49,15 @@ export function MeseraScreen({
     aplicaServicio,
   };
 
-  // Panel central en landscape: Menú + Licores + Otros con tabs
-  const [menuTab, setMenuTab] = useState('menu');
+  // Panel central con secciones y buscador global
+  const [menuTab, setMenuTab] = useState('productos');
 
   const menuCenterJSX = (
     <div className="space-y-3">
-      <div className="flex gap-2">
+      <div className="flex gap-1.5">
         {[
-          { id: 'menu',    label: '🍽️ Menú' },
-          { id: 'licores', label: '🥃 Licores' },
-          { id: 'otros',   label: '📦 Otros' },
+          { id: 'productos', label: 'Productos' },
+          { id: 'otros',     label: 'Otros' },
         ].map(t => (
           <button
             key={t.id}
@@ -66,16 +65,15 @@ export function MeseraScreen({
             className={`flex-1 py-2 rounded-lg font-bold text-sm transition ${
               menuTab === t.id
                 ? 'bg-[#94cb47] text-black'
-                : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                : 'bg-slate-800 text-slate-400 hover:bg-slate-700 border border-slate-700'
             }`}
           >
             {t.label}
           </button>
         ))}
       </div>
-      {menuTab === 'menu'    && <MenuDropdown menu={menu} onSelectItem={addToCart} />}
-      {menuTab === 'licores' && <LicoresPanel onAddToCart={addToCart} onModalChange={onModalChange} />}
-      {menuTab === 'otros'   && <OtrosPanel onAddToCart={addToCart} onModalChange={onModalChange} />}
+      {menuTab === 'productos' && <MenuPanel menu={menu} licores={licores} onSelectItem={addToCart} onModalChange={onModalChange} />}
+      {menuTab === 'otros'     && <OtrosPanel onAddToCart={addToCart} onModalChange={onModalChange} />}
     </div>
   );
 
@@ -136,12 +134,11 @@ export function MeseraScreen({
         <div className="flex-1 overflow-y-auto p-3">
           {mobileTab === 'menu' && (
             <div className="space-y-4">
-              {/* Mini tabs también en portrait */}
-              <div className="flex gap-2">
+              {/* Mini tabs portrait: Productos / Otros */}
+              <div className="flex gap-1.5">
                 {[
-                  { id: 'menu',    label: '🍽️ Menú' },
-                  { id: 'licores', label: '🥃 Licores' },
-                  { id: 'otros',   label: '📦 Otros' },
+                  { id: 'productos', label: 'Productos' },
+                  { id: 'otros',     label: 'Otros' },
                 ].map(t => (
                   <button
                     key={t.id}
@@ -149,17 +146,15 @@ export function MeseraScreen({
                     className={`flex-1 py-2 rounded-lg font-bold text-xs transition ${
                       menuTab === t.id
                         ? 'bg-[#94cb47] text-black'
-                        : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                        : 'bg-slate-800 text-slate-400 hover:bg-slate-700 border border-slate-700'
                     }`}
                   >
                     {t.label}
                   </button>
                 ))}
               </div>
-
-              {menuTab === 'menu'    && <MenuDropdown menu={menu} onSelectItem={addToCart} />}
-              {menuTab === 'licores' && <LicoresPanel onAddToCart={addToCart} onModalChange={onModalChange} />}
-              {menuTab === 'otros'   && <OtrosPanel onAddToCart={addToCart} onModalChange={onModalChange} />}
+              {menuTab === 'productos' && <MenuPanel menu={menu} licores={licores} onSelectItem={addToCart} onModalChange={onModalChange} />}
+              {menuTab === 'otros'     && <OtrosPanel onAddToCart={addToCart} onModalChange={onModalChange} />}
 
             </div>
           )}
