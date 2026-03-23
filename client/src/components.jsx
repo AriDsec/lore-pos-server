@@ -889,11 +889,36 @@ ${hayDescuento ? `
 </body>
 </html>`;
 
-  const ventana = window.open('', '_blank', 'width=300,height=600');
-  ventana.document.write(contenido);
-  ventana.document.close();
-  ventana.focus();
-  setTimeout(() => { ventana.print(); }, 400);
+  // Imprimir de forma segura — compatible con PWA y browser normal
+  try {
+    const ventana = window.open('', '_blank', 'width=300,height=600');
+    if (ventana) {
+      ventana.document.write(contenido);
+      ventana.document.close();
+      ventana.focus();
+      setTimeout(() => { try { ventana.print(); } catch(e) {} }, 400);
+    } else {
+      // window.open bloqueado (PWA Android) — usar iframe oculto
+      try {
+        const iframe = document.createElement('iframe');
+        iframe.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;';
+        document.body.appendChild(iframe);
+        const doc = iframe.contentDocument || iframe.contentWindow?.document;
+        if (doc) {
+          doc.write(contenido);
+          doc.close();
+          setTimeout(() => {
+            try { iframe.contentWindow.print(); } catch(e) {}
+            setTimeout(() => { try { document.body.removeChild(iframe); } catch(e) {} }, 2000);
+          }, 600);
+        }
+      } catch(e) {
+        console.warn('No se pudo imprimir:', e);
+      }
+    }
+  } catch(e) {
+    console.warn('Error al imprimir:', e);
+  }
 }
 
 export function BillModal({ order, onClose, onPay, zona }) {
