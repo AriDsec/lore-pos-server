@@ -903,7 +903,11 @@ ${hayDescuento ? `
   style.innerHTML = `
     @media print {
       body > *:not(#lore-print-area) { display: none !important; }
-      #lore-print-area { display: block !important; }
+      #lore-print-area { display: block !important; background: white !important; color: black !important; }
+      #lore-print-area * { background: white !important; color: black !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    }
+    @media screen {
+      #lore-print-area { display: none !important; }
     }
   `;
   document.head.appendChild(style);
