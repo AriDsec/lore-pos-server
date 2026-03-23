@@ -479,6 +479,15 @@ export default function RestaurantePOS() {
     setLoading(true);
     try {
       await api.deleteAccount(account.id || account._id);
+      // También borrar los kitchen orders asociados a esta cuenta
+      const accId = account.id || account._id;
+      const kitchenToDelete = kitchenOrders.filter(o =>
+        o.mesera === account.mesera &&
+        (o.table === account.table || o.barra === account.barra) &&
+        o.clientName === account.clientName
+      );
+      await Promise.all(kitchenToDelete.map(o => api.deleteKitchenOrder(o.id).catch(() => {})));
+      setKitchenOrders(prev => prev.filter(o => !kitchenToDelete.find(k => k.id === o.id)));
       const fresh = await api.getOpenAccounts(currentZone);
       setOpenAccounts(fresh);
       showToast('Cuenta eliminada');
