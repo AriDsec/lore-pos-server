@@ -406,6 +406,176 @@ export function MenuDropdown({ menu, onSelectItem }) {
 // ─────────────────────────────────────────────
 // PEDIDOS LISTOS
 // ─────────────────────────────────────────────
+// ─────────────────────────────────────────────
+// MENU PANEL UNIFICADO — Comida / Bebidas / Licores + Buscador Global
+// ─────────────────────────────────────────────
+export function MenuPanel({ menu, licores, onSelectItem, onModalChange }) {
+  const [seccion, setSeccion] = useState('comida');
+  const [busqueda, setBusqueda] = useState('');
+  const [expandedCat, setExpandedCat] = useState(null);
+  const [selectedLicor, setSelectedLicor] = useState(null);
+
+  // Separar menú en comida y bebidas
+  const allItems = Object.entries(menu).flatMap(([cat, items]) =>
+    items.map(i => ({ ...i, cat }))
+  );
+  const comidaItems = allItems.filter(i => i.category === 'food');
+  const bebidaItems = allItems.filter(i => ['beverage', 'soda'].includes(i.category));
+
+  // Agrupar por categoría para mostrar
+  const comidaGroups = Object.fromEntries(
+    Object.entries(menu).filter(([, items]) => items.some(i => i.category === 'food'))
+  );
+  const bebidaGroups = Object.fromEntries(
+    Object.entries(menu).filter(([, items]) => items.some(i => ['beverage', 'soda'].includes(i.category)))
+  );
+
+  // Búsqueda global
+  const q = busqueda.toLowerCase().trim();
+  const searchResults = q.length > 1 ? [
+    ...allItems.filter(i => i.name.toLowerCase().includes(q)),
+    ...licores.filter(l => l.name.toLowerCase().includes(q)).map(l => ({ ...l, esLicor: true })),
+  ] : [];
+
+  const tabs = [
+    { id: 'comida',  label: 'Comida' },
+    { id: 'bebidas', label: 'Bebidas' },
+    { id: 'licores', label: 'Licores' },
+  ];
+
+  const ItemBtn = ({ item }) => (
+    <button
+      onClick={() => onSelectItem(item)}
+      className="w-full flex justify-between items-center bg-slate-700/50 hover:bg-slate-600/60 border border-slate-600/50 hover:border-[#94cb47]/40 rounded-xl px-3 py-2.5 transition-all text-left group"
+    >
+      <span className="font-semibold text-white text-sm group-hover:text-[#94cb47] transition leading-tight">{item.name}</span>
+      <span className="text-[#94cb47] font-bold text-xs ml-2 whitespace-nowrap">₡{item.price.toLocaleString()}</span>
+    </button>
+  );
+
+  const CategoryGroup = ({ groups, category }) => (
+    <div className="space-y-2">
+      {Object.entries(groups).map(([cat, items]) => {
+        const filtered = items.filter(i =>
+          category === 'food' ? i.category === 'food' : ['beverage', 'soda'].includes(i.category)
+        );
+        if (filtered.length === 0) return null;
+        const isOpen = expandedCat === cat;
+        return (
+          <div key={cat} className="bg-slate-800/60 rounded-xl overflow-hidden border border-slate-700/50">
+            <button
+              onClick={() => setExpandedCat(isOpen ? null : cat)}
+              className="w-full flex justify-between items-center px-4 py-3 text-left"
+            >
+              <span className="font-bold text-[#94cb47] text-sm">{cat}</span>
+              <span className={`text-slate-400 text-xs transition-transform ${isOpen ? 'rotate-180' : ''}`}>▾</span>
+            </button>
+            {isOpen && (
+              <div className="px-3 pb-3 space-y-1.5">
+                {filtered.map(item => <ItemBtn key={item.id} item={item} />)}
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+
+  return (
+    <div className="space-y-3">
+      {/* Buscador global */}
+      <div className="relative">
+        <input
+          type="text"
+          value={busqueda}
+          onChange={e => setBusqueda(e.target.value)}
+          placeholder="Buscar en comida, bebidas y licores..."
+          className="w-full bg-slate-800 border border-slate-600 focus:border-[#94cb47] text-white rounded-xl px-4 py-2.5 text-sm focus:outline-none placeholder-slate-500"
+        />
+        {busqueda && (
+          <button onClick={() => setBusqueda('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white text-lg">×</button>
+        )}
+      </div>
+
+      {/* Resultados de búsqueda */}
+      {q.length > 1 ? (
+        <div className="bg-slate-800/60 rounded-xl border border-slate-700/50 p-3">
+          <div className="text-slate-400 text-xs font-bold uppercase tracking-wide mb-2">
+            {searchResults.length} resultado{searchResults.length !== 1 ? 's' : ''} para "{busqueda}"
+          </div>
+          {searchResults.length === 0 ? (
+            <p className="text-slate-500 text-sm">Sin resultados</p>
+          ) : (
+            <div className="space-y-1.5">
+              {searchResults.map(item =>
+                item.esLicor ? (
+                  <button
+                    key={item.id}
+                    onClick={() => { setSelectedLicor(item); onModalChange?.(true); }}
+                    className="w-full flex justify-between items-center bg-slate-700/50 hover:bg-slate-600/60 border border-slate-600/50 hover:border-amber-500/40 rounded-xl px-3 py-2.5 transition-all text-left group"
+                  >
+                    <span className="font-semibold text-white text-sm group-hover:text-amber-400 transition">{item.name}</span>
+                    <span className="text-amber-400 font-bold text-xs ml-2 whitespace-nowrap">desde ₡{Math.min(...item.presentaciones.map(p => p.price)).toLocaleString()}</span>
+                  </button>
+                ) : (
+                  <ItemBtn key={item.id} item={item} />
+                )
+              )}
+            </div>
+          )}
+        </div>
+      ) : (
+        <>
+          {/* Tabs */}
+          <div className="grid grid-cols-3 gap-1.5">
+            {tabs.map(t => (
+              <button
+                key={t.id}
+                onClick={() => setSeccion(t.id)}
+                className={`py-2 rounded-lg font-bold text-sm transition ${
+                  seccion === t.id
+                    ? 'bg-[#94cb47] text-black'
+                    : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-slate-200 border border-slate-700'
+                }`}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Contenido por sección */}
+          {seccion === 'comida' && <CategoryGroup groups={comidaGroups} category="food" />}
+          {seccion === 'bebidas' && <CategoryGroup groups={bebidaGroups} category="beverage" />}
+          {seccion === 'licores' && (
+            <div className="space-y-2">
+              {licores.map(licor => (
+                <button
+                  key={licor.id}
+                  onClick={() => { setSelectedLicor(licor); onModalChange?.(true); }}
+                  className="w-full flex justify-between items-center bg-slate-800/60 hover:bg-slate-700/60 border border-slate-700/50 hover:border-amber-500/30 rounded-xl px-4 py-3 transition-all text-left group"
+                >
+                  <span className="font-semibold text-white text-sm group-hover:text-amber-300 transition">{licor.name}</span>
+                  <span className="text-amber-400 text-xs font-bold whitespace-nowrap">
+                    desde ₡{Math.min(...licor.presentaciones.map(p => p.price)).toLocaleString()}
+                  </span>
+                </button>
+              ))}
+            </div>
+          )}
+        </>
+      )}
+
+      {selectedLicor && (
+        <LicorModal
+          licor={selectedLicor}
+          onSelect={(item) => { onSelectItem(item); setSelectedLicor(null); onModalChange?.(false); }}
+          onClose={() => { setSelectedLicor(null); onModalChange?.(false); }}
+        />
+      )}
+    </div>
+  );
+}
+
 export function ReadyOrdersPanel({ kitchenOrders, mesera }) {
   const readyOrders = kitchenOrders.filter(o => o.status === 'ready' && o.mesera === mesera);
   if (readyOrders.length === 0) return null;
