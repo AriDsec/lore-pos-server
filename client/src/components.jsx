@@ -774,7 +774,7 @@ export function imprimirTiquete(order, zona) {
 
   let itemsText = '';
   (order.items || []).forEach(item => {
-    const subtotal = `C/${(item.price * item.quantity).toLocaleString()}`;
+    const subtotal = `&#x20A1;${(item.price * item.quantity).toLocaleString()}`;
     const nombreLocal = item.name.length > 22 ? item.name.substring(0, 22) : item.name;
     const izq = `${item.quantity}x ${nombreLocal}`;
     itemsText += `${izq.padEnd(28)}${subtotal.padStart(12)}
@@ -783,10 +783,10 @@ export function imprimirTiquete(order, zona) {
 `;
   });
 
-  const totalStr = `C/${order.total.toLocaleString()}`;
+  const totalStr = `&#x20A1;${order.total.toLocaleString()}`;
   const hayDescuento = order.descuento && order.descuento > 0;
-  const totalOriginalStr = hayDescuento ? `C/${order.totalOriginal.toLocaleString()}` : null;
-  const descuentoStr = hayDescuento ? `C/${order.descuento.toLocaleString()}` : null;
+  const totalOriginalStr = hayDescuento ? `&#x20A1;${order.totalOriginal.toLocaleString()}` : null;
+  const descuentoStr = hayDescuento ? `&#x20A1;${order.descuento.toLocaleString()}` : null;
 
   const contenido = `
 <html>
