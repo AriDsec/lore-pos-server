@@ -50,13 +50,15 @@ function KitchenCard({ order, colorScheme, onReady, onDelivered }) {
       </div>
       <div className="flex gap-2">
         {order.status === 'pending' && (
-          <button onClick={() => onReady(order.id)} className={`flex-1 font-bold py-3 rounded-lg transition shadow-lg ${readyBtn}`}>
-            ✓ Listo
+          <button onClick={() => onReady(order.id)}
+            className={`flex-1 py-3 rounded-lg transition shadow-lg tracking-widest text-base font-black uppercase ${readyBtn}`}>
+            LISTO
           </button>
         )}
         {order.status === 'ready' && (
-          <button onClick={() => onDelivered(order.id)} className="flex-1 bg-slate-600 hover:bg-slate-500 text-white font-bold py-3 rounded-lg transition shadow-lg">
-            ✓ Entregado
+          <button onClick={() => onDelivered(order.id)}
+            className="flex-1 bg-slate-700 hover:bg-slate-600 text-slate-300 hover:text-white py-3 rounded-lg transition shadow-lg tracking-widest text-base font-black uppercase border border-slate-600">
+            ENTREGADO
           </button>
         )}
       </div>
@@ -76,9 +78,18 @@ export function KitchenScreen({ kitchenOrders, loading, onLogout, onReady, onDel
       <div className="p-4 md:p-6 max-w-7xl mx-auto space-y-8">
 
         {totalPending === 0 && (
-          <div className="text-center py-20">
-            <div className="text-7xl mb-4">😎</div>
-            <p className="text-slate-400 text-2xl">Todo está listo</p>
+          <div className="flex flex-col items-center justify-center" style={{minHeight: 'calc(100vh - 120px)'}}>
+            <div className="text-center space-y-4">
+              <div style={{fontFamily:"'Cinzel', serif", letterSpacing: '0.2em'}}
+                className="text-[#94cb47]/20 font-bold select-none"
+                style={{fontSize: 'clamp(80px, 20vw, 160px)', lineHeight: 1}}>
+                LORE
+              </div>
+              <p style={{fontFamily:"'Cinzel', serif", letterSpacing: '0.3em'}}
+                className="text-slate-600 text-sm uppercase tracking-widest">
+                Sin pedidos pendientes
+              </p>
+            </div>
           </div>
         )}
 
