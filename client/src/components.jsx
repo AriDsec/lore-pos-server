@@ -624,7 +624,7 @@ export function ItemsModal({ order, onClose }) {
         </div>
         <div className="bg-gradient-to-r from-[#94cb47]/30 to-[#7ab035]/30 rounded-xl p-4 border border-[#94cb47]/50 mb-4">
           <div className="text-slate-300 text-sm">TOTAL</div>
-          <div className="text-3xl font-bold text-[#94cb47]">₡{order.total.toLocaleString()}</div>
+          <div className="text-3xl font-bold text-[#94cb47]">C/{order.total.toLocaleString()}</div>
         </div>
         <button onClick={onClose} className="w-full bg-gradient-to-r from-slate-600 to-slate-700 hover:from-slate-700 hover:to-slate-800 text-white font-bold py-3 rounded-lg transition">Cerrar</button>
       </div>
@@ -774,7 +774,7 @@ export function imprimirTiquete(order, zona) {
 
   let itemsText = '';
   (order.items || []).forEach(item => {
-    const subtotal = `₡${(item.price * item.quantity).toLocaleString()}`;
+    const subtotal = `C/${(item.price * item.quantity).toLocaleString()}`;
     const nombreLocal = item.name.length > 22 ? item.name.substring(0, 22) : item.name;
     const izq = `${item.quantity}x ${nombreLocal}`;
     itemsText += `${izq.padEnd(28)}${subtotal.padStart(12)}
@@ -783,10 +783,10 @@ export function imprimirTiquete(order, zona) {
 `;
   });
 
-  const totalStr = `₡${order.total.toLocaleString()}`;
+  const totalStr = `C/${order.total.toLocaleString()}`;
   const hayDescuento = order.descuento && order.descuento > 0;
-  const totalOriginalStr = hayDescuento ? `₡${order.totalOriginal.toLocaleString()}` : null;
-  const descuentoStr = hayDescuento ? `₡${order.descuento.toLocaleString()}` : null;
+  const totalOriginalStr = hayDescuento ? `C/${order.totalOriginal.toLocaleString()}` : null;
+  const descuentoStr = hayDescuento ? `C/${order.descuento.toLocaleString()}` : null;
 
   const contenido = `
 <html>
@@ -804,7 +804,8 @@ export function imprimirTiquete(order, zona) {
     font-family: 'Courier New', Courier, monospace;
     font-size: 10.5px;
     width: 76mm;
-    color: #000;
+    color: #000 !important;
+    background: #fff !important;
     line-height: 1.45;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
@@ -891,11 +892,18 @@ ${hayDescuento ? `
 
   // Imprimir sin abrir ventana nueva — compatible con PWA Android
   // Crea un div temporal sobre la app, imprime solo ese contenido y lo elimina
+  // Crear iframe para que el HTML del tiquete use sus propios estilos
   const printDiv = document.createElement('div');
   printDiv.id = 'lore-print-area';
-  printDiv.innerHTML = contenido;
   printDiv.style.cssText = 'display:none;';
+  const iframe = document.createElement('iframe');
+  iframe.style.cssText = 'width:100%;height:600px;border:none;';
+  printDiv.appendChild(iframe);
   document.body.appendChild(printDiv);
+  const doc = iframe.contentDocument || iframe.contentWindow.document;
+  doc.open();
+  doc.write(contenido);
+  doc.close();
 
   // Agregar estilos de impresión al head
   const style = document.createElement('style');
@@ -903,8 +911,8 @@ ${hayDescuento ? `
   style.innerHTML = `
     @media print {
       body > *:not(#lore-print-area) { display: none !important; }
-      #lore-print-area { display: block !important; background: white !important; color: black !important; }
-      #lore-print-area * { background: white !important; color: black !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      #lore-print-area { display: block !important; }
+      #lore-print-area iframe { width: 100%; height: 100vh; border: none; }
     }
     @media screen {
       #lore-print-area { display: none !important; }
