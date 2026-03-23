@@ -74,6 +74,7 @@ export function Header({ mesera, zona, onLogout }) {
 export const payBadge = (m) => {
   if (m === 'sinpe')   return <span style={{whiteSpace:'nowrap'}} className="inline-flex items-center gap-1 bg-blue-900/50 text-blue-300 border border-blue-600 px-2 py-0.5 rounded-full text-xs font-bold">📱 Sinpe</span>;
   if (m === 'tarjeta') return <span style={{whiteSpace:'nowrap'}} className="inline-flex items-center gap-1 bg-purple-900/50 text-purple-300 border border-purple-600 px-2 py-0.5 rounded-full text-xs font-bold">💳 Tarjeta</span>;
+  if (m === 'mixto')   return <span style={{whiteSpace:'nowrap'}} className="inline-flex items-center gap-1 bg-amber-900/50 text-amber-300 border border-amber-600 px-2 py-0.5 rounded-full text-xs font-bold">Efectivo + Tarjeta</span>;
   return <span style={{whiteSpace:'nowrap'}} className="inline-flex items-center gap-1 bg-green-900/50 text-green-300 border border-green-600 px-2 py-0.5 rounded-full text-xs font-bold">💵 Efectivo</span>;
 };
 
@@ -897,6 +898,8 @@ export function BillModal({ order, onClose, onPay, zona }) {
   const [payMethod, setPayMethod] = useState(null);
   const [montoPersonalizado, setMontoPersonalizado] = useState('');
   const [aplicandoDescuento, setAplicandoDescuento] = useState(false);
+  const [montoRecibido, setMontoRecibido] = useState('');
+  const [montoEfectivoMixto, setMontoEfectivoMixto] = useState('');
 
   if (!order) return null;
 
@@ -907,19 +910,35 @@ export function BillModal({ order, onClose, onPay, zona }) {
   const descuento = totalOriginal - montoFinal;
   const hayDescuento = descuento > 0;
 
+  // Vuelto efectivo
+  const recibido = parseInt(montoRecibido) || 0;
+  const vuelto = recibido - montoFinal;
+  const hayVuelto = payMethod === 'efectivo' && recibido > 0;
+
+  // Pago mixto
+  const efectivoMixto = parseInt(montoEfectivoMixto) || 0;
+  const tarjetaMixto = Math.max(0, montoFinal - efectivoMixto);
+  const mixtoValido = efectivoMixto > 0 && efectivoMixto < montoFinal;
+
   const methods = [
-    { id: 'efectivo', label: '💵 Efectivo', color: 'border-green-500 bg-green-900/30 text-green-300' },
-    { id: 'sinpe',    label: '📱 Sinpe',    color: 'border-blue-500 bg-blue-900/30 text-blue-300' },
-    { id: 'tarjeta',  label: '💳 Tarjeta',  color: 'border-purple-500 bg-purple-900/30 text-purple-300' },
+    { id: 'efectivo', label: 'Efectivo',        color: 'border-green-500 bg-green-900/30 text-green-300' },
+    { id: 'sinpe',    label: 'Sinpe',            color: 'border-blue-500 bg-blue-900/30 text-blue-300' },
+    { id: 'tarjeta',  label: 'Tarjeta',          color: 'border-purple-500 bg-purple-900/30 text-purple-300' },
+    { id: 'mixto',    label: 'Efectivo + Tarjeta', color: 'border-amber-500 bg-amber-900/30 text-amber-300' },
   ];
 
   const handlePay = () => {
     if (!payMethod || montoFinal <= 0) return;
     if (aplicandoDescuento && montoPersonalizado && montoFinal >= totalOriginal) return;
+    if (payMethod === 'mixto' && !mixtoValido) return;
     const orderConDescuento = hayDescuento
       ? { ...order, total: montoFinal, totalOriginal, descuento }
       : order;
-    onPay(orderConDescuento, payMethod);
+    // Para mixto, guardar desglose en el historial
+    const orderFinal = payMethod === 'mixto'
+      ? { ...orderConDescuento, efectivoMixto, tarjetaMixto }
+      : orderConDescuento;
+    onPay(orderFinal, payMethod);
   };
 
   return (
@@ -1010,26 +1029,155 @@ export function BillModal({ order, onClose, onPay, zona }) {
           <p className="text-slate-400 text-xs mb-2 font-bold uppercase tracking-wide">Método de pago</p>
           <div className="grid grid-cols-3 gap-2">
             {methods.map(m => (
-              <button key={m.id} onClick={() => setPayMethod(m.id)}
+              <button key={m.id} onClick={() => { setPayMethod(m.id); setMontoRecibido(''); setMontoEfectivoMixto(''); }}
                 className={`border-2 rounded-xl py-3 font-bold text-sm transition ${payMethod === m.id ? m.color : 'border-slate-600 text-slate-400 hover:border-slate-500'}`}>
                 {m.label}
               </button>
             ))}
           </div>
         </div>
+        {/* Sección de vuelto — solo cuando es efectivo */}
+        {payMethod === 'efectivo' && (
+          <div className="mb-4 rounded-xl border border-slate-600 overflow-hidden">
+            <div className="bg-slate-700/40 px-4 py-2.5">
+              <p className="text-slate-300 text-xs font-bold uppercase tracking-wide">Efectivo recibido</p>
+            </div>
+            <div className="p-3 space-y-3">
+              {/* Denominaciones rápidas */}
+              <div className="grid grid-cols-5 gap-1.5">
+                {[1000, 2000, 5000, 10000, 20000].map(b => {
+                  // Calcular el billete mínimo que cubre el total
+                  const esSugerido = b >= montoFinal && (b < parseInt(montoRecibido) || !montoRecibido);
+                  return (
+                    <button
+                      key={b}
+                      onClick={() => setMontoRecibido(String(b))}
+                      className={`py-2 rounded-lg font-bold text-xs transition border ${
+                        montoRecibido === String(b)
+                          ? 'bg-green-700 border-green-500 text-white'
+                          : esSugerido
+                          ? 'bg-slate-700/80 border-[#94cb47]/50 text-[#94cb47]'
+                          : 'bg-slate-700/50 border-slate-600 text-slate-300 hover:border-slate-500'
+                      }`}
+                    >
+                      {b >= 1000 ? `${b/1000}k` : b}
+                    </button>
+                  );
+                })}
+              </div>
+              {/* Input manual */}
+              <input
+                type="number"
+                value={montoRecibido}
+                onChange={e => setMontoRecibido(e.target.value)}
+                onWheel={e => e.target.blur()}
+                placeholder="O escribe el monto recibido..."
+                className="w-full bg-slate-800 border border-slate-600 focus:border-green-500 text-white rounded-xl px-3 py-2 text-sm focus:outline-none placeholder-slate-500"
+              />
+              {/* Resultado del vuelto */}
+              {hayVuelto && (
+                <div className={`rounded-xl p-3 text-center ${vuelto >= 0 ? 'bg-green-900/30 border border-green-500/40' : 'bg-red-900/30 border border-red-500/40'}`}>
+                  {vuelto >= 0 ? (
+                    <>
+                      <div className="text-green-400 text-xs font-bold uppercase tracking-wide mb-1">Vuelto</div>
+                      <div className="text-green-300 text-3xl font-bold">₡{vuelto.toLocaleString()}</div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="text-red-400 text-xs font-bold uppercase tracking-wide mb-1">Falta</div>
+                      <div className="text-red-300 text-3xl font-bold">₡{Math.abs(vuelto).toLocaleString()}</div>
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Sección mixto */}
+        {payMethod === 'mixto' && (
+          <div className="mb-4 rounded-xl border border-amber-500/40 overflow-hidden">
+            <div className="bg-amber-900/20 px-4 py-2.5">
+              <p className="text-amber-300 text-xs font-bold uppercase tracking-wide">¿Cuánto pone en efectivo?</p>
+            </div>
+            <div className="p-3 space-y-3">
+              <div className="grid grid-cols-5 gap-1.5">
+                {[1000, 2000, 5000, 10000, 20000].map(b => (
+                  <button
+                    key={b}
+                    onClick={() => setMontoEfectivoMixto(String(Math.min(b, montoFinal - 1)))}
+                    className={`py-2 rounded-lg font-bold text-xs transition border ${
+                      montoEfectivoMixto === String(Math.min(b, montoFinal - 1))
+                        ? 'bg-amber-700 border-amber-500 text-white'
+                        : 'bg-slate-700/50 border-slate-600 text-slate-300 hover:border-amber-500/40'
+                    }`}
+                  >
+                    {b >= 1000 ? `${b/1000}k` : b}
+                  </button>
+                ))}
+              </div>
+              <input
+                type="number"
+                value={montoEfectivoMixto}
+                onChange={e => setMontoEfectivoMixto(e.target.value)}
+                onWheel={e => e.target.blur()}
+                placeholder="Monto en efectivo..."
+                className="w-full bg-slate-800 border border-amber-500/30 focus:border-amber-400 text-white rounded-xl px-3 py-2 text-sm focus:outline-none placeholder-slate-500"
+              />
+              {efectivoMixto > 0 && (
+                <div className={`rounded-xl p-3 space-y-2 ${mixtoValido ? 'bg-slate-700/40 border border-slate-600' : 'bg-red-900/20 border border-red-500/40'}`}>
+                  {mixtoValido ? (
+                    <>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-slate-400">Efectivo</span>
+                        <span className="text-green-300 font-bold">₡{efectivoMixto.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between text-sm border-t border-slate-600 pt-2">
+                        <span className="text-slate-400">Tarjeta</span>
+                        <span className="text-purple-300 font-bold">₡{tarjetaMixto.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between text-sm border-t border-slate-600 pt-2">
+                        <span className="text-slate-300 font-bold">Total</span>
+                        <span className="text-[#94cb47] font-bold">₡{montoFinal.toLocaleString()}</span>
+                      </div>
+                    </>
+                  ) : (
+                    <p className="text-red-400 text-xs text-center font-bold">
+                      El efectivo debe ser menor al total (₡{montoFinal.toLocaleString()})
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
         <div className="flex gap-2">
           {onPay && (
             <button
               onClick={handlePay}
-              disabled={!payMethod || montoFinal <= 0 || (aplicandoDescuento && montoPersonalizado && montoFinal >= totalOriginal)}
-              className={`flex-1 font-bold py-3 rounded-lg transition ${payMethod && montoFinal > 0 && !(aplicandoDescuento && montoPersonalizado && montoFinal >= totalOriginal) ? 'bg-[#94cb47] hover:bg-[#7ab035] text-black' : 'bg-slate-700 text-slate-500 cursor-not-allowed'}`}>
-              ✅ Cobrar {hayDescuento ? `₡${montoFinal.toLocaleString()}` : ''}
+              disabled={
+                !payMethod ||
+                montoFinal <= 0 ||
+                (aplicandoDescuento && montoPersonalizado && montoFinal >= totalOriginal) ||
+                (payMethod === 'efectivo' && recibido > 0 && vuelto < 0) ||
+                (payMethod === 'mixto' && !mixtoValido)
+              }
+              className={`flex-1 font-bold py-3 rounded-lg transition ${
+                payMethod && montoFinal > 0 &&
+                !(aplicandoDescuento && montoPersonalizado && montoFinal >= totalOriginal) &&
+                !(payMethod === 'efectivo' && recibido > 0 && vuelto < 0) &&
+                !(payMethod === 'mixto' && !mixtoValido)
+                  ? 'bg-[#94cb47] hover:bg-[#7ab035] text-black'
+                  : 'bg-slate-700 text-slate-500 cursor-not-allowed'
+              }`}>
+              Cobrar {hayDescuento ? `₡${montoFinal.toLocaleString()}` : ''}
             </button>
           )}
           <button onClick={() => imprimirTiquete(
             hayDescuento ? { ...order, total: montoFinal, totalOriginal, descuento } : order,
             zona
-          )} className="bg-blue-700 hover:bg-blue-800 text-white font-bold px-4 py-3 rounded-lg transition">🖨️ Tiquete</button>
+          )} className="bg-blue-700 hover:bg-blue-800 text-white font-bold px-4 py-3 rounded-lg transition">🖨️</button>
           <button onClick={onClose} className="bg-slate-700 hover:bg-slate-600 text-white font-bold px-4 py-3 rounded-lg transition">✕</button>
         </div>
       </div>
