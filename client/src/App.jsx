@@ -455,12 +455,15 @@ export default function RestaurantePOS() {
     }
     setLoading(true);
     try {
-      // Si la cuenta tiene descuento aplicado, enviarlo al servidor
       const descuentoData = account.descuento ? {
         totalCobrado: account.total,
         descuento: account.descuento,
       } : null;
-      await api.closeAccount(account.id || account._id, paymentMethod, descuentoData);
+      const mixtoData = paymentMethod === 'mixto' ? {
+        efectivoMixto: account.efectivoMixto || 0,
+        tarjetaMixto:  account.tarjetaMixto  || 0,
+      } : null;
+      await api.closeAccount(account.id || account._id, paymentMethod, descuentoData, mixtoData);
       const [open, paid] = await Promise.all([api.getOpenAccounts(currentZone), api.getPaidAccounts(currentZone)]);
       setOpenAccounts(open); setPaidOrders(paid); setBillOrder(null);
       sonidoCobro();
