@@ -82,10 +82,24 @@ export function AdminScreen({ barPaid, restPaid, loading, onLogout, setPaidOrder
     const restFoodTotal  = restPaid.reduce((s,o) => s+(o.items||[]).filter(i=>i.category==='food').reduce((a,i)=>a+i.price*i.quantity,0),0);
     const restDrinkTotal = restPaid.reduce((s,o) => s+(o.items||[]).filter(i=>i.category!=='food').reduce((a,i)=>a+i.price*i.quantity,0),0);
 
-    const methodLabel = (m) => m === 'sinpe' ? '📱 Sinpe' : m === 'tarjeta' ? '💳 Tarjeta' : '💵 Efectivo';
+    const methodLabel = (m) =>
+      m === 'sinpe'          ? 'Sinpe' :
+      m === 'tarjeta'        ? 'Tarjeta' :
+      m === 'mixto'          ? 'Efectivo + Tarjeta' :
+      m === 'efectivo_sinpe' ? 'Efectivo + Sinpe' :
+      m === 'tarjeta_sinpe'  ? 'Tarjeta + Sinpe' :
+      'Efectivo';
 
-    const cuentasBarHTML  = barPaid.map(o => `<tr><td>${o.mesera}</td><td>${o.locationLabel || o.barra || 'Mesa ' + o.table}${o.clientName ? ' — ' + o.clientName : ''}</td><td style="text-align:center">${methodLabel(o.paymentMethod)}</td><td style="text-align:right">₡${o.total.toLocaleString()}${o.descuento > 0 ? ` <span style="color:#d97706;font-size:10px">(-₡${o.descuento.toLocaleString()})</span>` : ''}</td></tr>`).join('');
-    const cuentasRestHTML = restPaid.map(o => `<tr><td>${o.mesera}</td><td>${o.locationLabel || o.barra || 'Mesa ' + o.table}${o.clientName ? ' — ' + o.clientName : ''}</td><td style="text-align:center">${methodLabel(o.paymentMethod)}</td><td style="text-align:right">₡${o.total.toLocaleString()}${o.descuento > 0 ? ` <span style="color:#d97706;font-size:10px">(-₡${o.descuento.toLocaleString()})</span>` : ''}</td></tr>`).join('');
+    const sortedBar  = [...barPaid].sort((a,b) => new Date(a.closedAt) - new Date(b.closedAt));
+    const sortedRest = [...restPaid].sort((a,b) => new Date(a.closedAt) - new Date(b.closedAt));
+    const cuentasBarHTML  = sortedBar.map(o => {
+      const hora = o.closedAt ? new Date(o.closedAt).toLocaleTimeString('es-CR',{hour:'2-digit',minute:'2-digit'}) : '';
+      return `<tr><td>${hora}</td><td>${o.mesera}</td><td>${o.locationLabel || o.barra || 'Mesa ' + o.table}${o.clientName ? ' — ' + o.clientName : ''}</td><td style="text-align:center">${methodLabel(o.paymentMethod)}</td><td style="text-align:right">C/${o.total.toLocaleString()}${o.descuento > 0 ? ` <span style="color:#d97706;font-size:10px">(-C/${o.descuento.toLocaleString()})</span>` : ''}</td></tr>`;
+    }).join('');
+    const cuentasRestHTML = sortedRest.map(o => {
+      const hora = o.closedAt ? new Date(o.closedAt).toLocaleTimeString('es-CR',{hour:'2-digit',minute:'2-digit'}) : '';
+      return `<tr><td>${hora}</td><td>${o.mesera}</td><td>${o.locationLabel || o.barra || 'Mesa ' + o.table}${o.clientName ? ' — ' + o.clientName : ''}</td><td style="text-align:center">${methodLabel(o.paymentMethod)}</td><td style="text-align:right">C/${o.total.toLocaleString()}${o.descuento > 0 ? ` <span style="color:#d97706;font-size:10px">(-C/${o.descuento.toLocaleString()})</span>` : ''}</td></tr>`;
+    }).join('');
 
     const html = `<!DOCTYPE html>
 <html lang="es">
@@ -123,40 +137,46 @@ td { padding:6px 8px;border-bottom:1px solid #f0f0f0; }
 </head>
 <body>
 <div class="header"><h1>🍽️ LORE</h1><p class="fecha">${fecha}</p><p style="color:#999;font-size:12px">Generado a las ${hora}</p></div>
-<div class="total-box"><div>💰 Total del Día</div><div class="monto">₡${grandTotal.toLocaleString()}</div>${totalDescuentos > 0 ? `<div style="font-size:12px;margin-top:4px;color:#fcd34d">Descuentos: -₡${totalDescuentos.toLocaleString()}</div>` : ''}</div>
+<div class="total-box"><div>💰 Total del Día</div><div class="monto">C/${grandTotal.toLocaleString()}</div>${totalDescuentos > 0 ? `<div style="font-size:12px;margin-top:4px;color:#fcd34d">Descuentos: -C/${totalDescuentos.toLocaleString()}</div>` : ''}</div>
 <div class="grid">
   <div class="card"><h2>🍺 Bar</h2>
     <div class="row"><span class="label">Cuentas cobradas</span><span class="val">${barPaid.length}</span></div>
-    <div class="row"><span class="label">Comida</span><span class="val">₡${barFoodTotal2.toLocaleString()}</span></div>
-    <div class="row"><span class="label">Bebidas</span><span class="val">₡${barDrinkTotal.toLocaleString()}</span></div>
-    <div class="total-row"><span>Total Bar</span><span class="val">₡${totalBarCobrado.toLocaleString()}</span></div>
+    <div class="row"><span class="label">Comida</span><span class="val">C/${barFoodTotal2.toLocaleString()}</span></div>
+    <div class="row"><span class="label">Bebidas</span><span class="val">C/${barDrinkTotal.toLocaleString()}</span></div>
+    <div class="total-row"><span>Total Bar</span><span class="val">C/${totalBarCobrado.toLocaleString()}</span></div>
   </div>
   <div class="card"><h2>🍽️ Restaurante</h2>
     <div class="row"><span class="label">Cuentas cobradas</span><span class="val">${restPaid.length}</span></div>
-    <div class="row"><span class="label">Comida</span><span class="val">₡${restFoodTotal.toLocaleString()}</span></div>
-    <div class="row"><span class="label">Bebidas</span><span class="val">₡${restDrinkTotal.toLocaleString()}</span></div>
-    <div class="total-row"><span>Total Restaurante</span><span class="val">₡${totalRestCobrado.toLocaleString()}</span></div>
+    <div class="row"><span class="label">Comida</span><span class="val">C/${restFoodTotal.toLocaleString()}</span></div>
+    <div class="row"><span class="label">Bebidas</span><span class="val">C/${restDrinkTotal.toLocaleString()}</span></div>
+    <div class="total-row"><span>Total Restaurante</span><span class="val">C/${totalRestCobrado.toLocaleString()}</span></div>
   </div>
 </div>
 <div class="liquidacion"><h2>🍺 Liquidación con Bar</h2>
-  <div class="row"><span class="label">Comida vendida por Bar (cocinada por Restaurante)</span><span class="val">₡${barFoodTotal.toLocaleString()}</span></div>
-  <div class="row"><span class="label">Licores y cervezas vendidos por Restaurante (inventario Bar)</span><span class="val">₡${restAlcoholTotal.toLocaleString()}</span></div>
-  <div class="saldo-final"><div><div style="font-weight:bold">SALDO FINAL</div><div style="font-size:11px;color:#666">${deudaBar >= 0 ? '📤 Bar nos paga' : '📥 Nosotros le pagamos al Bar'}</div></div><div class="saldo-monto">₡${Math.abs(deudaBar).toLocaleString()}</div></div>
+  <div class="row"><span class="label">Comida vendida por Bar (cocinada por Restaurante)</span><span class="val">C/${barFoodTotal.toLocaleString()}</span></div>
+  <div class="row"><span class="label">Licores y cervezas vendidos por Restaurante (inventario Bar)</span><span class="val">C/${restAlcoholTotal.toLocaleString()}</span></div>
+  <div class="saldo-final"><div><div style="font-weight:bold">SALDO FINAL</div><div style="font-size:11px;color:#666">${deudaBar >= 0 ? '📤 Bar nos paga' : '📥 Nosotros le pagamos al Bar'}</div></div><div class="saldo-monto">C/${Math.abs(deudaBar).toLocaleString()}</div></div>
 </div>
 ${barPaid.length > 0 ? `<div class="section-title">📋 Detalle — Bar (${barPaid.length})</div>
 <div style="display:flex;gap:12px;margin-bottom:8px;font-size:12px">
-<span style="background:#14532d;color:#86efac;padding:3px 10px;border-radius:20px">💵 Efectivo: ${countMethod(barPaid,'efectivo')} — ₡${sumMethod(barPaid,'efectivo').toLocaleString()}</span>
-<span style="background:#1e3a5f;color:#93c5fd;padding:3px 10px;border-radius:20px">📱 Sinpe: ${countMethod(barPaid,'sinpe')} — ₡${sumMethod(barPaid,'sinpe').toLocaleString()}</span>
-<span style="background:#3b1f6e;color:#d8b4fe;padding:3px 10px;border-radius:20px">💳 Tarjeta: ${countMethod(barPaid,'tarjeta')} — ₡${sumMethod(barPaid,'tarjeta').toLocaleString()}</span>
+<span style="background:#14532d;color:#86efac;padding:3px 10px;border-radius:20px">Efectivo: ${countMethod(barPaid,'efectivo')} — C/${sumMethod(barPaid,'efectivo').toLocaleString()}</span>
+${countMethod(barPaid,'sinpe')>0?`<span style="background:#1e3a5f;color:#93c5fd;padding:3px 10px;border-radius:20px">Sinpe: ${countMethod(barPaid,'sinpe')} — C/${sumMethod(barPaid,'sinpe').toLocaleString()}</span>`:''}
+${countMethod(barPaid,'tarjeta')>0?`<span style="background:#3b1f6e;color:#d8b4fe;padding:3px 10px;border-radius:20px">Tarjeta: ${countMethod(barPaid,'tarjeta')} — C/${sumMethod(barPaid,'tarjeta').toLocaleString()}</span>`:''}
+${countMethod(barPaid,'mixto')>0?`<span style="background:#78350f;color:#fcd34d;padding:3px 10px;border-radius:20px">Efectivo+Tarjeta: ${countMethod(barPaid,'mixto')} — C/${sumMethod(barPaid,'mixto').toLocaleString()}</span>`:''}
+${countMethod(barPaid,'efectivo_sinpe')>0?`<span style="background:#134e4a;color:#5eead4;padding:3px 10px;border-radius:20px">Efectivo+Sinpe: ${countMethod(barPaid,'efectivo_sinpe')} — C/${sumMethod(barPaid,'efectivo_sinpe').toLocaleString()}</span>`:''}
+${countMethod(barPaid,'tarjeta_sinpe')>0?`<span style="background:#1e1b4b;color:#a5b4fc;padding:3px 10px;border-radius:20px">Tarjeta+Sinpe: ${countMethod(barPaid,'tarjeta_sinpe')} — C/${sumMethod(barPaid,'tarjeta_sinpe').toLocaleString()}</span>`:''}
 </div>
-<table><thead><tr><th>Mesera</th><th>Mesa / Barra</th><th style="text-align:center">Pago</th><th style="text-align:right">Total</th></tr></thead><tbody>${cuentasBarHTML}</tbody></table>` : ''}
+<table><thead><tr><th>Hora</th><th>Mesera</th><th>Mesa / Barra</th><th style="text-align:center">Pago</th><th style="text-align:right">Total</th></tr></thead><tbody>${cuentasBarHTML}</tbody></table>` : ''}
 ${restPaid.length > 0 ? `<div class="section-title">📋 Detalle — Restaurante (${restPaid.length})</div>
 <div style="display:flex;gap:12px;margin-bottom:8px;font-size:12px">
-<span style="background:#14532d;color:#86efac;padding:3px 10px;border-radius:20px">💵 Efectivo: ${countMethod(restPaid,'efectivo')} — ₡${sumMethod(restPaid,'efectivo').toLocaleString()}</span>
-<span style="background:#1e3a5f;color:#93c5fd;padding:3px 10px;border-radius:20px">📱 Sinpe: ${countMethod(restPaid,'sinpe')} — ₡${sumMethod(restPaid,'sinpe').toLocaleString()}</span>
-<span style="background:#3b1f6e;color:#d8b4fe;padding:3px 10px;border-radius:20px">💳 Tarjeta: ${countMethod(restPaid,'tarjeta')} — ₡${sumMethod(restPaid,'tarjeta').toLocaleString()}</span>
+<span style="background:#14532d;color:#86efac;padding:3px 10px;border-radius:20px">Efectivo: ${countMethod(restPaid,'efectivo')} — C/${sumMethod(restPaid,'efectivo').toLocaleString()}</span>
+${countMethod(restPaid,'sinpe')>0?`<span style="background:#1e3a5f;color:#93c5fd;padding:3px 10px;border-radius:20px">Sinpe: ${countMethod(restPaid,'sinpe')} — C/${sumMethod(restPaid,'sinpe').toLocaleString()}</span>`:''}
+${countMethod(restPaid,'tarjeta')>0?`<span style="background:#3b1f6e;color:#d8b4fe;padding:3px 10px;border-radius:20px">Tarjeta: ${countMethod(restPaid,'tarjeta')} — C/${sumMethod(restPaid,'tarjeta').toLocaleString()}</span>`:''}
+${countMethod(restPaid,'mixto')>0?`<span style="background:#78350f;color:#fcd34d;padding:3px 10px;border-radius:20px">Efectivo+Tarjeta: ${countMethod(restPaid,'mixto')} — C/${sumMethod(restPaid,'mixto').toLocaleString()}</span>`:''}
+${countMethod(restPaid,'efectivo_sinpe')>0?`<span style="background:#134e4a;color:#5eead4;padding:3px 10px;border-radius:20px">Efectivo+Sinpe: ${countMethod(restPaid,'efectivo_sinpe')} — C/${sumMethod(restPaid,'efectivo_sinpe').toLocaleString()}</span>`:''}
+${countMethod(restPaid,'tarjeta_sinpe')>0?`<span style="background:#1e1b4b;color:#a5b4fc;padding:3px 10px;border-radius:20px">Tarjeta+Sinpe: ${countMethod(restPaid,'tarjeta_sinpe')} — C/${sumMethod(restPaid,'tarjeta_sinpe').toLocaleString()}</span>`:''}
 </div>
-<table><thead><tr><th>Mesera</th><th>Mesa / Barra</th><th style="text-align:center">Pago</th><th style="text-align:right">Total</th></tr></thead><tbody>${cuentasRestHTML}</tbody></table>` : ''}
+<table><thead><tr><th>Hora</th><th>Mesera</th><th>Mesa / Barra</th><th style="text-align:center">Pago</th><th style="text-align:right">Total</th></tr></thead><tbody>${cuentasRestHTML}</tbody></table>` : ''}
 <div class="footer">LORE POS — Cierre de Caja ${fecha}</div>
 </body></html>`;
 
@@ -202,7 +222,7 @@ ${restPaid.length > 0 ? `<div class="section-title">📋 Detalle — Restaurante
               <StatRow label="Bebidas vendidas" value={`₡${paid.reduce((s,o)=>s+(o.items||[]).filter(i=>i.category!=='food').reduce((a,i)=>a+i.price*i.quantity,0),0).toLocaleString()}`} />
               <div className="border-t border-slate-700 pt-2 space-y-1">
                 <div className="text-slate-400 text-xs font-bold uppercase tracking-wide mb-1">Forma de pago</div>
-                {['efectivo','sinpe','tarjeta'].map(m => {
+                {['efectivo','sinpe','tarjeta','mixto','efectivo_sinpe','tarjeta_sinpe'].map(m => {
                   const t = paid.filter(o=>(o.paymentMethod||'efectivo')===m).reduce((s,o)=>s+o.total,0);
                   const c = paid.filter(o=>(o.paymentMethod||'efectivo')===m).length;
                   if (c === 0) return null;
@@ -296,7 +316,7 @@ ${restPaid.length > 0 ? `<div class="section-title">📋 Detalle — Restaurante
               <div className="bg-purple-900/50 rounded-xl p-4 border border-purple-500/50 flex justify-between items-center">
                 <div>
                   <div className="text-purple-200 text-sm font-bold">Por mesera</div>
-                  <div className="text-xs text-purple-400">María, Milena, Lin{numMeseras === 4 ? ', Temp Bar' : ''}</div>
+                  <div className="text-xs text-purple-400">Mari, Mile, Lin{numMeseras === 4 ? ', Temp Bar' : ''}</div>
                 </div>
                 <div className="text-2xl font-bold text-purple-200">₡{porMesera.toLocaleString()}</div>
               </div>
@@ -310,18 +330,21 @@ ${restPaid.length > 0 ? `<div class="section-title">📋 Detalle — Restaurante
               <h3 className="text-[#94cb47] font-bold text-lg mb-4">{titulo}</h3>
               {paid.length === 0 ? <p className="text-slate-500 text-sm">Sin pagos</p> : (
                 <div className="space-y-2 max-h-60 overflow-y-auto">
-                  {paid.map(o => (
-                    <div key={o._id || o.id} className="flex justify-between items-center p-3 bg-slate-700/50 rounded-lg gap-2">
-                      <div className="min-w-0">
-                        <div className="text-white text-sm font-bold truncate">
-                          {o.locationLabel || o.barra || (o.table ? `Mesa ${o.table}` : '-')}{o.clientName ? ` — ${o.clientName}` : ''}
+                  {[...paid].sort((a,b) => new Date(b.closedAt) - new Date(a.closedAt)).map(o => (
+                    <div key={o._id || o.id} className="p-3 bg-slate-700/50 rounded-lg">
+                      <div className="flex justify-between items-start gap-2">
+                        <div className="min-w-0 flex-1">
+                          <div className="text-white text-sm font-bold truncate">
+                            {o.locationLabel || o.barra || (o.table ? `Mesa ${o.table}` : '-')}{o.clientName ? ` — ${o.clientName}` : ''}
+                          </div>
+                          <div className="text-slate-400 text-xs">👤 {o.mesera}{o.closedAt ? ` · ${new Date(o.closedAt).toLocaleTimeString('es-CR',{hour:'2-digit',minute:'2-digit'})}` : ''}</div>
                         </div>
-                        <div className="text-slate-400 text-xs">👤 {o.mesera}</div>
-                      </div>
-                      <div className="flex flex-col items-end gap-1 flex-shrink-0">
-                        {payBadge(o.paymentMethod)}
-                        <span className="text-[#94cb47] font-bold text-sm whitespace-nowrap">₡{o.total.toLocaleString()}</span>
-                        <button onClick={() => setViewItemsOrder(o)} className="bg-slate-600 hover:bg-slate-500 text-white px-2 py-1 rounded text-xs">📋</button>
+                        <div className="flex flex-col items-end gap-1 flex-shrink-0">
+                          {payBadge(o.paymentMethod)}
+                          <span className="text-[#94cb47] font-bold text-sm whitespace-nowrap">₡{o.total.toLocaleString()}</span>
+                          {o.descuento > 0 && <span className="text-amber-400 text-xs">-₡{o.descuento.toLocaleString()} desc.</span>}
+                          <button onClick={() => setViewItemsOrder(o)} className="bg-slate-600 hover:bg-slate-500 text-white px-2 py-1 rounded text-xs">📋</button>
+                        </div>
                       </div>
                     </div>
                   ))}
