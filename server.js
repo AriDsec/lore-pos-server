@@ -45,6 +45,8 @@ const accountSchema = new mongoose.Schema({
   total: Number,
   totalOriginal: Number,
   descuento: { type: Number, default: 0 },
+  efectivoMixto: Number,
+  tarjetaMixto: Number,
   createdAt: Date,
   lastUpdated: Date,
   status: { type: String, default: 'open' },
@@ -130,6 +132,11 @@ app.post('/api/accounts/:id/close', async (req, res) => {
     account.status = 'paid';
     account.closedAt = new Date();
     account.paymentMethod = req.body.paymentMethod || 'efectivo';
+    // Si es pago mixto, guardar desglose
+    if (req.body.paymentMethod === 'mixto') {
+      account.efectivoMixto = req.body.efectivoMixto || 0;
+      account.tarjetaMixto  = req.body.tarjetaMixto  || 0;
+    }
     // Si hay descuento, guardar total real cobrado y original
     if (req.body.totalCobrado !== undefined) {
       account.totalOriginal = account.total;
