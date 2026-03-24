@@ -75,6 +75,15 @@ export const deleteKitchenOrder = (id) =>
 export const deleteAccount = (id) =>
   fetch(`${BASE}/accounts/${id}`, { method: 'DELETE' }).then(handleResponse);
 
+export const getMeserasActivas = () =>
+  fetch(`${BASE}/config/meseras_activas`).then(r => r.ok ? r.json() : null).catch(() => null);
+
+export const setMeserasActivas = (val) =>
+  fetch(`${BASE}/config/meseras_activas`, {
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ value: val })
+  }).then(handleResponse);
+
 export const getReport = (zone) =>
   fetch(`${BASE}/reports/${zone}`).then(handleResponse);
 
