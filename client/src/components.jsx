@@ -1337,6 +1337,7 @@ export function PinModal({ userName, onSuccess, onCancel }) {
 export function PinLoginScreen({ isLandscape, syncError, loading, onLogin }) {
   const [loginPin, setPin] = useState('');
   const [loginError, setLoginError] = useState(false);
+  const [loginBloqueado, setLoginBloqueado] = useState(false);
   const [attempting, setAttempting] = useState(false);
 
   const loginHandleDigit = async (d) => {
@@ -1344,11 +1345,15 @@ export function PinLoginScreen({ isLandscape, syncError, loading, onLogin }) {
     const loginNext = loginPin + d;
     setPin(loginNext);
     setLoginError(false);
+    setLoginBloqueado(false);
     if (loginNext.length === 4) {
       setAttempting(true);
       setTimeout(async () => {
         const loginOk = await onLogin(loginNext);
-        if (!loginOk) {
+        if (loginOk === 'bloqueado') {
+          setLoginBloqueado(true);
+          setPin('');
+        } else if (!loginOk) {
           setLoginError(true);
           setPin('');
         }
@@ -1375,6 +1380,7 @@ export function PinLoginScreen({ isLandscape, syncError, loading, onLogin }) {
         ))}
       </div>
       {loginError && <p className="text-red-400 text-center text-xs mb-3">PIN incorrecto</p>}
+      {loginBloqueado && <p className="text-amber-400 text-center text-xs mb-3 font-bold">Acceso no disponible hoy — contacta al administrador</p>}
       <div className="grid grid-cols-3 gap-2">
         {[1,2,3,4,5,6,7,8,9].map(d => (
           <button key={d} onClick={() => loginHandleDigit(String(d))}
