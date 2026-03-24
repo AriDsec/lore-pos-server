@@ -2,283 +2,75 @@
 // LICORES CON PRESENTACIONES
 // ─────────────────────────────────────────────
 export const LICORES = [
-  // ── 1800 ──
-  { id: 'lic_1800_anejo', name: '1800 Añejo', category: 'alcoholic', presentaciones: [
-    { id: 've', label: 'Venta', price: 30000 }, { id: 'tp', label: 'Trago Pequeño', price: 3000 },
-    { id: 'tg', label: 'Trago Grande', price: 5000 }, { id: 'cu', label: 'Cuarto', price: 15000 },
-    { id: 'me', label: 'Media', price: 20000 }, { id: 'bo', label: 'Botella', price: 40000 },
-  ]},
-  { id: 'lic_1800_blanco', name: '1800 Blanco', category: 'alcoholic', presentaciones: [
-    { id: 've', label: 'Venta', price: 24000 }, { id: 'tp', label: 'Trago Pequeño', price: 2500 },
-    { id: 'tg', label: 'Trago Grande', price: 4000 }, { id: 'cu', label: 'Cuarto', price: 10000 },
-    { id: 'me', label: 'Media', price: 16000 }, { id: 'bo', label: 'Botella', price: 32000 },
-  ]},
-  { id: 'lic_1800_reposado', name: '1800 Reposado', category: 'alcoholic', presentaciones: [
-    { id: 've', label: 'Venta', price: 24000 }, { id: 'tp', label: 'Trago Pequeño', price: 2500 },
-    { id: 'tg', label: 'Trago Grande', price: 4000 }, { id: 'cu', label: 'Cuarto', price: 10000 },
-    { id: 'me', label: 'Media', price: 16000 }, { id: 'bo', label: 'Botella', price: 32000 },
-  ]},
-  // ── A ──
-  { id: 'lic_absolut', name: 'Absolut', category: 'alcoholic', presentaciones: [
-    { id: 've', label: 'Venta', price: 17000 }, { id: 'tp', label: 'Trago Pequeño', price: 2000 },
-    { id: 'tg', label: 'Trago Grande', price: 3000 }, { id: 'cu', label: 'Cuarto', price: 6000 },
-    { id: 'me', label: 'Media', price: 9000 }, { id: 'li', label: 'Litro', price: 22000 },
-  ]},
-  { id: 'lic_amarula', name: 'Amarula', category: 'alcoholic', presentaciones: [
-    { id: 've', label: 'Venta', price: 22000 }, { id: 'tp', label: 'Trago Pequeño', price: 2000 },
-    { id: 'tg', label: 'Trago Grande', price: 3000 }, { id: 'cu', label: 'Cuarto', price: 8000 },
-    { id: 'me', label: 'Media', price: 13000 }, { id: 'li', label: 'Litro', price: 30000 },
-  ]},
-  { id: 'lic_antioq_azul', name: 'Antioqueño Azul', category: 'alcoholic', presentaciones: [
-    { id: 've', label: 'Venta', price: 16000 }, { id: 'tp', label: 'Trago Pequeño', price: 2000 },
-    { id: 'tg', label: 'Trago Grande', price: 3000 }, { id: 'cu', label: 'Cuarto', price: 7000 },
-    { id: 'me', label: 'Media', price: 10000 }, { id: 'li', label: 'Litro', price: 21000 },
-  ]},
-  { id: 'lic_antioq_rojo', name: 'Antioqueño Rojo', category: 'alcoholic', presentaciones: [
-    { id: 've', label: 'Venta', price: 16000 }, { id: 'tp', label: 'Trago Pequeño', price: 2000 },
-    { id: 'tg', label: 'Trago Grande', price: 3000 }, { id: 'cu', label: 'Cuarto', price: 7000 },
-    { id: 'me', label: 'Media', price: 10000 }, { id: 'li', label: 'Litro', price: 21000 },
-  ]},
-  { id: 'lic_antioq_verde', name: 'Antioqueño Verde', category: 'alcoholic', presentaciones: [
-    { id: 've', label: 'Venta', price: 16000 }, { id: 'tp', label: 'Trago Pequeño', price: 2000 },
-    { id: 'tg', label: 'Trago Grande', price: 3000 }, { id: 'cu', label: 'Cuarto', price: 7000 },
-    { id: 'me', label: 'Media', price: 10000 }, { id: 'li', label: 'Litro', price: 21000 },
-  ]},
-  { id: 'lic_anis_imperial', name: 'Anís Imperial', category: 'alcoholic', presentaciones: [
-    { id: 've', label: 'Venta', price: 11000 }, { id: 'tp', label: 'Trago Pequeño', price: 1500 },
-    { id: 'tg', label: 'Trago Grande', price: 2500 }, { id: 'cu', label: 'Cuarto', price: 5000 },
-    { id: 'me', label: 'Media', price: 8000 }, { id: 'bo', label: 'Botella', price: 15000 },
-  ]},
-  // ── B ──
-  { id: 'lic_bacardi', name: 'Bacardi', category: 'alcoholic', presentaciones: [
-    { id: 've', label: 'Venta', price: 12000 }, { id: 'tp', label: 'Trago Pequeño', price: 1500 },
-    { id: 'tg', label: 'Trago Grande', price: 2500 }, { id: 'cu', label: 'Cuarto', price: 5000 },
-    { id: 'me', label: 'Media', price: 8000 }, { id: 'li', label: 'Litro', price: 15000 },
-  ]},
-  { id: 'lic_baileys', name: 'Baileys', category: 'alcoholic', presentaciones: [
-    { id: 've', label: 'Venta', price: 25000 }, { id: 'tp', label: 'Trago Pequeño', price: 2000 },
-    { id: 'tg', label: 'Trago Grande', price: 3500 }, { id: 'cu', label: 'Cuarto', price: 9000 },
-    { id: 'me', label: 'Media', price: 13000 }, { id: 'li', label: 'Litro', price: 31000 },
-  ]},
-  { id: 'lic_ballantines', name: 'Ballantines', category: 'alcoholic', presentaciones: [
-    { id: 've', label: 'Venta', price: 20000 }, { id: 'tp', label: 'Trago Pequeño', price: 2000 },
-    { id: 'tg', label: 'Trago Grande', price: 3000 }, { id: 'cu', label: 'Cuarto', price: 7000 },
-    { id: 'me', label: 'Media', price: 12000 }, { id: 'li', label: 'Litro', price: 30000 },
-  ]},
-  { id: 'lic_black_white', name: 'Black & White', category: 'alcoholic', presentaciones: [
-    { id: 've', label: 'Venta', price: 15000 }, { id: 'tp', label: 'Trago Pequeño', price: 1500 },
-    { id: 'tg', label: 'Trago Grande', price: 2500 }, { id: 'cu', label: 'Cuarto', price: 6000 },
-    { id: 'me', label: 'Media', price: 9000 }, { id: 'li', label: 'Litro', price: 20000 },
-  ]},
-  { id: 'lic_buchanans', name: "Buchanan's", category: 'alcoholic', presentaciones: [
-    { id: 've', label: 'Venta', price: 35000 }, { id: 'tp', label: 'Trago Pequeño', price: 3000 },
-    { id: 'tg', label: 'Trago Grande', price: 5000 }, { id: 'cu', label: 'Cuarto', price: 15000 },
-    { id: 'me', label: 'Media', price: 27000 }, { id: 'li', label: 'Litro', price: 65000 },
-  ]},
-  // ── C ──
-  { id: 'lic_cacique', name: 'Cacique', category: 'alcoholic', presentaciones: [
-    { id: 've', label: 'Venta', price: 10000 }, { id: 'tp', label: 'Trago Pequeño', price: 1000 },
-    { id: 'tg', label: 'Trago Grande', price: 1500 }, { id: 'cu', label: 'Cuarto', price: 4000 },
-    { id: 'me', label: 'Media', price: 6000 }, { id: 'li', label: 'Litro', price: 12000 },
-  ]},
-  { id: 'lic_campari', name: 'Campari', category: 'alcoholic', presentaciones: [
-    { id: 've', label: 'Venta', price: 20000 }, { id: 'tp', label: 'Trago Pequeño', price: 2000 },
-    { id: 'tg', label: 'Trago Grande', price: 3000 }, { id: 'cu', label: 'Cuarto', price: 7000 },
-    { id: 'me', label: 'Media', price: 12000 }, { id: 'li', label: 'Litro', price: 27000 },
-  ]},
-  { id: 'lic_captain_morgan', name: 'Captain Morgan', category: 'alcoholic', presentaciones: [
-    { id: 've', label: 'Venta', price: 15000 }, { id: 'tp', label: 'Trago Pequeño', price: 1500 },
-    { id: 'tg', label: 'Trago Grande', price: 2500 }, { id: 'cu', label: 'Cuarto', price: 5000 },
-    { id: 'me', label: 'Media', price: 8000 }, { id: 'li', label: 'Litro', price: 20000 },
-  ]},
-  { id: 'lic_centenario', name: 'Centenario', category: 'alcoholic', presentaciones: [
-    { id: 've', label: 'Venta', price: 18000 }, { id: 'tp', label: 'Trago Pequeño', price: 1500 },
-    { id: 'tg', label: 'Trago Grande', price: 2500 }, { id: 'cu', label: 'Cuarto', price: 7000 },
-    { id: 'me', label: 'Media', price: 10000 }, { id: 'li', label: 'Litro', price: 23000 },
-  ]},
-  { id: 'lic_chivas_regal', name: 'Chivas Regal', category: 'alcoholic', presentaciones: [
-    { id: 've', label: 'Venta', price: 35000 }, { id: 'tp', label: 'Trago Pequeño', price: 2200 },
-    { id: 'tg', label: 'Trago Grande', price: 4000 }, { id: 'cu', label: 'Cuarto', price: 12000 },
-    { id: 'me', label: 'Media', price: 17000 }, { id: 'li', label: 'Litro', price: 50000 },
-  ]},
-  // ── D ──
-  { id: 'lic_don_julio', name: 'Don Julio', category: 'alcoholic', presentaciones: [
-    { id: 've', label: 'Venta', price: 75000 }, { id: 'tp', label: 'Trago Pequeño', price: 5000 },
-    { id: 'tg', label: 'Trago Grande', price: 10000 }, { id: 'cu', label: 'Cuarto', price: 30000 },
-    { id: 'me', label: 'Media', price: 50000 }, { id: 'bo', label: 'Botella', price: 100000 },
-  ]},
-  // ── F ──
-  { id: 'lic_fireball', name: 'Fireball', category: 'alcoholic', presentaciones: [
-    { id: 've', label: 'Venta', price: 17000 }, { id: 'tp', label: 'Trago Pequeño', price: 2000 },
-    { id: 'tg', label: 'Trago Grande', price: 3000 }, { id: 'cu', label: 'Cuarto', price: 7000 },
-    { id: 'me', label: 'Media', price: 11000 }, { id: 'li', label: 'Litro', price: 22000 },
-  ]},
-  { id: 'lic_flor_cana', name: 'Flor de Caña', category: 'alcoholic', presentaciones: [
-    { id: 've', label: 'Venta', price: 14000 }, { id: 'tp', label: 'Trago Pequeño', price: 1500 },
-    { id: 'tg', label: 'Trago Grande', price: 2500 }, { id: 'cu', label: 'Cuarto', price: 5000 },
-    { id: 'me', label: 'Media', price: 8000 }, { id: 'li', label: 'Litro', price: 18000 },
-  ]},
-  { id: 'lic_flor_cana_coco', name: 'Flor de Caña Coco', category: 'alcoholic', presentaciones: [
-    { id: 've', label: 'Venta', price: 15000 }, { id: 'tp', label: 'Trago Pequeño', price: 1500 },
-    { id: 'tg', label: 'Trago Grande', price: 2500 }, { id: 'cu', label: 'Cuarto', price: 5000 },
-    { id: 'me', label: 'Media', price: 8000 }, { id: 'li', label: 'Litro', price: 18000 },
-  ]},
-  { id: 'lic_frangelico', name: 'Frangelico', category: 'alcoholic', presentaciones: [
-    { id: 've', label: 'Venta', price: 26000 }, { id: 'tp', label: 'Trago Pequeño', price: 2500 },
-    { id: 'tg', label: 'Trago Grande', price: 3500 }, { id: 'cu', label: 'Cuarto', price: 9000 },
-    { id: 'me', label: 'Media', price: 15000 }, { id: 'li', label: 'Litro', price: 32000 },
-  ]},
-  // ── G ──
-  { id: 'lic_gotas_amargas', name: 'Gotas Amargas', category: 'alcoholic', presentaciones: [
-    { id: 've', label: 'Venta', price: 8000 }, { id: 'tp', label: 'Trago Pequeño', price: 1000 },
-    { id: 'tg', label: 'Trago Grande', price: 1500 }, { id: 'cu', label: 'Cuarto', price: 3000 },
-    { id: 'me', label: 'Media', price: 5000 }, { id: 'bo', label: 'Botella', price: 9000 },
-  ]},
-  // ── H ──
-  { id: 'lic_hypnotic', name: 'Hypnotic', category: 'alcoholic', presentaciones: [
-    { id: 've', label: 'Venta', price: 28000 }, { id: 'tp', label: 'Trago Pequeño', price: 2500 },
-    { id: 'tg', label: 'Trago Grande', price: 3500 }, { id: 'cu', label: 'Cuarto', price: 10000 },
-    { id: 'me', label: 'Media', price: 16000 }, { id: 'li', label: 'Litro', price: 34000 },
-  ]},
-  // ── J ──
-  { id: 'lic_jack_daniels', name: "Jack Daniel's", category: 'alcoholic', presentaciones: [
-    { id: 've', label: 'Venta', price: 30000 }, { id: 'tp', label: 'Trago Pequeño', price: 2500 },
-    { id: 'tg', label: 'Trago Grande', price: 4000 }, { id: 'cu', label: 'Cuarto', price: 12000 },
-    { id: 'me', label: 'Media', price: 20000 }, { id: 'li', label: 'Litro', price: 40000 },
-  ]},
-  { id: 'lic_jack_manzana', name: "Jack Daniel's Manzana", category: 'alcoholic', presentaciones: [
-    { id: 've', label: 'Venta', price: 30000 }, { id: 'tp', label: 'Trago Pequeño', price: 2500 },
-    { id: 'tg', label: 'Trago Grande', price: 4000 }, { id: 'cu', label: 'Cuarto', price: 12000 },
-    { id: 'me', label: 'Media', price: 20000 }, { id: 'li', label: 'Litro', price: 40000 },
-  ]},
-  { id: 'lic_jack_honey', name: "Jack Daniel's Honey", category: 'alcoholic', presentaciones: [
-    { id: 've', label: 'Venta', price: 30000 }, { id: 'tp', label: 'Trago Pequeño', price: 2500 },
-    { id: 'tg', label: 'Trago Grande', price: 4000 }, { id: 'cu', label: 'Cuarto', price: 12000 },
-    { id: 'me', label: 'Media', price: 20000 }, { id: 'li', label: 'Litro', price: 40000 },
-  ]},
-  { id: 'lic_jagermeister', name: 'Jägermeister', category: 'alcoholic', presentaciones: [
-    { id: 've', label: 'Venta', price: 32000 }, { id: 'tp', label: 'Trago Pequeño', price: 2500 },
-    { id: 'tg', label: 'Trago Grande', price: 4000 }, { id: 'cu', label: 'Cuarto', price: 12000 },
-    { id: 'me', label: 'Media', price: 21000 }, { id: 'li', label: 'Litro', price: 42000 },
-  ]},
-  { id: 'lic_jarana_claro', name: 'Jarana Claro', category: 'alcoholic', presentaciones: [
-    { id: 've', label: 'Venta', price: 10000 }, { id: 'tp', label: 'Trago Pequeño', price: 1200 },
-    { id: 'tg', label: 'Trago Grande', price: 1800 }, { id: 'cu', label: 'Cuarto', price: 4000 },
-    { id: 'me', label: 'Media', price: 6000 }, { id: 'li', label: 'Litro', price: 12000 },
-  ]},
-  { id: 'lic_jarana_oscuro', name: 'Jarana Oscuro', category: 'alcoholic', presentaciones: [
-    { id: 've', label: 'Venta', price: 10000 }, { id: 'tp', label: 'Trago Pequeño', price: 1200 },
-    { id: 'tg', label: 'Trago Grande', price: 1800 }, { id: 'cu', label: 'Cuarto', price: 4000 },
-    { id: 'me', label: 'Media', price: 6000 }, { id: 'li', label: 'Litro', price: 12000 },
-  ]},
-  { id: 'lic_jb', name: 'J&B', category: 'alcoholic', presentaciones: [
-    { id: 've', label: 'Venta', price: 18000 }, { id: 'tp', label: 'Trago Pequeño', price: 1800 },
-    { id: 'tg', label: 'Trago Grande', price: 2800 }, { id: 'cu', label: 'Cuarto', price: 7000 },
-    { id: 'me', label: 'Media', price: 11000 }, { id: 'li', label: 'Litro', price: 23000 },
-  ]},
-  { id: 'lic_jim_beam_honey', name: 'Jim Beam Honey', category: 'alcoholic', presentaciones: [
-    { id: 've', label: 'Venta', price: 25000 }, { id: 'tp', label: 'Trago Pequeño', price: 2200 },
-    { id: 'tg', label: 'Trago Grande', price: 3500 }, { id: 'cu', label: 'Cuarto', price: 9000 },
-    { id: 'me', label: 'Media', price: 15000 }, { id: 'li', label: 'Litro', price: 30000 },
-  ]},
-  { id: 'lic_jw_rojo', name: 'Johnnie Walker Rojo', category: 'alcoholic', presentaciones: [
-    { id: 've', label: 'Venta', price: 21000 }, { id: 'tp', label: 'Trago Pequeño', price: 2000 },
-    { id: 'tg', label: 'Trago Grande', price: 3000 }, { id: 'cu', label: 'Cuarto', price: 8000 },
-    { id: 'me', label: 'Media', price: 13000 }, { id: 'li', label: 'Litro', price: 26000 },
-  ]},
-  { id: 'lic_jw_negro', name: 'Johnnie Walker Negro', category: 'alcoholic', presentaciones: [
-    { id: 've', label: 'Venta', price: 33000 }, { id: 'tp', label: 'Trago Pequeño', price: 2500 },
-    { id: 'tg', label: 'Trago Grande', price: 4000 }, { id: 'cu', label: 'Cuarto', price: 12000 },
-    { id: 'me', label: 'Media', price: 20000 }, { id: 'li', label: 'Litro', price: 42000 },
-  ]},
-  { id: 'lic_jw_double_black', name: 'Johnnie Walker Double Black', category: 'alcoholic', presentaciones: [
-    { id: 've', label: 'Venta', price: 38000 }, { id: 'tp', label: 'Trago Pequeño', price: 3000 },
-    { id: 'tg', label: 'Trago Grande', price: 4500 }, { id: 'cu', label: 'Cuarto', price: 15000 },
-    { id: 'me', label: 'Media', price: 24000 }, { id: 'li', label: 'Litro', price: 48000 },
-  ]},
-  // ── M ──
-  { id: 'lic_malibu', name: 'Malibu', category: 'alcoholic', presentaciones: [
-    { id: 've', label: 'Venta', price: 18000 }, { id: 'tp', label: 'Trago Pequeño', price: 1800 },
-    { id: 'tg', label: 'Trago Grande', price: 2800 }, { id: 'cu', label: 'Cuarto', price: 7000 },
-    { id: 'me', label: 'Media', price: 11000 }, { id: 'li', label: 'Litro', price: 23000 },
-  ]},
-  { id: 'lic_milagro', name: 'Milagro', category: 'alcoholic', presentaciones: [
-    { id: 've', label: 'Venta', price: 32000 }, { id: 'tp', label: 'Trago Pequeño', price: 2500 },
-    { id: 'tg', label: 'Trago Grande', price: 4000 }, { id: 'cu', label: 'Cuarto', price: 12000 },
-    { id: 'me', label: 'Media', price: 20000 }, { id: 'li', label: 'Litro', price: 42000 },
-  ]},
-  // ── N ──
-  { id: 'lic_nikolai', name: 'Nikolai', category: 'alcoholic', presentaciones: [
-    { id: 've', label: 'Venta', price: 14000 }, { id: 'tp', label: 'Trago Pequeño', price: 1500 },
-    { id: 'tg', label: 'Trago Grande', price: 2500 }, { id: 'cu', label: 'Cuarto', price: 5000 },
-    { id: 'me', label: 'Media', price: 8000 }, { id: 'li', label: 'Litro', price: 18000 },
-  ]},
-  // ── O ──
-  { id: 'lic_old_parr', name: 'Old Parr', category: 'alcoholic', presentaciones: [
-    { id: 've', label: 'Venta', price: 36000 }, { id: 'tp', label: 'Trago Pequeño', price: 2800 },
-    { id: 'tg', label: 'Trago Grande', price: 4200 }, { id: 'cu', label: 'Cuarto', price: 14000 },
-    { id: 'me', label: 'Media', price: 22000 }, { id: 'li', label: 'Litro', price: 46000 },
-  ]},
-  // ── P ──
-  { id: 'lic_patron_reposado', name: 'Patrón Reposado', category: 'alcoholic', presentaciones: [
-    { id: 've', label: 'Venta', price: 65000 }, { id: 'tp', label: 'Trago Pequeño', price: 4500 },
-    { id: 'tg', label: 'Trago Grande', price: 8000 }, { id: 'cu', label: 'Cuarto', price: 25000 },
-    { id: 'me', label: 'Media', price: 40000 }, { id: 'bo', label: 'Botella', price: 85000 },
-  ]},
-  { id: 'lic_patron_silver', name: 'Patrón Silver', category: 'alcoholic', presentaciones: [
-    { id: 've', label: 'Venta', price: 65000 }, { id: 'tp', label: 'Trago Pequeño', price: 4500 },
-    { id: 'tg', label: 'Trago Grande', price: 8000 }, { id: 'cu', label: 'Cuarto', price: 25000 },
-    { id: 'me', label: 'Media', price: 40000 }, { id: 'bo', label: 'Botella', price: 85000 },
-  ]},
-  // ── R ──
-  { id: 'lic_ron_cortes', name: 'Ron Cortés', category: 'alcoholic', presentaciones: [
-    { id: 've', label: 'Venta', price: 11000 }, { id: 'tp', label: 'Trago Pequeño', price: 1200 },
-    { id: 'tg', label: 'Trago Grande', price: 1800 }, { id: 'cu', label: 'Cuarto', price: 4000 },
-    { id: 'me', label: 'Media', price: 6000 }, { id: 'li', label: 'Litro', price: 12000 },
-  ]},
-  { id: 'lic_ron_rico', name: 'Ron Rico', category: 'alcoholic', presentaciones: [
-    { id: 've', label: 'Venta', price: 12000 }, { id: 'tp', label: 'Trago Pequeño', price: 1300 },
-    { id: 'tg', label: 'Trago Grande', price: 2000 }, { id: 'cu', label: 'Cuarto', price: 4500 },
-    { id: 'me', label: 'Media', price: 7000 }, { id: 'li', label: 'Litro', price: 14000 },
-  ]},
-  { id: 'lic_ron_viejo', name: 'Ron Viejo', category: 'alcoholic', presentaciones: [
-    { id: 've', label: 'Venta', price: 14000 }, { id: 'tp', label: 'Trago Pequeño', price: 1500 },
-    { id: 'tg', label: 'Trago Grande', price: 2500 }, { id: 'cu', label: 'Cuarto', price: 5000 },
-    { id: 'me', label: 'Media', price: 8000 }, { id: 'li', label: 'Litro', price: 18000 },
-  ]},
-  // ── S ──
-  { id: 'lic_sambuca', name: 'Sambuca', category: 'alcoholic', presentaciones: [
-    { id: 've', label: 'Venta', price: 24000 }, { id: 'tp', label: 'Trago Pequeño', price: 2200 },
-    { id: 'tg', label: 'Trago Grande', price: 3500 }, { id: 'cu', label: 'Cuarto', price: 9000 },
-    { id: 'me', label: 'Media', price: 14000 }, { id: 'li', label: 'Litro', price: 28000 },
-  ]},
-  { id: 'lic_smirnoff', name: 'Smirnoff', category: 'alcoholic', presentaciones: [
-    { id: 've', label: 'Venta', price: 17000 }, { id: 'tp', label: 'Trago Pequeño', price: 2000 },
-    { id: 'tg', label: 'Trago Grande', price: 3000 }, { id: 'cu', label: 'Cuarto', price: 6000 },
-    { id: 'me', label: 'Media', price: 9000 }, { id: 'li', label: 'Litro', price: 22000 },
-  ]},
-  { id: 'lic_something_special', name: 'Something Special', category: 'alcoholic', presentaciones: [
-    { id: 've', label: 'Venta', price: 26000 }, { id: 'tp', label: 'Trago Pequeño', price: 2500 },
-    { id: 'tg', label: 'Trago Grande', price: 3800 }, { id: 'cu', label: 'Cuarto', price: 10000 },
-    { id: 'me', label: 'Media', price: 16000 }, { id: 'li', label: 'Litro', price: 32000 },
-  ]},
-  // ── VINOS ──
-  { id: 'lic_vino_casillero', name: 'Vino Casillero', category: 'alcoholic', presentaciones: [
-    { id: 've', label: 'Venta', price: 15000 }, { id: 'bo', label: 'Botella', price: 15000 },
-  ]},
-  { id: 'lic_vino_frontera', name: 'Vino Frontera', category: 'alcoholic', presentaciones: [
-    { id: 've', label: 'Venta', price: 12000 }, { id: 'bo', label: 'Botella', price: 12000 },
-  ]},
-  { id: 'lic_vino_reunite', name: 'Vino Reunite', category: 'alcoholic', presentaciones: [
-    { id: 've', label: 'Venta', price: 13000 }, { id: 'bo', label: 'Botella', price: 13000 },
-  ]},
-  { id: 'lic_valdespino', name: 'Valdespino', category: 'alcoholic', presentaciones: [
-    { id: 've', label: 'Venta', price: 16000 }, { id: 'bo', label: 'Botella', price: 16000 },
-  ]},
-  { id: 'lic_rose', name: 'Rosé', category: 'alcoholic', presentaciones: [
-    { id: 've', label: 'Venta', price: 14000 }, { id: 'bo', label: 'Botella', price: 14000 },
-  ]},
+  // ── Tequila ──
+  { id: 'lic_1800_anejo', name: '1800 Añejo', category: 'alcoholic', categoria: 'Tequila', presentaciones: [{ id: 've', label: 'Venta', price: 30000 }, { id: 'tp', label: 'Trago Pequeño', price: 3000 }, { id: 'tg', label: 'Trago Grande', price: 5000 }, { id: 'cu', label: 'Cuarto', price: 15000 }, { id: 'me', label: 'Media', price: 20000 }, { id: 'bo', label: 'Botella', price: 40000 }] },
+  { id: 'lic_1800_blanco', name: '1800 Blanco', category: 'alcoholic', categoria: 'Tequila', presentaciones: [{ id: 've', label: 'Venta', price: 24000 }, { id: 'tp', label: 'Trago Pequeño', price: 2500 }, { id: 'tg', label: 'Trago Grande', price: 4000 }, { id: 'cu', label: 'Cuarto', price: 10000 }, { id: 'me', label: 'Media', price: 16000 }, { id: 'bo', label: 'Botella', price: 32000 }] },
+  { id: 'lic_1800_reposado', name: '1800 Reposado', category: 'alcoholic', categoria: 'Tequila', presentaciones: [{ id: 've', label: 'Venta', price: 24000 }, { id: 'tp', label: 'Trago Pequeño', price: 2500 }, { id: 'tg', label: 'Trago Grande', price: 4000 }, { id: 'cu', label: 'Cuarto', price: 10000 }, { id: 'me', label: 'Media', price: 16000 }, { id: 'bo', label: 'Botella', price: 32000 }] },
+  { id: 'lic_don_julio', name: 'Don Julio', category: 'alcoholic', categoria: 'Tequila', presentaciones: [{ id: 've', label: 'Venta', price: 75000 }, { id: 'tp', label: 'Trago Pequeño', price: 5000 }, { id: 'tg', label: 'Trago Grande', price: 10000 }, { id: 'cu', label: 'Cuarto', price: 30000 }, { id: 'me', label: 'Media', price: 50000 }, { id: 'li', label: 'Litro', price: 100000 }] },
+  { id: 'lic_milagro', name: 'Milagro', category: 'alcoholic', categoria: 'Tequila', presentaciones: [{ id: 've', label: 'Venta', price: 40000 }, { id: 'tp', label: 'Trago Pequeño', price: 4000 }, { id: 'tg', label: 'Trago Grande', price: 8000 }, { id: 'cu', label: 'Cuarto', price: 15000 }, { id: 'me', label: 'Media', price: 25000 }, { id: 'li', label: 'Litro', price: 50000 }] },
+  { id: 'lic_patron_reposado', name: 'Patrón Reposado', category: 'alcoholic', categoria: 'Tequila', presentaciones: [{ id: 've', label: 'Venta', price: 75000 }, { id: 'tp', label: 'Trago Pequeño', price: 5000 }, { id: 'tg', label: 'Trago Grande', price: 9000 }, { id: 'cu', label: 'Cuarto', price: 30000 }, { id: 'me', label: 'Media', price: 50000 }, { id: 'bo', label: 'Botella', price: 100000 }] },
+  { id: 'lic_patron_silver', name: 'Patrón Silver', category: 'alcoholic', categoria: 'Tequila', presentaciones: [{ id: 've', label: 'Venta', price: 75000 }, { id: 'tp', label: 'Trago Pequeño', price: 5000 }, { id: 'tg', label: 'Trago Grande', price: 9000 }, { id: 'cu', label: 'Cuarto', price: 30000 }, { id: 'me', label: 'Media', price: 50000 }, { id: 'bo', label: 'Botella', price: 100000 }] },
+  { id: 'lic_jose_cuervo_oscuro', name: 'José Cuervo Oscuro', category: 'alcoholic', categoria: 'Tequila', presentaciones: [{ id: 've', label: 'Venta', price: 20000 }, { id: 'tp', label: 'Trago Pequeño', price: 1500 }, { id: 'tg', label: 'Trago Grande', price: 2500 }, { id: 'cu', label: 'Cuarto', price: 7000 }, { id: 'me', label: 'Media', price: 11000 }, { id: 'li', label: 'Litro', price: 25000 }] },
+
+  // ── Vodka ──
+  { id: 'lic_absolut', name: 'Absolut', category: 'alcoholic', categoria: 'Vodka', presentaciones: [{ id: 've', label: 'Venta', price: 17000 }, { id: 'tp', label: 'Trago Pequeño', price: 2000 }, { id: 'tg', label: 'Trago Grande', price: 3000 }, { id: 'cu', label: 'Cuarto', price: 6000 }, { id: 'me', label: 'Media', price: 9000 }, { id: 'li', label: 'Litro', price: 22000 }] },
+  { id: 'lic_smirnoff', name: 'Smirnoff', category: 'alcoholic', categoria: 'Vodka', presentaciones: [{ id: 've', label: 'Venta', price: 15000 }, { id: 'tp', label: 'Trago Pequeño', price: 1500 }, { id: 'tg', label: 'Trago Grande', price: 2500 }, { id: 'cu', label: 'Cuarto', price: 6000 }, { id: 'me', label: 'Media', price: 9000 }, { id: 'li', label: 'Litro', price: 18000 }] },
+  { id: 'lic_nikolai', name: 'Nikolai', category: 'alcoholic', categoria: 'Vodka', presentaciones: [{ id: 've', label: 'Venta', price: 9000 }, { id: 'tp', label: 'Trago Pequeño', price: 1500 }, { id: 'tg', label: 'Trago Grande', price: 2500 }, { id: 'cu', label: 'Cuarto', price: 5000 }, { id: 'me', label: 'Media', price: 7000 }, { id: 'li', label: 'Litro', price: 12000 }] },
+
+  // ── Ron ──
+  { id: 'lic_bacardi', name: 'Bacardí', category: 'alcoholic', categoria: 'Ron', presentaciones: [{ id: 've', label: 'Venta', price: 12000 }, { id: 'tp', label: 'Trago Pequeño', price: 1500 }, { id: 'tg', label: 'Trago Grande', price: 2500 }, { id: 'cu', label: 'Cuarto', price: 5000 }, { id: 'me', label: 'Media', price: 8000 }, { id: 'li', label: 'Litro', price: 15000 }] },
+  { id: 'lic_flor_de_cana', name: 'Flor de Caña', category: 'alcoholic', categoria: 'Ron', presentaciones: [{ id: 've', label: 'Venta', price: 16000 }, { id: 'tp', label: 'Trago Pequeño', price: 1500 }, { id: 'tg', label: 'Trago Grande', price: 2500 }, { id: 'cu', label: 'Cuarto', price: 6000 }, { id: 'me', label: 'Media', price: 9000 }, { id: 'li', label: 'Litro', price: 21000 }] },
+  { id: 'lic_flor_de_cana_coco', name: 'Flor de Caña Coco', category: 'alcoholic', categoria: 'Ron', presentaciones: [{ id: 've', label: 'Venta', price: 13000 }, { id: 'tp', label: 'Trago Pequeño', price: 2000 }, { id: 'tg', label: 'Trago Grande', price: 3000 }, { id: 'cu', label: 'Cuarto', price: 7000 }, { id: 'me', label: 'Media', price: 9000 }, { id: 'bo', label: 'Botella', price: 17000 }] },
+  { id: 'lic_captain_morgan', name: 'Captain Morgan', category: 'alcoholic', categoria: 'Ron', presentaciones: [{ id: 've', label: 'Venta', price: 15000 }, { id: 'tp', label: 'Trago Pequeño', price: 1500 }, { id: 'tg', label: 'Trago Grande', price: 2500 }, { id: 'cu', label: 'Cuarto', price: 5000 }, { id: 'me', label: 'Media', price: 8000 }, { id: 'li', label: 'Litro', price: 20000 }] },
+  { id: 'lic_ron_viejo', name: 'Ron Viejo', category: 'alcoholic', categoria: 'Ron', presentaciones: [{ id: 've', label: 'Venta', price: 8000 }, { id: 'tp', label: 'Trago Pequeño', price: 1500 }, { id: 'tg', label: 'Trago Grande', price: 2500 }, { id: 'cu', label: 'Cuarto', price: 4000 }, { id: 'me', label: 'Media', price: 6000 }, { id: 'li', label: 'Litro', price: 10000 }] },
+  { id: 'lic_ron_rico', name: 'Ron Rico', category: 'alcoholic', categoria: 'Ron', presentaciones: [{ id: 've', label: 'Venta', price: 11000 }, { id: 'tp', label: 'Trago Pequeño', price: 1500 }, { id: 'tg', label: 'Trago Grande', price: 2500 }, { id: 'cu', label: 'Cuarto', price: 5000 }, { id: 'me', label: 'Media', price: 7000 }, { id: 'li', label: 'Litro', price: 14000 }] },
+  { id: 'lic_ron_cortes', name: 'Ron Cortés', category: 'alcoholic', categoria: 'Ron', presentaciones: [{ id: 've', label: 'Venta', price: 9000 }, { id: 'tp', label: 'Trago Pequeño', price: 1500 }, { id: 'tg', label: 'Trago Grande', price: 2500 }, { id: 'cu', label: 'Cuarto', price: 5000 }, { id: 'me', label: 'Media', price: 7000 }, { id: 'li', label: 'Litro', price: 12000 }] },
+  { id: 'lic_cacique_litro', name: 'Cacique Litro', category: 'alcoholic', categoria: 'Ron', presentaciones: [{ id: 've', label: 'Venta', price: 10000 }, { id: 'tp', label: 'Trago Pequeño', price: 1000 }, { id: 'tg', label: 'Trago Grande', price: 1500 }, { id: 'cu', label: 'Cuarto', price: 4000 }, { id: 'me', label: 'Media', price: 6000 }, { id: 'li', label: 'Litro', price: 12000 }] },
+
+  // ── Whisky ──
+  { id: 'lic_buchanans', name: 'Buchanan\'s', category: 'alcoholic', categoria: 'Whisky', presentaciones: [{ id: 've', label: 'Venta', price: 35000 }, { id: 'tp', label: 'Trago Pequeño', price: 3000 }, { id: 'tg', label: 'Trago Grande', price: 5000 }, { id: 'cu', label: 'Cuarto', price: 15000 }, { id: 'me', label: 'Media', price: 27000 }, { id: 'li', label: 'Litro', price: 65000 }] },
+  { id: 'lic_chivas_regal', name: 'Chivas Regal', category: 'alcoholic', categoria: 'Whisky', presentaciones: [{ id: 've', label: 'Venta', price: 35000 }, { id: 'tp', label: 'Trago Pequeño', price: 2200 }, { id: 'tg', label: 'Trago Grande', price: 4000 }, { id: 'cu', label: 'Cuarto', price: 12000 }, { id: 'me', label: 'Media', price: 17000 }, { id: 'li', label: 'Litro', price: 50000 }] },
+  { id: 'lic_old_parr', name: 'Old Parr', category: 'alcoholic', categoria: 'Whisky', presentaciones: [{ id: 've', label: 'Venta', price: 35000 }, { id: 'tp', label: 'Trago Pequeño', price: 2200 }, { id: 'tg', label: 'Trago Grande', price: 4000 }, { id: 'cu', label: 'Cuarto', price: 12000 }, { id: 'me', label: 'Media', price: 17000 }, { id: 'li', label: 'Litro', price: 50000 }] },
+  { id: 'lic_johnnie_walker_red', name: 'Johnnie Walker Red', category: 'alcoholic', categoria: 'Whisky', presentaciones: [{ id: 've', label: 'Venta', price: 18000 }, { id: 'tp', label: 'Trago Pequeño', price: 1500 }, { id: 'tg', label: 'Trago Grande', price: 2500 }, { id: 'cu', label: 'Cuarto', price: 7000 }, { id: 'me', label: 'Media', price: 12000 }, { id: 'li', label: 'Litro', price: 24000 }] },
+  { id: 'lic_johnnie_walker_black', name: 'Johnnie Walker Black', category: 'alcoholic', categoria: 'Whisky', presentaciones: [{ id: 've', label: 'Venta', price: 35000 }, { id: 'tp', label: 'Trago Pequeño', price: 2200 }, { id: 'tg', label: 'Trago Grande', price: 4000 }, { id: 'cu', label: 'Cuarto', price: 10000 }, { id: 'me', label: 'Media', price: 15000 }, { id: 'li', label: 'Litro', price: 40000 }] },
+  { id: 'lic_johnnie_walker_double_black', name: 'Johnnie Walker Double Black', category: 'alcoholic', categoria: 'Whisky', presentaciones: [{ id: 've', label: 'Venta', price: 37000 }, { id: 'tp', label: 'Trago Pequeño', price: 3000 }, { id: 'tg', label: 'Trago Grande', price: 5000 }, { id: 'cu', label: 'Cuarto', price: 12000 }, { id: 'me', label: 'Media', price: 17000 }, { id: 'li', label: 'Litro', price: 50000 }] },
+  { id: 'lic_ballantines', name: 'Ballantine\'s', category: 'alcoholic', categoria: 'Whisky', presentaciones: [{ id: 've', label: 'Venta', price: 20000 }, { id: 'tp', label: 'Trago Pequeño', price: 2000 }, { id: 'tg', label: 'Trago Grande', price: 3000 }, { id: 'cu', label: 'Cuarto', price: 7000 }, { id: 'me', label: 'Media', price: 12000 }, { id: 'li', label: 'Litro', price: 30000 }] },
+  { id: 'lic_black_y_white', name: 'Black & White', category: 'alcoholic', categoria: 'Whisky', presentaciones: [{ id: 've', label: 'Venta', price: 15000 }, { id: 'tp', label: 'Trago Pequeño', price: 1500 }, { id: 'tg', label: 'Trago Grande', price: 2500 }, { id: 'cu', label: 'Cuarto', price: 6000 }, { id: 'me', label: 'Media', price: 9000 }, { id: 'li', label: 'Litro', price: 20000 }] },
+  { id: 'lic_jyb', name: 'J&B', category: 'alcoholic', categoria: 'Whisky', presentaciones: [{ id: 've', label: 'Venta', price: 18000 }, { id: 'tp', label: 'Trago Pequeño', price: 1500 }, { id: 'tg', label: 'Trago Grande', price: 2500 }, { id: 'cu', label: 'Cuarto', price: 7000 }, { id: 'me', label: 'Media', price: 12000 }, { id: 'li', label: 'Litro', price: 24000 }] },
+  { id: 'lic_jack_daniels', name: 'Jack Daniel\'s', category: 'alcoholic', categoria: 'Whisky', presentaciones: [{ id: 've', label: 'Venta', price: 30000 }, { id: 'tp', label: 'Trago Pequeño', price: 2000 }, { id: 'tg', label: 'Trago Grande', price: 3500 }, { id: 'cu', label: 'Cuarto', price: 10000 }, { id: 'me', label: 'Media', price: 15000 }, { id: 'li', label: 'Litro', price: 40000 }] },
+  { id: 'lic_jack_daniels_honey', name: 'Jack Daniel\'s Honey', category: 'alcoholic', categoria: 'Whisky', presentaciones: [{ id: 've', label: 'Venta', price: 35000 }, { id: 'tp', label: 'Trago Pequeño', price: 3000 }, { id: 'tg', label: 'Trago Grande', price: 5000 }, { id: 'cu', label: 'Cuarto', price: 15000 }, { id: 'me', label: 'Media', price: 25000 }, { id: 'li', label: 'Litro', price: 50000 }] },
+  { id: 'lic_jim_beam_honey', name: 'Jim Beam Honey', category: 'alcoholic', categoria: 'Whisky', presentaciones: [{ id: 've', label: 'Venta', price: 20000 }, { id: 'tp', label: 'Trago Pequeño', price: 2000 }, { id: 'tg', label: 'Trago Grande', price: 3000 }, { id: 'cu', label: 'Cuarto', price: 7000 }, { id: 'me', label: 'Media', price: 10000 }, { id: 'li', label: 'Litro', price: 20000 }] },
+
+  // ── Aguardiente ──
+  { id: 'lic_antioqueno_azul', name: 'Antioqueño Azul', category: 'alcoholic', categoria: 'Aguardiente', presentaciones: [{ id: 've', label: 'Venta', price: 16000 }, { id: 'tp', label: 'Trago Pequeño', price: 2000 }, { id: 'tg', label: 'Trago Grande', price: 3000 }, { id: 'cu', label: 'Cuarto', price: 7000 }, { id: 'me', label: 'Media', price: 10000 }, { id: 'li', label: 'Litro', price: 21000 }] },
+  { id: 'lic_antioqueno_rojo', name: 'Antioqueño Rojo', category: 'alcoholic', categoria: 'Aguardiente', presentaciones: [{ id: 've', label: 'Venta', price: 16000 }, { id: 'tp', label: 'Trago Pequeño', price: 2000 }, { id: 'tg', label: 'Trago Grande', price: 3000 }, { id: 'cu', label: 'Cuarto', price: 7000 }, { id: 'me', label: 'Media', price: 10000 }, { id: 'li', label: 'Litro', price: 21000 }] },
+  { id: 'lic_antioqueno_verde', name: 'Antioqueño Verde', category: 'alcoholic', categoria: 'Aguardiente', presentaciones: [{ id: 've', label: 'Venta', price: 16000 }, { id: 'tp', label: 'Trago Pequeño', price: 2000 }, { id: 'tg', label: 'Trago Grande', price: 3000 }, { id: 'cu', label: 'Cuarto', price: 7000 }, { id: 'me', label: 'Media', price: 10000 }, { id: 'li', label: 'Litro', price: 21000 }] },
+  { id: 'lic_centenario', name: 'Centenario', category: 'alcoholic', categoria: 'Aguardiente', presentaciones: [{ id: 've', label: 'Venta', price: 18000 }, { id: 'tp', label: 'Trago Pequeño', price: 1500 }, { id: 'tg', label: 'Trago Grande', price: 2500 }, { id: 'cu', label: 'Cuarto', price: 7000 }, { id: 'me', label: 'Media', price: 10000 }, { id: 'li', label: 'Litro', price: 23000 }] },
+  { id: 'lic_jarana_clara', name: 'Jarana Clara', category: 'alcoholic', categoria: 'Aguardiente', presentaciones: [{ id: 've', label: 'Venta', price: 20000 }, { id: 'tp', label: 'Trago Pequeño', price: 2000 }, { id: 'tg', label: 'Trago Grande', price: 3000 }, { id: 'cu', label: 'Cuarto', price: 10000 }, { id: 'me', label: 'Media', price: 15000 }, { id: 'li', label: 'Litro', price: 27000 }] },
+  { id: 'lic_jarana_oscura', name: 'Jarana Oscura', category: 'alcoholic', categoria: 'Aguardiente', presentaciones: [{ id: 've', label: 'Venta', price: 20000 }, { id: 'tp', label: 'Trago Pequeño', price: 2000 }, { id: 'tg', label: 'Trago Grande', price: 3000 }, { id: 'cu', label: 'Cuarto', price: 10000 }, { id: 'me', label: 'Media', price: 15000 }, { id: 'li', label: 'Litro', price: 27000 }] },
+
+  // ── Licor ──
+  { id: 'lic_amarula', name: 'Amarula', category: 'alcoholic', categoria: 'Licor', presentaciones: [{ id: 've', label: 'Venta', price: 22000 }, { id: 'tp', label: 'Trago Pequeño', price: 2000 }, { id: 'tg', label: 'Trago Grande', price: 3000 }, { id: 'cu', label: 'Cuarto', price: 8000 }, { id: 'me', label: 'Media', price: 13000 }, { id: 'li', label: 'Litro', price: 30000 }] },
+  { id: 'lic_baileys', name: 'Baileys', category: 'alcoholic', categoria: 'Licor', presentaciones: [{ id: 've', label: 'Venta', price: 25000 }, { id: 'tp', label: 'Trago Pequeño', price: 2000 }, { id: 'tg', label: 'Trago Grande', price: 3500 }, { id: 'cu', label: 'Cuarto', price: 9000 }, { id: 'me', label: 'Media', price: 13000 }, { id: 'li', label: 'Litro', price: 31000 }] },
+  { id: 'lic_frangelico', name: 'Frangelico', category: 'alcoholic', categoria: 'Licor', presentaciones: [{ id: 've', label: 'Venta', price: 26000 }, { id: 'tp', label: 'Trago Pequeño', price: 2000 }, { id: 'tg', label: 'Trago Grande', price: 3000 }, { id: 'cu', label: 'Cuarto', price: 10000 }, { id: 'me', label: 'Media', price: 15000 }, { id: 'li', label: 'Litro', price: 35000 }] },
+  { id: 'lic_fireball', name: 'Fireball', category: 'alcoholic', categoria: 'Licor', presentaciones: [{ id: 've', label: 'Venta', price: 23000 }, { id: 'tp', label: 'Trago Pequeño', price: 2000 }, { id: 'tg', label: 'Trago Grande', price: 3000 }, { id: 'cu', label: 'Cuarto', price: 9000 }, { id: 'me', label: 'Media', price: 13000 }, { id: 'li', label: 'Litro', price: 30000 }] },
+  { id: 'lic_jagermeister', name: 'Jägermeister', category: 'alcoholic', categoria: 'Licor', presentaciones: [{ id: 've', label: 'Venta', price: 20000 }, { id: 'tp', label: 'Trago Pequeño', price: 2000 }, { id: 'tg', label: 'Trago Grande', price: 3000 }, { id: 'cu', label: 'Cuarto', price: 10000 }, { id: 'me', label: 'Media', price: 15000 }, { id: 'li', label: 'Litro', price: 30000 }] },
+  { id: 'lic_sambuca', name: 'Sambuca', category: 'alcoholic', categoria: 'Licor', presentaciones: [{ id: 've', label: 'Venta', price: 11000 }, { id: 'tp', label: 'Trago Pequeño', price: 2000 }, { id: 'tg', label: 'Trago Grande', price: 3000 }, { id: 'cu', label: 'Cuarto', price: 7000 }, { id: 'me', label: 'Media', price: 9000 }, { id: 'li', label: 'Litro', price: 18000 }] },
+  { id: 'lic_campari', name: 'Campari', category: 'alcoholic', categoria: 'Licor', presentaciones: [{ id: 've', label: 'Venta', price: 20000 }, { id: 'tp', label: 'Trago Pequeño', price: 2000 }, { id: 'tg', label: 'Trago Grande', price: 3000 }, { id: 'cu', label: 'Cuarto', price: 7000 }, { id: 'me', label: 'Media', price: 12000 }, { id: 'li', label: 'Litro', price: 27000 }] },
+  { id: 'lic_malibu', name: 'Malibu', category: 'alcoholic', categoria: 'Licor', presentaciones: [{ id: 've', label: 'Venta', price: 15000 }, { id: 'tp', label: 'Trago Pequeño', price: 2000 }, { id: 'tg', label: 'Trago Grande', price: 3000 }, { id: 'cu', label: 'Cuarto', price: 7000 }, { id: 'me', label: 'Media', price: 10000 }, { id: 'li', label: 'Litro', price: 20000 }] },
+  { id: 'lic_anis_imperial', name: 'Anís Imperial', category: 'alcoholic', categoria: 'Licor', presentaciones: [{ id: 've', label: 'Venta', price: 11000 }, { id: 'tp', label: 'Trago Pequeño', price: 1500 }, { id: 'tg', label: 'Trago Grande', price: 2500 }, { id: 'cu', label: 'Cuarto', price: 5000 }, { id: 'me', label: 'Media', price: 8000 }, { id: 'bo', label: 'Botella', price: 15000 }] },
+  { id: 'lic_gotas_amargas', name: 'Gotas Amargas', category: 'alcoholic', categoria: 'Licor', presentaciones: [{ id: 've', label: 'Venta', price: 7000 }, { id: 'tp', label: 'Trago Pequeño', price: 500 }, { id: 'tg', label: 'Trago Grande', price: 1000 }, { id: 'cu', label: 'Cuarto', price: 2000 }, { id: 'me', label: 'Media', price: 4000 }, { id: 'li', label: 'Litro', price: 8000 }] },
+  { id: 'lic_hipnotic', name: 'Hipnotic', category: 'alcoholic', categoria: 'Licor', presentaciones: [{ id: 've', label: 'Venta', price: 30000 }, { id: 'tp', label: 'Trago Pequeño', price: 2500 }, { id: 'tg', label: 'Trago Grande', price: 4000 }, { id: 'cu', label: 'Cuarto', price: 12000 }, { id: 'me', label: 'Media', price: 17000 }, { id: 'li', label: 'Litro', price: 40000 }] },
+  { id: 'lic_something', name: 'Something', category: 'alcoholic', categoria: 'Licor', presentaciones: [{ id: 've', label: 'Venta', price: 20000 }, { id: 'tp', label: 'Trago Pequeño', price: 2000 }, { id: 'tg', label: 'Trago Grande', price: 3500 }, { id: 'cu', label: 'Cuarto', price: 8000 }, { id: 'me', label: 'Media', price: 13000 }, { id: 'li', label: 'Litro', price: 30000 }] },
+
+  // ── Vino ──
+  { id: 'lic_valdespino', name: 'Valdespino', category: 'alcoholic', categoria: 'Vino', presentaciones: [{ id: 've', label: 'Venta', price: 16000 }, { id: 'tp', label: 'Trago Pequeño', price: 1500 }, { id: 'tg', label: 'Trago Grande', price: 2500 }, { id: 'cu', label: 'Cuarto', price: 7000 }, { id: 'me', label: 'Media', price: 11000 }, { id: 'li', label: 'Litro', price: 22000 }] },
+  { id: 'lic_v_casillero', name: 'V. Casillero', category: 'alcoholic', categoria: 'Vino', presentaciones: [{ id: 've', label: 'Venta', price: 9000 }, { id: 'tp', label: 'Trago Pequeño', price: 1000 }, { id: 'tg', label: 'Trago Grande', price: 1500 }, { id: 'cu', label: 'Cuarto', price: 5000 }, { id: 'me', label: 'Media', price: 7000 }, { id: 'li', label: 'Litro', price: 12000 }] },
+  { id: 'lic_v_frontera', name: 'V. Frontera', category: 'alcoholic', categoria: 'Vino', presentaciones: [{ id: 've', label: 'Venta', price: 9000 }, { id: 'tp', label: 'Trago Pequeño', price: 1000 }, { id: 'tg', label: 'Trago Grande', price: 1500 }, { id: 'cu', label: 'Cuarto', price: 5000 }, { id: 'me', label: 'Media', price: 7000 }, { id: 'li', label: 'Litro', price: 12000 }] },
+  { id: 'lic_v_riunite', name: 'V. Riunite', category: 'alcoholic', categoria: 'Vino', presentaciones: [{ id: 've', label: 'Venta', price: 9000 }, { id: 'tp', label: 'Trago Pequeño', price: 1000 }, { id: 'tg', label: 'Trago Grande', price: 1500 }, { id: 'cu', label: 'Cuarto', price: 5000 }, { id: 'me', label: 'Media', price: 7000 }, { id: 'li', label: 'Litro', price: 12000 }] },
+  { id: 'lic_rose', name: 'Rosé', category: 'alcoholic', categoria: 'Vino', presentaciones: [{ id: 've', label: 'Venta', price: 27000 }, { id: 'tp', label: 'Trago Pequeño', price: 2500 }, { id: 'tg', label: 'Trago Grande', price: 4000 }, { id: 'cu', label: 'Cuarto', price: 12000 }, { id: 'me', label: 'Media', price: 18000 }, { id: 'li', label: 'Litro', price: 36000 }] },
 ];
+
 
 // ─────────────────────────────────────────────
 // ADICIONALES COCINA — van a pantalla de cocina
@@ -350,6 +142,7 @@ export const MENU = {
       { id: 'b_jugo_tomate', name: 'Jugo de Tomate', price: 1500, category: 'soda' },
       { id: 'b_tropicales', name: 'Tropicales', price: 1500, category: 'soda' },
       { id: 'b_aloe', name: 'Aloe', price: 2000, category: 'soda' },
+      { id: 'b_red_bull', name: 'Red Bull', price: 2000, category: 'soda' },
     ],
     'Arroz con': [
       { id: 'f_arroz_pollo', name: 'Arroz con Pollo', price: 3900, category: 'food' },
@@ -449,6 +242,7 @@ export const MENU = {
       { id: 'r_jugos', name: 'Jugos', price: 1500, category: 'soda' },
       { id: 'r_jugo_tomate', name: 'Jugo de Tomate', price: 1500, category: 'soda' },
       { id: 'r_aloe', name: 'Aloe', price: 2000, category: 'soda' },
+      { id: 'r_red_bull', name: 'Red Bull', price: 2000, category: 'soda' },
     ],
     'Arroz con': [
       { id: 'f_arroz_pollo', name: 'Arroz con Pollo', price: 3900, category: 'food' },
