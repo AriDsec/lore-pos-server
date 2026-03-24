@@ -39,9 +39,22 @@ export function AdminScreen({ barPaid, restPaid, loading, onLogout, setPaidOrder
     localStorage.setItem('lore_num_meseras', String(n));
   };
 
+  const [meserasActivas, setMeserasActivas] = useState({});
+
   useEffect(() => {
     api.getAccessLog().then(setAccessLog).catch(() => {});
+    api.getMeserasActivas().then(cfg => {
+      if (cfg && cfg.value) setMeserasActivas(cfg.value);
+    }).catch(() => {});
   }, []);
+
+  const toggleMesera = async (nombre) => {
+    const updated = { ...meserasActivas, [nombre]: meserasActivas[nombre] === false ? true : false };
+    setMeserasActivas(updated);
+    await api.setMeserasActivas(updated).catch(() => {});
+  };
+
+  const meseras = ['Mari', 'Mile', 'Lin', 'Temp Bar'];
 
   const totalBarCobrado  = barPaid.reduce((s, o) => s + o.total, 0);
   const totalRestCobrado = restPaid.reduce((s, o) => s + o.total, 0);
@@ -372,6 +385,31 @@ ${countMethod(restPaid,'tarjeta_sinpe')>0?`<span style="background:#1e1b4b;color
               )}
             </div>
           ))}
+        </div>
+
+        {/* ── Control de acceso meseras ── */}
+        <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-5 shadow-2xl">
+          <h3 className="text-[#94cb47] font-bold text-lg mb-4">Acceso Meseras</h3>
+          <p className="text-slate-500 text-xs mb-4">Desactiva el PIN de una mesera para que no pueda entrar al sistema</p>
+          <div className="grid grid-cols-2 gap-3">
+            {meseras.map(nombre => {
+              const activa = meserasActivas[nombre] !== false;
+              return (
+                <div key={nombre} className={`flex items-center justify-between p-3 rounded-xl border transition ${activa ? 'bg-slate-700/40 border-slate-600' : 'bg-red-900/20 border-red-500/40'}`}>
+                  <div>
+                    <div className={`font-bold text-sm ${activa ? 'text-white' : 'text-red-300'}`}>{nombre}</div>
+                    <div className={`text-xs ${activa ? 'text-slate-400' : 'text-red-400'}`}>{activa ? 'Activa' : 'Bloqueada'}</div>
+                  </div>
+                  <button
+                    onClick={() => toggleMesera(nombre)}
+                    className={`relative w-12 h-6 rounded-full transition-all ${activa ? 'bg-[#94cb47]' : 'bg-red-700'}`}
+                  >
+                    <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-all ${activa ? 'left-6' : 'left-0.5'}`} />
+                  </button>
+                </div>
+              );
+            })}
+          </div>
         </div>
 
         {/* ── Registro de acceso admin ── */}
