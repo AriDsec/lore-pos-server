@@ -135,9 +135,17 @@ export default function RestaurantePOS() {
   useEffect(() => {
     if (!currentUser || !userRole) return;
     const interval_ms = (userRole === 'mesera' || userRole === 'cocina' || userRole === 'caja') ? 5000 : 15000;
-    const interval = setInterval(() => {
+    const interval = setInterval(async () => {
       const anyModalOpen = modalOpenRef.current || !!splitOrder || !!billOrder || !!viewItemsOrder;
       if (!anyModalOpen) loadData(currentZone, userRole, true);
+      // Validar si la sesión sigue activa (meseras pueden ser bloqueadas desde admin)
+      if (userRole === 'mesera' || userRole === 'caja') {
+        const cfg = await api.getMeserasActivas().catch(() => null);
+        if (cfg && cfg.value && cfg.value[currentUser] === false) {
+          showToast('Tu acceso fue desactivado por el administrador', 'error');
+          setTimeout(() => handleLogout(), 2000);
+        }
+      }
     }, interval_ms);
     return () => clearInterval(interval);
   }, [currentUser, userRole, currentZone, loadData]);
