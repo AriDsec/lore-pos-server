@@ -219,6 +219,16 @@ export default function RestaurantePOS() {
       api.logAccess(name, pin, 'login');
       return true;
     }
+    // Verificar si la mesera está activa
+    if (role === 'mesera' || role === 'caja') {
+      const config = await api.getMeserasActivas();
+      if (config && config.value) {
+        const activas = config.value;
+        if (activas[name] === false) {
+          return 'bloqueado';
+        }
+      }
+    }
     const [, { zone }] = entry;
     api.logAccess(name, pin, 'login');
     await handleLogin(name, role, zone);
