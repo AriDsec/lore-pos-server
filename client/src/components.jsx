@@ -549,22 +549,47 @@ export function MenuPanel({ menu, licores, onSelectItem, onModalChange }) {
           {/* Contenido por sección */}
           {seccion === 'comida' && <CategoryGroup groups={comidaGroups} category="food" />}
           {seccion === 'bebidas' && <CategoryGroup groups={bebidaGroups} category="beverage" />}
-          {seccion === 'licores' && (
-            <div className="space-y-2">
-              {licores.map(licor => (
-                <button
-                  key={licor.id}
-                  onClick={() => { setSelectedLicor(licor); onModalChange?.(true); }}
-                  className="w-full flex justify-between items-center bg-slate-800/60 hover:bg-slate-700/60 border border-slate-700/50 hover:border-amber-500/30 rounded-xl px-4 py-3 transition-all text-left group"
-                >
-                  <span className="font-semibold text-white text-sm group-hover:text-amber-300 transition">{licor.name}</span>
-                  <span className="text-amber-400 text-xs font-bold whitespace-nowrap">
-                    desde ₡{Math.min(...licor.presentaciones.map(p => p.price)).toLocaleString()}
-                  </span>
-                </button>
-              ))}
-            </div>
-          )}
+          {seccion === 'licores' && (() => {
+            const cats = [...new Set(licores.map(l => l.categoria).filter(Boolean))];
+            const sinCat = licores.filter(l => !l.categoria);
+            return (
+              <div className="space-y-3">
+                {cats.map(cat => (
+                  <div key={cat} className="bg-slate-800/60 rounded-xl overflow-hidden border border-slate-700/50">
+                    <div className="px-4 py-2 border-b border-slate-700/50">
+                      <span className="text-slate-300 text-xs font-bold uppercase tracking-widest">{cat}</span>
+                    </div>
+                    <div className="p-2 space-y-1">
+                      {licores.filter(l => l.categoria === cat).map(licor => (
+                        <button
+                          key={licor.id}
+                          onClick={() => { setSelectedLicor(licor); onModalChange?.(true); }}
+                          className="w-full flex justify-between items-center bg-slate-700/40 hover:bg-slate-600/50 border border-transparent hover:border-amber-500/20 rounded-lg px-3 py-2 transition-all text-left group"
+                        >
+                          <span className="font-semibold text-white text-sm group-hover:text-amber-300 transition">{licor.name}</span>
+                          <span className="text-amber-400 text-xs font-bold whitespace-nowrap ml-2">
+                            desde ₡{Math.min(...licor.presentaciones.map(p => p.price)).toLocaleString()}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+                {sinCat.length > 0 && sinCat.map(licor => (
+                  <button
+                    key={licor.id}
+                    onClick={() => { setSelectedLicor(licor); onModalChange?.(true); }}
+                    className="w-full flex justify-between items-center bg-slate-800/60 hover:bg-slate-700/60 border border-slate-700/50 hover:border-amber-500/30 rounded-xl px-4 py-3 transition-all text-left group"
+                  >
+                    <span className="font-semibold text-white text-sm group-hover:text-amber-300 transition">{licor.name}</span>
+                    <span className="text-amber-400 text-xs font-bold whitespace-nowrap">
+                      desde ₡{Math.min(...licor.presentaciones.map(p => p.price)).toLocaleString()}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            );
+          })()}
         </>
       )}
 
