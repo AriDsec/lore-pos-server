@@ -29,7 +29,7 @@ export function ShoppingCart({
             <span className="bg-white/20 text-white text-xs font-bold px-2 py-0.5 rounded-full ml-2">{cartItems.length}</span>
           )}
           {aplicaServicio && (
-            <span className="ml-2 bg-purple-800/70 text-purple-300 text-xs font-bold px-2 py-0.5 rounded-full border border-purple-500/50">+10% serv.</span>
+            <span className="ml-2 bg-[#94cb47]/20 text-[#94cb47] text-xs font-bold px-2 py-0.5 rounded-full border border-[#94cb47]/40">+10% serv.</span>
           )}
         </h2>
       </div>
@@ -163,7 +163,7 @@ export function ShoppingCart({
                   const acc = openAccounts.find(a => a.id === selectedAccount || a._id === selectedAccount);
                   if (acc) onSplit(acc);
                 }}
-                className="w-full bg-orange-700 hover:bg-orange-600 text-white font-bold py-2.5 rounded-xl transition text-sm">
+                className="w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-2.5 rounded-xl transition text-sm">
                 ✂️ Separar Cuenta
               </button>
             )}
