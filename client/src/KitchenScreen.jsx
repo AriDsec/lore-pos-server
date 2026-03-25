@@ -1,12 +1,12 @@
 import { Header, Spinner } from './components.jsx';
 
 function KitchenCard({ order, colorScheme, onReady, onDelivered }) {
-  const pendingBg  = colorScheme === 'bar' ? 'from-blue-900/40 to-purple-900/40 border-blue-500' : 'from-orange-900/40 to-orange-800/40 border-orange-500';
-  const readyBg    = colorScheme === 'bar' ? 'from-blue-600/30 to-purple-600/30 border-blue-400' : 'from-[#94cb47]/10 to-black border-[#94cb47]';
-  const badgeColor = colorScheme === 'bar' ? 'bg-blue-500 text-white' : 'bg-orange-500 text-white';
-  const readyBadge = colorScheme === 'bar' ? 'bg-blue-400 text-black' : 'bg-[#94cb47] text-black';
-  const noteColor  = colorScheme === 'bar' ? 'text-blue-300' : 'text-[#94cb47]';
-  const readyBtn   = colorScheme === 'bar' ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-[#94cb47] hover:bg-[#7ab035] text-black';
+  const pendingBg  = colorScheme === 'bar' ? 'from-red-900/40 to-slate-900 border-red-600' : 'from-[#94cb47]/10 to-slate-900 border-[#94cb47]/60';
+  const readyBg    = colorScheme === 'bar' ? 'from-red-800/30 to-slate-900 border-red-500' : 'from-[#94cb47]/10 to-black border-[#94cb47]';
+  const badgeColor = colorScheme === 'bar' ? 'bg-red-600 text-white' : 'bg-[#94cb47] text-black';
+  const readyBadge = colorScheme === 'bar' ? 'bg-red-500 text-white' : 'bg-[#94cb47] text-black';
+  const noteColor  = colorScheme === 'bar' ? 'text-red-300' : 'text-[#94cb47]';
+  const readyBtn   = colorScheme === 'bar' ? 'bg-red-700 hover:bg-red-800 text-white' : 'bg-[#94cb47] hover:bg-[#7ab035] text-black';
 
   return (
     <div className={`rounded-2xl border-2 p-5 shadow-xl transition-all duration-300 bg-gradient-to-br ${order.status === 'ready' ? readyBg : pendingBg}`}>
@@ -30,7 +30,7 @@ function KitchenCard({ order, colorScheme, onReady, onDelivered }) {
             {order.status === 'ready' ? '✓ LISTO' : '⏳ PREP'}
           </span>
           {order.esActualizacion && order.status === 'pending' && (
-            <span className="bg-orange-500 text-white text-xs font-bold px-2 py-0.5 rounded-full animate-pulse">+ADICIONAL</span>
+            <span className="bg-[#94cb47] text-black text-xs font-bold px-2 py-0.5 rounded-full animate-pulse">+ADICIONAL</span>
           )}
           {!order.esActualizacion && order.status === 'pending' && order.createdAt && (Date.now() - new Date(order.createdAt).getTime()) < 120000 && (
             <span className="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full animate-pulse">NUEVO</span>
@@ -95,8 +95,8 @@ export function KitchenScreen({ kitchenOrders, loading, onLogout, onReady, onDel
         {ordersBar.length > 0 && (
           <div>
             <div className="flex items-center gap-3 mb-4">
-              <h2 className="text-blue-400 font-bold text-xl">🍺 Bar</h2>
-              <span className="bg-blue-500 text-white text-xs font-bold px-3 py-1 rounded-full">{ordersBar.length}</span>
+              <h2 className="text-red-400 font-bold text-xl">🍺 Bar</h2>
+              <span className="bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full">{ordersBar.length}</span>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {ordersBar.map(order => (
