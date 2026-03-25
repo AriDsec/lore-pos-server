@@ -195,10 +195,7 @@ export function LicoresPanel({ onAddToCart, onModalChange }) {
               className="w-full flex items-center justify-between bg-slate-700/60 hover:bg-[#94cb47]/10 border border-slate-600 hover:border-[#94cb47]/50 rounded-lg px-4 py-3 transition-all group text-left"
             >
               <span className="font-bold text-white text-sm group-hover:text-[#94cb47] transition">{licor.name}</span>
-              <span className="text-[#94cb47]/70 text-xs flex items-center gap-1">
-                desde ₡{Math.min(...licor.presentaciones.map(p => p.price)).toLocaleString()}
-                <ChevronDown size={14} className="-rotate-90" />
-              </span>
+              <ChevronDown size={14} className="text-slate-500 -rotate-90" />
             </button>
           ))}
         </div>
@@ -518,7 +515,7 @@ export function MenuPanel({ menu, licores, onSelectItem, onModalChange }) {
                     className="w-full flex justify-between items-center bg-slate-700/50 hover:bg-slate-600/60 border border-slate-600/50 hover:border-amber-500/40 rounded-xl px-3 py-2.5 transition-all text-left group"
                   >
                     <span className="font-semibold text-white text-sm group-hover:text-amber-400 transition">{item.name}</span>
-                    <span className="text-amber-400 font-bold text-xs ml-2 whitespace-nowrap">desde ₡{Math.min(...item.presentaciones.map(p => p.price)).toLocaleString()}</span>
+
                   </button>
                 ) : (
                   <ItemBtn key={item.id} item={item} />
@@ -567,9 +564,7 @@ export function MenuPanel({ menu, licores, onSelectItem, onModalChange }) {
                           className="w-full flex justify-between items-center bg-slate-700/40 hover:bg-slate-600/50 border border-transparent hover:border-amber-500/20 rounded-lg px-3 py-2 transition-all text-left group"
                         >
                           <span className="font-semibold text-white text-sm group-hover:text-amber-300 transition">{licor.name}</span>
-                          <span className="text-amber-400 text-xs font-bold whitespace-nowrap ml-2">
-                            desde ₡{Math.min(...licor.presentaciones.map(p => p.price)).toLocaleString()}
-                          </span>
+
                         </button>
                       ))}
                     </div>
@@ -582,9 +577,7 @@ export function MenuPanel({ menu, licores, onSelectItem, onModalChange }) {
                     className="w-full flex justify-between items-center bg-slate-800/60 hover:bg-slate-700/60 border border-slate-700/50 hover:border-amber-500/30 rounded-xl px-4 py-3 transition-all text-left group"
                   >
                     <span className="font-semibold text-white text-sm group-hover:text-amber-300 transition">{licor.name}</span>
-                    <span className="text-amber-400 text-xs font-bold whitespace-nowrap">
-                      desde ₡{Math.min(...licor.presentaciones.map(p => p.price)).toLocaleString()}
-                    </span>
+
                   </button>
                 ))}
               </div>
