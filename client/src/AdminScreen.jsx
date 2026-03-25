@@ -275,15 +275,15 @@ ${countMethod(restPaid,'tarjeta_sinpe')>0?`<span style="background:#1e1b4b;color
           ))}
         </div>
 
-        <div className="bg-gradient-to-br from-orange-900/40 to-red-900/40 rounded-2xl border-2 border-orange-500/60 p-5 shadow-2xl">
-          <h3 className="text-orange-300 font-bold text-xl mb-4">🍺 Liquidación con Bar</h3>
+        <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border-2 border-[#94cb47]/40 p-5 shadow-2xl">
+          <h3 className="text-[#94cb47] font-bold text-xl mb-4">🍺 Liquidación con Bar</h3>
           <div className="space-y-3 mb-4">
             <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700 flex flex-wrap justify-between items-center gap-2">
               <div>
                 <div className="text-slate-400 text-sm">Comida vendida por Bar</div>
                 <div className="text-xs text-slate-500">Cocinada por Restaurante → Bar nos debe esto</div>
               </div>
-              <div className="text-xl font-bold text-orange-300 whitespace-nowrap">₡{barFoodTotal.toLocaleString()}</div>
+              <div className="text-xl font-bold text-[#94cb47] whitespace-nowrap">₡{barFoodTotal.toLocaleString()}</div>
             </div>
             <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700 flex flex-wrap justify-between items-center gap-2">
               <div>
@@ -292,12 +292,12 @@ ${countMethod(restPaid,'tarjeta_sinpe')>0?`<span style="background:#1e1b4b;color
               </div>
               <div className="text-xl font-bold text-[#94cb47] whitespace-nowrap">₡{restAlcoholTotal.toLocaleString()}</div>
             </div>
-            <div className={`rounded-xl p-4 border flex justify-between items-center gap-3 ${deudaBar >= 0 ? 'bg-orange-900/40 border-orange-500' : 'bg-[#94cb47]/40 border-[#94cb47]'}`}>
+            <div className={`rounded-xl p-4 border flex justify-between items-center gap-3 ${deudaBar >= 0 ? 'bg-[#94cb47]/20 border-[#94cb47]' : 'bg-[#94cb47]/40 border-[#94cb47]'}`}>
               <div>
                 <div className="text-slate-300 text-sm font-bold">SALDO FINAL</div>
                 <div className="text-xs text-slate-400">{deudaBar >= 0 ? '📤 Bar nos paga esto' : '📥 Nosotros le pagamos al Bar'}</div>
               </div>
-              <div className={`text-2xl font-bold whitespace-nowrap ${deudaBar >= 0 ? 'text-orange-300' : 'text-[#94cb47]'}`}>
+              <div className={`text-2xl font-bold whitespace-nowrap ${deudaBar >= 0 ? 'text-[#94cb47]' : 'text-[#94cb47]'}`}>
                 ₡{Math.abs(deudaBar).toLocaleString()}
               </div>
             </div>
@@ -305,10 +305,10 @@ ${countMethod(restPaid,'tarjeta_sinpe')>0?`<span style="background:#1e1b4b;color
         </div>
 
         {/* ── Servicio 10% Meseras (Sábados) ── */}
-        <div className={`rounded-2xl border-2 p-5 shadow-2xl ${servicioActivo ? 'bg-gradient-to-br from-purple-900/40 to-indigo-900/40 border-purple-500/60' : 'bg-slate-800/50 border-slate-600/40'}`}>
+        <div className={`rounded-2xl border-2 p-5 shadow-2xl ${servicioActivo ? 'bg-gradient-to-br from-[#94cb47]/10 to-slate-900 border-[#94cb47]/40' : 'bg-slate-800/50 border-slate-600/40'}`}>
           <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
             <div>
-              <h3 className={`font-bold text-xl ${servicioActivo ? 'text-purple-300' : 'text-slate-400'}`}>
+              <h3 className={`font-bold text-xl ${servicioActivo ? 'text-[#94cb47]' : 'text-slate-400'}`}>
                 💜 Servicio 10% — Meseras
               </h3>
               <p className="text-slate-500 text-xs mt-0.5">
@@ -317,7 +317,7 @@ ${countMethod(restPaid,'tarjeta_sinpe')>0?`<span style="background:#1e1b4b;color
             </div>
             <button
               onClick={() => toggleServicio(!servicioActivo)}
-              className={`px-4 py-2 rounded-xl font-bold text-sm transition border ${servicioActivo ? 'bg-purple-600 hover:bg-purple-700 text-white border-purple-400' : 'bg-slate-700 hover:bg-slate-600 text-slate-300 border-slate-500'}`}
+              className={`px-4 py-2 rounded-xl font-bold text-sm transition border ${servicioActivo ? 'bg-[#94cb47] hover:bg-[#7ab035] text-black border-[#94cb47]' : 'bg-slate-700 hover:bg-slate-600 text-slate-300 border-slate-500'}`}
             >
               {servicioActivo ? '✅ Activo' : '⭕ Inactivo'}
             </button>
@@ -330,7 +330,7 @@ ${countMethod(restPaid,'tarjeta_sinpe')>0?`<span style="background:#1e1b4b;color
                   <div className="text-slate-300 text-sm">Servicio extraído del total Bar</div>
                   <div className="text-xs text-slate-500">₡{totalBarCobrado.toLocaleString()} ÷ 11 (10% ya incluido en precios)</div>
                 </div>
-                <div className="text-xl font-bold text-purple-300">₡{totalServicio.toLocaleString()}</div>
+                <div className="text-xl font-bold text-[#94cb47]">₡{totalServicio.toLocaleString()}</div>
               </div>
 
               <div className="flex items-center gap-3">
@@ -339,19 +339,19 @@ ${countMethod(restPaid,'tarjeta_sinpe')>0?`<span style="background:#1e1b4b;color
                   <button
                     key={n}
                     onClick={() => changeNumMeseras(n)}
-                    className={`px-4 py-1.5 rounded-lg font-bold text-sm transition border ${numMeseras === n ? 'bg-purple-600 text-white border-purple-400' : 'bg-slate-700 text-slate-300 border-slate-600 hover:bg-slate-600'}`}
+                    className={`px-4 py-1.5 rounded-lg font-bold text-sm transition border ${numMeseras === n ? 'bg-[#94cb47] text-black border-[#94cb47]' : 'bg-slate-700 text-slate-300 border-slate-600 hover:bg-slate-600'}`}
                   >
                     {n} meseras
                   </button>
                 ))}
               </div>
 
-              <div className="bg-purple-900/50 rounded-xl p-4 border border-purple-500/50 flex justify-between items-center">
+              <div className="bg-[#94cb47]/10 rounded-xl p-4 border border-[#94cb47]/30 flex justify-between items-center">
                 <div>
-                  <div className="text-purple-200 text-sm font-bold">Por mesera</div>
-                  <div className="text-xs text-purple-400">Mari, Mile, Lin{numMeseras === 4 ? ', Temp Bar' : ''}</div>
+                  <div className="text-[#94cb47] text-sm font-bold">Por mesera</div>
+                  <div className="text-xs text-slate-400">Mari, Mile, Lin{numMeseras === 4 ? ', Temp Bar' : ''}</div>
                 </div>
-                <div className="text-2xl font-bold text-purple-200">₡{porMesera.toLocaleString()}</div>
+                <div className="text-2xl font-bold text-[#94cb47]">₡{porMesera.toLocaleString()}</div>
               </div>
             </div>
           )}
