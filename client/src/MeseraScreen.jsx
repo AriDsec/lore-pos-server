@@ -83,8 +83,8 @@ export function MeseraScreen({
 
       {/* Indicador servicio sábado */}
       {aplicaServicio && (
-        <div className="bg-purple-900/60 border-b border-purple-500/40 px-4 py-1.5 flex items-center gap-2">
-          <span className="text-purple-300 text-xs font-bold">💜 Servicio 10% activo — aplica en mesas</span>
+        <div className="bg-[#94cb47]/10 border-b border-[#94cb47]/30 px-4 py-1.5 flex items-center gap-2">
+          <span className="text-[#94cb47] text-xs font-bold">Servicio 10% activo — aplica en mesas</span>
         </div>
       )}
 
@@ -199,7 +199,7 @@ export function MeseraScreen({
           <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-amber-500/50 p-6 shadow-2xl w-full max-w-sm">
             <div className="text-center mb-5">
               <div className="text-4xl mb-2">⚠️</div>
-              <h2 className="text-amber-300 font-bold text-xl">Mesa ocupada</h2>
+              <h2 className="text-[#94cb47] font-bold text-xl">Mesa ocupada</h2>
               <p className="text-slate-400 text-sm mt-2">
                 {mesaConflict.existingAcc.barra || `Mesa ${mesaConflict.existingAcc.table}`} ya tiene una cuenta abierta
               </p>
