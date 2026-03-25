@@ -27,7 +27,7 @@ export function Toast({ toasts, offline }) {
           <span className="text-2xl flex-shrink-0 animate-pulse">📡</span>
           <div>
             <div className="font-bold text-base leading-tight">Sin conexión al servidor</div>
-            <div className="text-orange-300 text-xs">Reintentando automáticamente...</div>
+            <div className="text-[#94cb47]/70 text-xs">Reintentando automáticamente...</div>
           </div>
         </div>
       )}
@@ -98,11 +98,11 @@ export function ItemButton({ item, onSelectItem }) {
       </div>
       {item.canHavePapas && (
         <div className="flex items-center gap-2 bg-slate-700/50 border border-[#94cb47]/20 hover:border-[#94cb47]/50 rounded-lg px-3 py-2 ml-3 transition-all">
-          <span className="flex-1 text-amber-200/80 text-xs">↳ con Papas</span>
+          <span className="flex-1 text-slate-400 text-xs">↳ con Papas</span>
           <span className="text-[#94cb47] font-bold text-xs whitespace-nowrap">₡{(item.price + 500).toLocaleString()}</span>
           <button
             onClick={() => onSelectItem(item, true)}
-            className="bg-amber-600 hover:bg-amber-500 text-white rounded-md w-6 h-6 flex items-center justify-center flex-shrink-0 transition"
+            className="bg-[#94cb47] hover:bg-[#7ab035] text-black rounded-md w-6 h-6 flex items-center justify-center flex-shrink-0 transition"
           >
             <Plus size={12} />
           </button>
@@ -306,10 +306,10 @@ export function OtrosPanel({ onAddToCart, onModalChange }) {
       <div className="space-y-3">
         {/* Adicionales de cocina */}
         <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-orange-500/30 overflow-hidden shadow-2xl">
-          <div className="bg-gradient-to-r from-orange-900/40 to-slate-800 px-4 py-3 flex items-center gap-2">
+          <div className="bg-gradient-to-r from-[#94cb47]/10 to-slate-800 px-4 py-3 flex items-center gap-2">
             <span className="text-lg">🍳</span>
             <div>
-              <h2 className="text-orange-300 font-bold text-sm">Adicionales Cocina</h2>
+              <h2 className="text-[#94cb47] font-bold text-sm">Adicionales Cocina</h2>
               <p className="text-slate-500 text-xs">Van directo a pantalla de cocina</p>
             </div>
           </div>
@@ -514,7 +514,7 @@ export function MenuPanel({ menu, licores, onSelectItem, onModalChange }) {
                     onClick={() => { setSelectedLicor(item); onModalChange?.(true); }}
                     className="w-full flex justify-between items-center bg-slate-700/50 hover:bg-slate-600/60 border border-slate-600/50 hover:border-amber-500/40 rounded-xl px-3 py-2.5 transition-all text-left group"
                   >
-                    <span className="font-semibold text-white text-sm group-hover:text-amber-400 transition">{item.name}</span>
+                    <span className="font-semibold text-white text-sm group-hover:text-[#94cb47] transition">{item.name}</span>
 
                   </button>
                 ) : (
@@ -563,7 +563,7 @@ export function MenuPanel({ menu, licores, onSelectItem, onModalChange }) {
                           onClick={() => { setSelectedLicor(licor); onModalChange?.(true); }}
                           className="w-full flex justify-between items-center bg-slate-700/40 hover:bg-slate-600/50 border border-transparent hover:border-amber-500/20 rounded-lg px-3 py-2 transition-all text-left group"
                         >
-                          <span className="font-semibold text-white text-sm group-hover:text-amber-300 transition">{licor.name}</span>
+                          <span className="font-semibold text-white text-sm group-hover:text-[#94cb47] transition">{licor.name}</span>
 
                         </button>
                       ))}
@@ -576,7 +576,7 @@ export function MenuPanel({ menu, licores, onSelectItem, onModalChange }) {
                     onClick={() => { setSelectedLicor(licor); onModalChange?.(true); }}
                     className="w-full flex justify-between items-center bg-slate-800/60 hover:bg-slate-700/60 border border-slate-700/50 hover:border-amber-500/30 rounded-xl px-4 py-3 transition-all text-left group"
                   >
-                    <span className="font-semibold text-white text-sm group-hover:text-amber-300 transition">{licor.name}</span>
+                    <span className="font-semibold text-white text-sm group-hover:text-[#94cb47] transition">{licor.name}</span>
 
                   </button>
                 ))}
@@ -1033,7 +1033,7 @@ export function BillModal({ order, onClose, onPay, zona }) {
             {hayDescuento && (
               <div className="text-right">
                 <div className="text-slate-300 text-xs">A COBRAR</div>
-                <div className="text-4xl font-bold text-amber-400">₡{montoFinal.toLocaleString()}</div>
+                <div className="text-4xl font-bold text-[#94cb47]">₡{montoFinal.toLocaleString()}</div>
                 <div className="text-red-400 text-xs">-₡{descuento.toLocaleString()} descuento</div>
               </div>
             )}
@@ -1043,15 +1043,15 @@ export function BillModal({ order, onClose, onPay, zona }) {
         {/* Toggle descuento */}
         {onPay && (
           <div className="mb-4">
-            <div className={`rounded-xl border transition overflow-hidden ${aplicandoDescuento ? 'border-amber-500/60' : 'border-slate-600'}`}>
+            <div className={`rounded-xl border transition overflow-hidden ${aplicandoDescuento ? 'border-[#94cb47]/50' : 'border-slate-600'}`}>
               <button
                 onClick={() => { setAplicandoDescuento(!aplicandoDescuento); setMontoPersonalizado(''); }}
-                className={`w-full text-sm font-semibold py-2.5 px-4 flex items-center justify-between transition ${aplicandoDescuento ? 'bg-amber-900/30 text-amber-300' : 'bg-slate-700/40 text-slate-400 hover:text-slate-300 hover:bg-slate-700/60'}`}>
+                className={`w-full text-sm font-semibold py-2.5 px-4 flex items-center justify-between transition ${aplicandoDescuento ? 'bg-[#94cb47]/10 text-[#94cb47]' : 'bg-slate-700/40 text-slate-400 hover:text-slate-300 hover:bg-slate-700/60'}`}>
                 <span>Aplicar descuento</span>
                 <span className={`text-xs transition-transform ${aplicandoDescuento ? 'rotate-180' : ''}`}>▾</span>
               </button>
               {aplicandoDescuento && (
-                <div className="px-4 pb-4 pt-3 bg-amber-900/10">
+                <div className="px-4 pb-4 pt-3 bg-[#94cb47]/5">
                   <p className="text-slate-400 text-xs mb-2">Monto final a cobrar al cliente</p>
                   <input
                     type="number"
@@ -1062,7 +1062,7 @@ export function BillModal({ order, onClose, onPay, zona }) {
                     min={0}
                     max={totalOriginal}
                     placeholder={String(Math.floor(totalOriginal / 1000) * 1000)}
-                    className={`w-full bg-slate-800 text-white text-2xl font-bold rounded-xl p-3 text-center focus:outline-none placeholder-slate-600 border ${montoPersonalizado && montoFinal >= totalOriginal ? 'border-red-500/70' : 'border-amber-500/40 focus:border-amber-400'}`}
+                    className={`w-full bg-slate-800 text-white text-2xl font-bold rounded-xl p-3 text-center focus:outline-none placeholder-slate-600 border ${montoPersonalizado && montoFinal >= totalOriginal ? 'border-red-500/70' : 'border-[#94cb47]/40 focus:border-[#94cb47]'}`}
                     autoFocus
                   />
                   {montoPersonalizado && montoFinal >= totalOriginal && (
@@ -1071,7 +1071,7 @@ export function BillModal({ order, onClose, onPay, zona }) {
                     </p>
                   )}
                   {hayDescuento && montoFinal < totalOriginal && (
-                    <p className="text-center text-amber-400/70 text-xs mt-2">
+                    <p className="text-center text-[#94cb47]/60 text-xs mt-2">
                       Descuento de ₡{descuento.toLocaleString()} aplicado
                     </p>
                   )}
@@ -1160,9 +1160,9 @@ export function BillModal({ order, onClose, onPay, zona }) {
 
         {/* Sección mixto */}
         {['mixto', 'efectivo_sinpe', 'tarjeta_sinpe'].includes(payMethod) && (
-          <div className="mb-4 rounded-xl border border-amber-500/40 overflow-hidden">
-            <div className="bg-amber-900/20 px-4 py-2.5">
-              <p className="text-amber-300 text-xs font-bold uppercase tracking-wide">
+          <div className="mb-4 rounded-xl border border-[#94cb47]/30 overflow-hidden">
+            <div className="bg-[#94cb47]/5 px-4 py-2.5">
+              <p className="text-[#94cb47] text-xs font-bold uppercase tracking-wide">
                 {payMethod === 'tarjeta_sinpe' ? '¿Cuánto va en Tarjeta?' : '¿Cuánto pone en Efectivo?'}
               </p>
             </div>
@@ -1177,7 +1177,7 @@ export function BillModal({ order, onClose, onPay, zona }) {
                       onClick={() => setMontoEfectivoMixto(val)}
                       className={`py-2 rounded-lg font-bold text-xs transition border ${
                         montoEfectivoMixto === val
-                          ? 'bg-amber-700 border-amber-500 text-white'
+                          ? 'bg-[#94cb47] border-[#94cb47] text-black'
                           : 'bg-slate-700/50 border-slate-600 text-slate-300 hover:border-amber-500/40'
                       }`}
                     >
@@ -1192,7 +1192,7 @@ export function BillModal({ order, onClose, onPay, zona }) {
                 onChange={e => setMontoEfectivoMixto(e.target.value)}
                 onWheel={e => e.target.blur()}
                 placeholder="Monto en efectivo..."
-                className="w-full bg-slate-800 border border-amber-500/30 focus:border-amber-400 text-white rounded-xl px-3 py-2 text-sm focus:outline-none placeholder-slate-500"
+                className="w-full bg-slate-800 border border-[#94cb47]/30 focus:border-[#94cb47] text-white rounded-xl px-3 py-2 text-sm focus:outline-none placeholder-slate-500"
               />
               {efectivoMixto > 0 && (
                 <div className={`rounded-xl p-3 space-y-2 ${mixtoValido ? 'bg-slate-700/40 border border-slate-600' : 'bg-red-900/20 border border-red-500/40'}`}>
@@ -1204,7 +1204,7 @@ export function BillModal({ order, onClose, onPay, zona }) {
                       </div>
                       <div className="flex justify-between text-sm border-t border-slate-600 pt-2">
                         <span className="text-slate-400">{payMethod === 'mixto' ? 'Tarjeta' : 'Sinpe'}</span>
-                        <span className="text-purple-300 font-bold">₡{tarjetaMixto.toLocaleString()}</span>
+                        <span className="text-[#94cb47] font-bold">₡{tarjetaMixto.toLocaleString()}</span>
                       </div>
                       <div className="flex justify-between text-sm border-t border-slate-600 pt-2">
                         <span className="text-slate-300 font-bold">Total</span>
@@ -1373,7 +1373,7 @@ export function PinLoginScreen({ isLandscape, syncError, loading, onLogin }) {
         ))}
       </div>
       {loginError && <p className="text-red-400 text-center text-xs mb-3">PIN incorrecto</p>}
-      {loginBloqueado && <p className="text-amber-400 text-center text-xs mb-3 font-bold">Acceso no disponible hoy — contacta al administrador</p>}
+      {loginBloqueado && <p className="text-[#94cb47] text-center text-xs mb-3 font-bold">Acceso no disponible hoy — contacta al administrador</p>}
       <div className="grid grid-cols-3 gap-2">
         {[1,2,3,4,5,6,7,8,9].map(d => (
           <button key={d} onClick={() => loginHandleDigit(String(d))}
