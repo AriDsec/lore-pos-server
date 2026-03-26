@@ -231,7 +231,7 @@ export function OtrosPanel({ onAddToCart, onModalChange }) {
     <>
       <div className="space-y-3">
         {/* Adicionales de cocina */}
-        <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-orange-500/30 overflow-hidden shadow-2xl">
+        <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/20 overflow-hidden shadow-2xl">
           <div className="bg-gradient-to-r from-[#94cb47]/10 to-slate-800 px-4 py-3 flex items-center gap-2">
             <span className="text-lg">🍳</span>
             <div>
@@ -441,7 +441,7 @@ export function MenuPanel({ menu, licores, onSelectItem, onModalChange }) {
                   <button
                     key={item.id}
                     onClick={() => { setSelectedLicor(item); onModalChange?.(true); }}
-                    className="w-full flex justify-between items-center bg-slate-700/50 hover:bg-slate-600/60 border border-slate-600/50 hover:border-amber-500/40 rounded-xl px-3 py-2.5 transition-all text-left group"
+                    className="w-full flex justify-between items-center bg-slate-700/50 hover:bg-slate-600/60 border border-slate-600/50 hover:border-[#94cb47]/40 rounded-xl px-3 py-2.5 transition-all text-left group"
                   >
                     <span className="font-semibold text-white text-sm group-hover:text-[#94cb47] transition">{item.name}</span>
 
