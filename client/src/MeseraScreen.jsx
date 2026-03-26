@@ -198,7 +198,7 @@ export function MeseraScreen({
       {/* Modal conflicto de mesa */}
       {mesaConflict && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-amber-500/50 p-6 shadow-2xl w-full max-w-sm">
+          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/40 p-6 shadow-2xl w-full max-w-sm">
             <div className="text-center mb-5">
               <div className="text-4xl mb-2">⚠️</div>
               <h2 className="text-[#94cb47] font-bold text-xl">Mesa ocupada</h2>
