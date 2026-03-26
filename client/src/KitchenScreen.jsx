@@ -1,12 +1,12 @@
 import { Header, Spinner } from './ui.jsx';
 
 function KitchenCard({ order, colorScheme, onReady, onDelivered }) {
-  const pendingBg  = colorScheme === 'bar' ? 'from-red-900/40 to-slate-900 border-red-600' : 'from-[#94cb47]/10 to-slate-900 border-[#94cb47]/60';
-  const readyBg    = colorScheme === 'bar' ? 'from-red-800/30 to-slate-900 border-red-500' : 'from-[#94cb47]/10 to-black border-[#94cb47]';
-  const badgeColor = colorScheme === 'bar' ? 'bg-red-600 text-white' : 'bg-[#94cb47] text-black';
-  const readyBadge = colorScheme === 'bar' ? 'bg-red-500 text-white' : 'bg-[#94cb47] text-black';
-  const noteColor  = colorScheme === 'bar' ? 'text-red-300' : 'text-[#94cb47]';
-  const readyBtn   = colorScheme === 'bar' ? 'bg-red-700 hover:bg-red-800 text-white' : 'bg-[#94cb47] hover:bg-[#7ab035] text-black';
+  const pendingBg  = colorScheme === 'bar' ? 'from-slate-800 to-slate-900 border-slate-500' : 'from-[#94cb47]/10 to-slate-900 border-[#94cb47]/60';
+  const readyBg    = colorScheme === 'bar' ? 'from-slate-700/30 to-slate-900 border-slate-400' : 'from-[#94cb47]/10 to-black border-[#94cb47]';
+  const badgeColor = colorScheme === 'bar' ? 'bg-slate-600 text-slate-200' : 'bg-[#94cb47] text-black';
+  const readyBadge = colorScheme === 'bar' ? 'bg-slate-500 text-white' : 'bg-[#94cb47] text-black';
+  const noteColor  = colorScheme === 'bar' ? 'text-slate-300' : 'text-[#94cb47]';
+  const readyBtn   = colorScheme === 'bar' ? 'bg-slate-600 hover:bg-slate-500 text-white' : 'bg-[#94cb47] hover:bg-[#7ab035] text-black';
 
   return (
     <div className={`rounded-2xl border-2 p-5 shadow-xl transition-all duration-300 bg-gradient-to-br ${order.status === 'ready' ? readyBg : pendingBg}`}>
@@ -92,20 +92,6 @@ export function KitchenScreen({ kitchenOrders, loading, onLogout, onReady, onDel
           </div>
         )}
 
-        {ordersBar.length > 0 && (
-          <div>
-            <div className="flex items-center gap-3 mb-4">
-              <h2 className="text-red-400 font-bold text-xl">🍺 Bar</h2>
-              <span className="bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full">{ordersBar.length}</span>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-              {ordersBar.map(order => (
-                <KitchenCard key={order.id} order={order} colorScheme="bar" onReady={onReady} onDelivered={onDelivered} />
-              ))}
-            </div>
-          </div>
-        )}
-
         {ordersRest.length > 0 && (
           <div>
             <div className="flex items-center gap-3 mb-4">
@@ -115,6 +101,20 @@ export function KitchenScreen({ kitchenOrders, loading, onLogout, onReady, onDel
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {ordersRest.map(order => (
                 <KitchenCard key={order.id} order={order} colorScheme="rest" onReady={onReady} onDelivered={onDelivered} />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {ordersBar.length > 0 && (
+          <div>
+            <div className="flex items-center gap-3 mb-4">
+              <h2 className="text-slate-300 font-bold text-xl">🍺 Bar</h2>
+              <span className="bg-slate-600 text-slate-200 text-xs font-bold px-3 py-1 rounded-full">{ordersBar.length}</span>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {ordersBar.map(order => (
+                <KitchenCard key={order.id} order={order} colorScheme="bar" onReady={onReady} onDelivered={onDelivered} />
               ))}
             </div>
           </div>
