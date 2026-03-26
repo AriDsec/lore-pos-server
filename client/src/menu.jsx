@@ -477,38 +477,36 @@ export function MenuPanel({ menu, licores, onSelectItem, onModalChange }) {
           {seccion === 'bebidas' && <CategoryGroup groups={bebidaGroups} category="beverage" />}
           {seccion === 'licores' && (() => {
             const cats = [...new Set(licores.map(l => l.categoria).filter(Boolean))];
-            const sinCat = licores.filter(l => !l.categoria);
             return (
-              <div className="space-y-3">
-                {cats.map(cat => (
-                  <div key={cat} className="bg-slate-800/60 rounded-xl overflow-hidden border border-slate-700/50">
-                    <div className="px-4 py-2 border-b border-slate-700/50">
-                      <span className="text-slate-300 text-xs font-bold uppercase tracking-widest">{cat}</span>
+              <div className="space-y-2">
+                {cats.map(cat => {
+                  const isOpen = expandedLicorCat === cat;
+                  return (
+                    <div key={cat} className="bg-slate-800/60 rounded-xl overflow-hidden border border-slate-700/50">
+                      <button
+                        onClick={() => setExpandedLicorCat(isOpen ? null : cat)}
+                        className="w-full flex justify-between items-center px-4 py-3 text-left"
+                      >
+                        <span className="font-bold text-[#94cb47] text-sm">{cat}</span>
+                        <span className={`text-slate-400 text-xs transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}>▾</span>
+                      </button>
+                      {isOpen && (
+                        <div className="px-3 pb-3 space-y-1.5">
+                          {licores.filter(l => l.categoria === cat).map(licor => (
+                            <button
+                              key={licor.id}
+                              onClick={() => { setSelectedLicor(licor); onModalChange?.(true); }}
+                              className="w-full flex justify-between items-center bg-slate-700/50 hover:bg-slate-600/60 border border-slate-600/50 hover:border-[#94cb47]/40 rounded-xl px-3 py-2.5 transition-all text-left group"
+                            >
+                              <span className="font-semibold text-white text-sm group-hover:text-[#94cb47] transition">{licor.name}</span>
+                              <ChevronDown size={13} className="text-slate-500 -rotate-90 flex-shrink-0 ml-2" />
+                            </button>
+                          ))}
+                        </div>
+                      )}
                     </div>
-                    <div className="p-2 space-y-1">
-                      {licores.filter(l => l.categoria === cat).map(licor => (
-                        <button
-                          key={licor.id}
-                          onClick={() => { setSelectedLicor(licor); onModalChange?.(true); }}
-                          className="w-full flex justify-between items-center bg-slate-700/40 hover:bg-slate-600/50 border border-transparent hover:border-amber-500/20 rounded-lg px-3 py-2 transition-all text-left group"
-                        >
-                          <span className="font-semibold text-white text-sm group-hover:text-[#94cb47] transition">{licor.name}</span>
-
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-                {sinCat.length > 0 && sinCat.map(licor => (
-                  <button
-                    key={licor.id}
-                    onClick={() => { setSelectedLicor(licor); onModalChange?.(true); }}
-                    className="w-full flex justify-between items-center bg-slate-800/60 hover:bg-slate-700/60 border border-slate-700/50 hover:border-amber-500/30 rounded-xl px-4 py-3 transition-all text-left group"
-                  >
-                    <span className="font-semibold text-white text-sm group-hover:text-[#94cb47] transition">{licor.name}</span>
-
-                  </button>
-                ))}
+                  );
+                })}
               </div>
             );
           })()}
