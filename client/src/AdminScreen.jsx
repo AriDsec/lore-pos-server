@@ -1,4 +1,5 @@
-import { Header, payBadge, ItemsModal, Spinner } from './components.jsx';
+import { Header, payBadge, Spinner } from './ui.jsx';
+import { ItemsModal } from './modals.jsx';
 import { useState, useEffect } from 'react';
 import * as api from './api.js';
 
