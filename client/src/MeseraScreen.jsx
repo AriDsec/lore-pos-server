@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { Utensils, Package } from 'lucide-react';
-import { Header, MenuPanel, OtrosPanel, SplitModal } from './components.jsx';
+import { Header } from './ui.jsx';
+import { MenuPanel, OtrosPanel } from './menu.jsx';
+import { SplitModal } from './modals.jsx';
 import { ShoppingCart } from './Cart.jsx';
 
 export function MeseraScreen({
