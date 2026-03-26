@@ -3,6 +3,10 @@ import { ItemsModal } from './modals.jsx';
 import { useState, useEffect } from 'react';
 import * as api from './api.js';
 
+// Item de comida = food O adicional de cocina (otro con kitchen)
+const isFood = (i) => i.category === 'food' || (i.category === 'otro' && i.kitchen);
+const isDrink = (i) => !isFood(i);
+
 function StatRow({ label, value }) {
   return (
     <div className="flex justify-between items-center p-3 bg-slate-700/50 rounded-lg gap-2">
@@ -66,7 +70,7 @@ export function AdminScreen({ barPaid, restPaid, loading, onLogout, setPaidOrder
 
   // Comida que el Bar vendió → el Restaurante la cocinó → Bar le debe al Restaurante
   const barFoodTotal = barPaid.reduce((s, o) =>
-    s + (o.items||[]).filter(i => i.category === 'food')
+    s + (o.items||[]).filter(i => isFood(i))
       .reduce((a, i) => a + i.price * i.quantity, 0), 0);
 
   // Bebidas alcohólicas y cervezas que el Restaurante vendió → son del inventario del Bar → Restaurante le debe al Bar
@@ -91,10 +95,10 @@ export function AdminScreen({ barPaid, restPaid, loading, onLogout, setPaidOrder
     const fecha = now.toLocaleDateString('es-CR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
     const hora  = now.toLocaleTimeString('es-CR', { hour: '2-digit', minute: '2-digit' });
 
-    const barFoodTotal2  = barPaid.reduce((s,o) => s+(o.items||[]).filter(i=>i.category==='food').reduce((a,i)=>a+i.price*i.quantity,0),0);
-    const barDrinkTotal  = barPaid.reduce((s,o) => s+(o.items||[]).filter(i=>i.category!=='food').reduce((a,i)=>a+i.price*i.quantity,0),0);
-    const restFoodTotal  = restPaid.reduce((s,o) => s+(o.items||[]).filter(i=>i.category==='food').reduce((a,i)=>a+i.price*i.quantity,0),0);
-    const restDrinkTotal = restPaid.reduce((s,o) => s+(o.items||[]).filter(i=>i.category!=='food').reduce((a,i)=>a+i.price*i.quantity,0),0);
+    const barFoodTotal2  = barPaid.reduce((s,o) => s+(o.items||[]).filter(i=>isFood(i)).reduce((a,i)=>a+i.price*i.quantity,0),0);
+    const barDrinkTotal  = barPaid.reduce((s,o) => s+(o.items||[]).filter(i=>isDrink(i)).reduce((a,i)=>a+i.price*i.quantity,0),0);
+    const restFoodTotal  = restPaid.reduce((s,o) => s+(o.items||[]).filter(i=>isFood(i)).reduce((a,i)=>a+i.price*i.quantity,0),0);
+    const restDrinkTotal = restPaid.reduce((s,o) => s+(o.items||[]).filter(i=>isDrink(i)).reduce((a,i)=>a+i.price*i.quantity,0),0);
 
     const methodLabel = (m) =>
       m === 'sinpe'          ? 'Sinpe' :
@@ -252,8 +256,8 @@ ${countMethod(restPaid,'tarjeta_sinpe')>0?`<span style="background:#1e1b4b;color
             <div key={titulo} className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-4 shadow-2xl space-y-3">
               <h3 className="text-white font-bold text-xl">{titulo}</h3>
               <StatRow label="Cuentas cobradas" value={paid.length} />
-              <StatRow label="Comida vendida" value={`₡${paid.reduce((s,o)=>s+(o.items||[]).filter(i=>i.category==='food').reduce((a,i)=>a+i.price*i.quantity,0),0).toLocaleString()}`} />
-              <StatRow label="Bebidas vendidas" value={`₡${paid.reduce((s,o)=>s+(o.items||[]).filter(i=>i.category!=='food').reduce((a,i)=>a+i.price*i.quantity,0),0).toLocaleString()}`} />
+              <StatRow label="Comida vendida" value={`₡${paid.reduce((s,o)=>s+(o.items||[]).filter(i=>isFood(i)).reduce((a,i)=>a+i.price*i.quantity,0),0).toLocaleString()}`} />
+              <StatRow label="Bebidas vendidas" value={`₡${paid.reduce((s,o)=>s+(o.items||[]).filter(i=>isDrink(i)).reduce((a,i)=>a+i.price*i.quantity,0),0).toLocaleString()}`} />
               <div className="border-t border-slate-700 pt-2 space-y-1">
                 <div className="text-slate-400 text-xs font-bold uppercase tracking-wide mb-1">Forma de pago</div>
                 {['efectivo','sinpe','tarjeta','mixto','efectivo_sinpe','tarjeta_sinpe'].map(m => {
