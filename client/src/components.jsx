@@ -589,7 +589,16 @@ export function MenuPanel({ menu, licores, onSelectItem, onModalChange }) {
       {selectedLicor && (
         <LicorModal
           licor={selectedLicor}
-          onSelect={(item) => { onSelectItem(item); setSelectedLicor(null); onModalChange?.(false); }}
+          onSelect={(licor, presentacion) => {
+            onSelectItem({
+              id: `${licor.id}_${presentacion.id}_${Date.now()}`,
+              name: `${licor.name} — ${presentacion.label}`,
+              price: presentacion.price,
+              category: 'alcoholic',
+              quantity: 1,
+            });
+            setSelectedLicor(null); onModalChange?.(false);
+          }}
           onClose={() => { setSelectedLicor(null); onModalChange?.(false); }}
         />
       )}
