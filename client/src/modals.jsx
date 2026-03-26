@@ -679,7 +679,7 @@ export function SelectorScreen({ isLandscape, syncError, loading, onSelect, onBa
             {meseras.filter(m => m !== 'Guido Bar').map(m => (
               <button key={m} onClick={() => onSelect(m)} className="w-full bg-slate-700/60 hover:bg-slate-600 text-[#94cb47] py-2 rounded-lg transition font-medium text-sm">{m}</button>
             ))}
-            <button onClick={() => onSelect('Guido Bar')} className="w-full bg-slate-700/60 hover:bg-slate-600 text-amber-400 py-2 rounded-lg transition font-medium text-sm border border-amber-500/30">👑 Guido</button>
+            <button onClick={() => onSelect('Guido Bar')} className="w-full bg-slate-700/60 hover:bg-slate-600 text-[#94cb47] py-2 rounded-lg transition font-medium text-sm border border-[#94cb47]/30">👑 Guido</button>
           </div>
         </div>
         <div className="bg-slate-800/80 backdrop-blur border border-[#94cb47]/40 rounded-2xl p-4 shadow-2xl">
