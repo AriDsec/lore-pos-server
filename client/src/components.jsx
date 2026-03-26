@@ -413,6 +413,7 @@ export function MenuPanel({ menu, licores, onSelectItem, onModalChange }) {
   const [seccion, setSeccion] = useState('comida');
   const [busqueda, setBusqueda] = useState('');
   const [expandedCat, setExpandedCat] = useState(null);
+  const [expandedLicorCat, setExpandedLicorCat] = useState(null);
   const [selectedLicor, setSelectedLicor] = useState(null);
 
   // Separar menú en comida y bebidas
