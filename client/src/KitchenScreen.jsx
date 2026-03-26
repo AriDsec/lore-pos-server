@@ -1,4 +1,4 @@
-import { Header, Spinner } from './components.jsx';
+import { Header, Spinner } from './ui.jsx';
 
 function KitchenCard({ order, colorScheme, onReady, onDelivered }) {
   const pendingBg  = colorScheme === 'bar' ? 'from-red-900/40 to-slate-900 border-red-600' : 'from-[#94cb47]/10 to-slate-900 border-[#94cb47]/60';
