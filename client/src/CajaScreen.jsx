@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Header, payBadge, BillModal, ItemsModal, SplitModal, Spinner, imprimirTiquete } from './components.jsx';
+import { Header, payBadge, imprimirTiquete, Spinner } from './ui.jsx';
+import { BillModal, ItemsModal, SplitModal } from './modals.jsx';
 
 function CajaStats({ paid, zona }) {
   const totalCobrado = paid.reduce((s, o) => s + o.total, 0);
