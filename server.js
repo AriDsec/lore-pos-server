@@ -32,15 +32,15 @@ const accountSchema = new mongoose.Schema({
   type: String,
   items: [{
     id: String, name: String, price: Number, quantity: Number,
-    category: String, notes: String, addedBy: String,
+    category: String, notes: String, addedBy: String, kitchen: Boolean,
   }],
   foodItems: [{
     id: String, name: String, price: Number, quantity: Number,
-    category: String, notes: String, addedBy: String,
+    category: String, notes: String, addedBy: String, kitchen: Boolean,
   }],
   drinkItems: [{
     id: String, name: String, price: Number, quantity: Number,
-    category: String, notes: String, addedBy: String,
+    category: String, notes: String, addedBy: String, kitchen: Boolean,
   }],
   total: Number,
   totalOriginal: Number,
