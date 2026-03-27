@@ -296,7 +296,7 @@ export default function RestaurantePOS() {
     if (!acc) return;
     setSelectedAccount(accountId);
     setCartItems(acc.items);
-    setSelectedTable(acc.table);
+    setSelectedTable(acc.table ? Number(acc.table) : null);
     setSelectedBarra(acc.barra);
     setClientName(acc.clientName || '');
     setOrderType(acc.type || 'dine-in');
@@ -332,8 +332,10 @@ export default function RestaurantePOS() {
   const completeOrder = async () => {
     if (loading) return;
     if (cartItems.length === 0) { showToast('El carrito está vacío', 'warning'); return; }
+    // En restaurante nunca debe haber barra
+    if (currentZone === 'restaurante' && selectedBarra) setSelectedBarra(null);
     if (!orderType) { showToast('Selecciona el tipo de pedido', 'warning'); return; }
-    if (orderType === 'dine-in' && !selectedTable && !selectedBarra) { showToast('Selecciona una mesa o barra', 'warning'); return; }
+    if (orderType === 'dine-in' && currentZone === 'restaurante' ? !selectedTable : (!selectedTable && !selectedBarra)) { showToast('Selecciona una mesa o barra', 'warning'); return; }
     if (!clientName.trim()) { showToast('Ingresa un nombre o seña', 'warning'); return; }
     if (clientName.trim().toLowerCase() === 'cliente general') { showToast('Usa un nombre real, no "Cliente General"', 'warning'); return; }
     const total = cartItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
@@ -633,8 +635,8 @@ export default function RestaurantePOS() {
             setSelectedAccount(accountId);
             const acc = openAccounts.find(a => (a._id === accountId || a.id === accountId));
             if (acc) {
-              setSelectedTable(acc.table);
-              setSelectedBarra(acc.barra);
+              setSelectedTable(acc.table ? Number(acc.table) : null);
+              setSelectedBarra(currentZone === 'bar' ? acc.barra : null);
               setOrderType(acc.type || 'dine-in');
             }
           }}
