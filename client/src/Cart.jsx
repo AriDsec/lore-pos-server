@@ -120,7 +120,7 @@ export function ShoppingCart({
               <div className={isBar ? "grid grid-cols-2 gap-2" : "grid grid-cols-1"}>
                 <div>
                   <label className="text-slate-400 text-xs mb-0.5 block">Mesa</label>
-                  <select value={selectedTable || ''} onChange={(e) => { setSelectedTable(e.target.value); setSelectedBarra(null); }}
+                  <select value={selectedTable || ''} onChange={(e) => { setSelectedTable(e.target.value ? Number(e.target.value) : null); setSelectedBarra(null); }}
                     className="w-full bg-slate-700 border border-[#94cb47]/30 text-white rounded-lg p-1.5 text-xs focus:outline-none">
                     <option value="">—</option>
                     {(tables || Array.from({ length: maxTables }, (_, i) => i + 1)).map(n => (
