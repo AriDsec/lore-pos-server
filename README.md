@@ -12,7 +12,6 @@
 
 Sistema POS hecho a la medida para un negocio con dos zonas independientes — Bar y Restaurante. Maneja pedidos, cocina, caja y reportes desde cualquier dispositivo sin instalación.
 
-**[→ Abrir sistema](https://lore-pos-server-production.up.railway.app)**
 
 ---
 
