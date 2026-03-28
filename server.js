@@ -5,6 +5,7 @@ const path = require('path');
 const fs = require('fs');
 require('dotenv').config();
 const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
 
 // ── Sanitización de inputs ──
 const sanitizeStr = (val, maxLen = 200) => {
@@ -19,6 +20,13 @@ const sanitizeStatus = (val, allowed, fallback) =>
   allowed.includes(val) ? val : fallback;
 
 const app = express();
+
+// ── Seguridad ──
+app.disable('x-powered-by');
+app.use(helmet({
+  contentSecurityPolicy: false, // Deshabilitado para no romper el frontend React
+  crossOriginEmbedderPolicy: false,
+}));
 
 // ── Rate Limiting ──
 // General: 200 requests per 15 min per IP (covers normal sync usage)
@@ -335,6 +343,12 @@ app.get('*', (req, res) => {
 });
 
 const PORT = process.env.PORT || 5000;
+// ── Error handler global ──
+app.use((err, req, res, next) => {
+  console.error('Server error:', err.message);
+  res.status(500).json({ error: 'Error interno del servidor' });
+});
+
 app.listen(PORT, () => {
   console.log(`\n🚀 Servidor LORE POS corriendo en puerto ${PORT}`);
   console.log(`📊 Health check: http://localhost:${PORT}/health\n`);
