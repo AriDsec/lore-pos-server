@@ -375,10 +375,10 @@ export function MenuPanel({ menu, licores, onSelectItem, onModalChange }) {
   const ItemBtn = ({ item }) => (
     <button
       onClick={() => onSelectItem(item)}
-      className="w-full flex justify-between items-center bg-slate-700/50 hover:bg-slate-600/60 border border-slate-600/50 hover:border-[#94cb47]/40 rounded-xl px-3 py-2.5 md:py-4 transition-all text-left group"
+      className="w-full flex justify-between items-center bg-slate-700/50 hover:bg-slate-600/60 border border-slate-600/50 hover:border-[#94cb47]/40 rounded-xl px-3 py-2.5 md:py-5 transition-all text-left group"
     >
-      <span className="font-semibold text-white text-sm md:text-base group-hover:text-[#94cb47] transition leading-tight">{item.name}</span>
-      <span className="text-[#94cb47] font-bold text-xs md:text-sm ml-2 whitespace-nowrap">₡{item.price.toLocaleString()}</span>
+      <span className="font-semibold text-white text-sm md:text-xl group-hover:text-[#94cb47] transition leading-tight">{item.name}</span>
+      <span className="text-[#94cb47] font-bold text-xs md:text-lg ml-2 whitespace-nowrap">₡{item.price.toLocaleString()}</span>
     </button>
   );
 
@@ -394,9 +394,9 @@ export function MenuPanel({ menu, licores, onSelectItem, onModalChange }) {
           <div key={cat} className="bg-slate-800/60 rounded-xl overflow-hidden border border-slate-700/50">
             <button
               onClick={() => setExpandedCat(isOpen ? null : cat)}
-              className="w-full flex justify-between items-center px-4 py-3 md:py-4 text-left"
+              className="w-full flex justify-between items-center px-4 py-3 md:py-6 text-left"
             >
-              <span className="font-bold text-[#94cb47] text-sm md:text-base">{cat}</span>
+              <span className="font-bold text-[#94cb47] text-sm md:text-xl">{cat}</span>
               <span className={`text-slate-400 text-xs transition-transform ${isOpen ? 'rotate-180' : ''}`}>▾</span>
             </button>
             {isOpen && (
@@ -419,7 +419,7 @@ export function MenuPanel({ menu, licores, onSelectItem, onModalChange }) {
           value={busqueda}
           onChange={e => setBusqueda(e.target.value)}
           placeholder="Buscar en comida, bebidas y licores..."
-          className="w-full bg-slate-800 border border-slate-600 focus:border-[#94cb47] text-white rounded-xl px-4 py-2.5 md:py-3.5 text-sm md:text-base focus:outline-none placeholder-slate-500"
+          className="w-full bg-slate-800 border border-slate-600 focus:border-[#94cb47] text-white rounded-xl px-4 py-3 md:py-5 text-sm md:text-xl focus:outline-none placeholder-slate-500"
         />
         {busqueda && (
           <button onClick={() => setBusqueda('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white text-lg">×</button>
@@ -441,7 +441,7 @@ export function MenuPanel({ menu, licores, onSelectItem, onModalChange }) {
                   <button
                     key={item.id}
                     onClick={() => { setSelectedLicor(item); onModalChange?.(true); }}
-                    className="w-full flex justify-between items-center bg-slate-700/50 hover:bg-slate-600/60 border border-slate-600/50 hover:border-[#94cb47]/40 rounded-xl px-3 py-2.5 md:py-4 transition-all text-left group"
+                    className="w-full flex justify-between items-center bg-slate-700/50 hover:bg-slate-600/60 border border-slate-600/50 hover:border-[#94cb47]/40 rounded-xl px-3 py-2.5 md:py-5 transition-all text-left group"
                   >
                     <span className="font-semibold text-white text-sm group-hover:text-[#94cb47] transition">{item.name}</span>
 
@@ -485,9 +485,9 @@ export function MenuPanel({ menu, licores, onSelectItem, onModalChange }) {
                     <div key={cat} className="bg-slate-800/60 rounded-xl overflow-hidden border border-slate-700/50">
                       <button
                         onClick={() => setExpandedLicorCat(isOpen ? null : cat)}
-                        className="w-full flex justify-between items-center px-4 py-3 md:py-4 text-left"
+                        className="w-full flex justify-between items-center px-4 py-3 md:py-6 text-left"
                       >
-                        <span className="font-bold text-[#94cb47] text-sm md:text-base">{cat}</span>
+                        <span className="font-bold text-[#94cb47] text-sm md:text-xl">{cat}</span>
                         <span className={`text-slate-400 text-xs transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}>▾</span>
                       </button>
                       {isOpen && (
@@ -496,7 +496,7 @@ export function MenuPanel({ menu, licores, onSelectItem, onModalChange }) {
                             <button
                               key={licor.id}
                               onClick={() => { setSelectedLicor(licor); onModalChange?.(true); }}
-                              className="w-full flex justify-between items-center bg-slate-700/50 hover:bg-slate-600/60 border border-slate-600/50 hover:border-[#94cb47]/40 rounded-xl px-3 py-2.5 md:py-4 transition-all text-left group"
+                              className="w-full flex justify-between items-center bg-slate-700/50 hover:bg-slate-600/60 border border-slate-600/50 hover:border-[#94cb47]/40 rounded-xl px-3 py-2.5 md:py-5 transition-all text-left group"
                             >
                               <span className="font-semibold text-white text-sm group-hover:text-[#94cb47] transition">{licor.name}</span>
                               <ChevronDown size={13} className="text-slate-500 -rotate-90 flex-shrink-0 ml-2" />
