@@ -23,7 +23,7 @@ export function ShoppingCart({
     <div className={wrapClass}>
       {/* Header fijo */}
       <div className="px-4 py-3 border-b border-[#94cb47]/10 bg-slate-800/90 sticky top-0 z-10">
-        <h2 className="text-white font-bold text-base md:text-xl">
+        <h2 className="text-white font-bold text-base md:text-2xl">
           🛒 Carrito
           {cartItems.length > 0 && (
             <span className="bg-white/20 text-white text-xs font-bold px-2 py-0.5 rounded-full ml-2">{cartItems.length}</span>
@@ -66,8 +66,8 @@ export function ShoppingCart({
               <div key={item.id} className="bg-slate-700/60 rounded-lg p-2 border border-[#94cb47]/20">
                 <div className="flex justify-between items-center mb-1">
                   <div className="flex-1 pr-1 min-w-0">
-                    <div className="font-bold text-white text-xs md:text-sm leading-tight">{item.name}</div>
-                    <div className="text-[#94cb47] font-bold text-xs md:text-sm">₡{(item.price * item.quantity).toLocaleString()}</div>
+                    <div className="font-bold text-white text-xs md:text-lg leading-tight">{item.name}</div>
+                    <div className="text-[#94cb47] font-bold text-xs md:text-lg">₡{(item.price * item.quantity).toLocaleString()}</div>
                     {item.addedBy && <div className="text-slate-500 text-xs">👤 {item.addedBy}</div>}
                   </div>
                   {!isOthersMesera && (
@@ -106,9 +106,9 @@ export function ShoppingCart({
           <div className="space-y-2 border-t border-[#94cb47]/20 pt-3">
             {/* Tipo */}
             <div>
-              <label className="text-slate-400 text-xs md:text-sm mb-0.5 block">Tipo</label>
+              <label className="text-slate-400 text-xs md:text-lg mb-0.5 block">Tipo</label>
               <select value={orderType || ''} onChange={(e) => setOrderType(e.target.value)}
-                className="w-full bg-slate-700 border border-[#94cb47]/30 text-white rounded-lg p-1.5 md:p-2.5 text-xs md:text-sm focus:outline-none">
+                className="w-full bg-slate-700 border border-[#94cb47]/30 text-white rounded-lg p-1.5 md:p-3 text-xs md:text-lg focus:outline-none">
                 <option value="">Seleccionar...</option>
                 <option value="dine-in">Local</option>
                 <option value="takeout">Llevar</option>
@@ -119,9 +119,9 @@ export function ShoppingCart({
             {orderType === 'dine-in' && (
               <div className={isBar ? "grid grid-cols-2 gap-2" : "grid grid-cols-1"}>
                 <div>
-                  <label className="text-slate-400 text-xs md:text-sm mb-0.5 block">Mesa</label>
+                  <label className="text-slate-400 text-xs md:text-lg mb-0.5 block">Mesa</label>
                   <select value={selectedTable || ''} onChange={(e) => { setSelectedTable(e.target.value ? Number(e.target.value) : null); setSelectedBarra(null); }}
-                    className="w-full bg-slate-700 border border-[#94cb47]/30 text-white rounded-lg p-1.5 md:p-2.5 text-xs md:text-sm focus:outline-none">
+                    className="w-full bg-slate-700 border border-[#94cb47]/30 text-white rounded-lg p-1.5 md:p-3 text-xs md:text-lg focus:outline-none">
                     <option value="">—</option>
                     {(tables || Array.from({ length: maxTables }, (_, i) => i + 1)).map(n => (
                       <option key={n} value={n}>Mesa {n}</option>
@@ -130,9 +130,9 @@ export function ShoppingCart({
                 </div>
                 {isBar && (
                   <div>
-                    <label className="text-slate-400 text-xs md:text-sm mb-0.5 block">Barra</label>
+                    <label className="text-slate-400 text-xs md:text-lg mb-0.5 block">Barra</label>
                     <select value={selectedBarra || ''} onChange={(e) => { setSelectedBarra(e.target.value); setSelectedTable(null); }}
-                      className="w-full bg-slate-700 border border-[#94cb47]/30 text-white rounded-lg p-1.5 md:p-2.5 text-xs md:text-sm focus:outline-none">
+                      className="w-full bg-slate-700 border border-[#94cb47]/30 text-white rounded-lg p-1.5 md:p-3 text-xs md:text-lg focus:outline-none">
                       <option value="">—</option>
                       {barras.map(b => <option key={b} value={b}>{b}</option>)}
                     </select>
@@ -144,7 +144,7 @@ export function ShoppingCart({
             {/* Nombre */}
             <input type="text" value={clientName} onChange={(e) => setClientName(e.target.value)}
               placeholder="Nombre / Seña del cliente..."
-              className="w-full bg-slate-700 border border-[#94cb47]/30 text-white rounded-lg p-1.5 md:p-2.5 text-xs md:text-sm focus:outline-none placeholder-slate-600" />
+              className="w-full bg-slate-700 border border-[#94cb47]/30 text-white rounded-lg p-1.5 md:p-3 text-xs md:text-lg focus:outline-none placeholder-slate-600" />
 
             {/* Total */}
             <div className="flex items-center justify-between bg-[#94cb47]/20 rounded-lg px-3 py-2 border border-[#94cb47]/40">
