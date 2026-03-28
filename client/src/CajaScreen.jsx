@@ -26,16 +26,16 @@ export function CajaScreen({
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-5 shadow-2xl">
-            <div className="text-slate-400 text-sm">Cuentas Pagadas</div>
-            <div className="text-3xl font-bold text-white mt-2">{paid.length}</div>
+            <div className="text-slate-400 text-sm md:text-base">Cuentas Pagadas</div>
+            <div className="text-3xl md:text-4xl font-bold text-white mt-2">{paid.length}</div>
           </div>
           <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-5 shadow-2xl">
-            <div className="text-slate-400 text-sm">Total Comida</div>
-            <div className="text-2xl font-bold text-[#94cb47] mt-2">₡{foodCobrado.toLocaleString()}</div>
+            <div className="text-slate-400 text-sm md:text-base">Total Comida</div>
+            <div className="text-2xl md:text-3xl font-bold text-[#94cb47] mt-2">₡{foodCobrado.toLocaleString()}</div>
           </div>
           <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-5 shadow-2xl">
-            <div className="text-slate-400 text-sm">Total Bebidas</div>
-            <div className="text-2xl font-bold text-[#94cb47] mt-2">₡{drinkCobrado.toLocaleString()}</div>
+            <div className="text-slate-400 text-sm md:text-base">Total Bebidas</div>
+            <div className="text-2xl md:text-3xl font-bold text-[#94cb47] mt-2">₡{drinkCobrado.toLocaleString()}</div>
           </div>
         </div>
 
@@ -51,22 +51,22 @@ export function CajaScreen({
             : (
               <div className="space-y-3">
                 {accounts.map(acc => (
-                  <div key={acc._id || acc.id} className="bg-slate-700/50 rounded-xl p-4 flex flex-wrap justify-between items-center gap-3 border border-slate-600">
+                  <div key={acc._id || acc.id} className="bg-slate-700/50 rounded-xl p-4 md:p-5 flex flex-wrap justify-between items-center gap-3 border border-slate-600">
                     <div>
-                      <div className="text-white font-bold">{acc.barra || (acc.table != null ? `Mesa ${acc.table}` : acc.locationLabel || 'Barra')}{acc.clientName ? ` — ${acc.clientName}` : ''}</div>
-                      <div className="text-slate-400 text-xs">👤 {acc.mesera} · {acc.items.length} items</div>
+                      <div className="text-white font-bold md:text-lg">{acc.barra || (acc.table != null ? `Mesa ${acc.table}` : acc.locationLabel || 'Barra')}{acc.clientName ? ` — ${acc.clientName}` : ''}</div>
+                      <div className="text-slate-400 text-xs md:text-sm">👤 {acc.mesera} · {acc.items.length} items</div>
                     </div>
                     <div className="flex flex-col gap-1.5 items-end">
-                      <span className="text-[#94cb47] font-bold text-sm">₡{acc.total.toLocaleString()}</span>
+                      <span className="text-[#94cb47] font-bold text-sm md:text-lg">₡{acc.total.toLocaleString()}</span>
                       <div className="flex items-center gap-1.5">
-                        <button onClick={() => setViewItemsOrder(acc)} className="bg-slate-600 hover:bg-slate-500 text-white px-2.5 py-1 rounded text-xs font-bold">Items</button>
+                        <button onClick={() => setViewItemsOrder(acc)} className="bg-slate-600 hover:bg-slate-500 text-white px-2.5 md:px-4 py-1 md:py-2.5 rounded text-xs md:text-sm font-bold">Items</button>
                         {acc.items.length > 1 && (
-                          <button onClick={() => setSplitOrder(acc)} className="bg-orange-700 hover:bg-orange-600 text-white px-2.5 py-1 rounded text-xs font-bold">Separar</button>
+                          <button onClick={() => setSplitOrder(acc)} className="bg-orange-700 hover:bg-orange-600 text-white px-2.5 md:px-4 py-1 md:py-2.5 rounded text-xs md:text-sm font-bold">Separar</button>
                         )}
-                        <button onClick={() => setBillOrder(acc)} className="bg-[#94cb47] hover:bg-[#7ab035] text-black px-2.5 py-1 rounded text-xs font-bold">Cobrar</button>
+                        <button onClick={() => setBillOrder(acc)} className="bg-[#94cb47] hover:bg-[#7ab035] text-black px-2.5 md:px-4 py-1 md:py-2.5 rounded text-xs md:text-sm font-bold">Cobrar</button>
                         {onDelete && (
                           <button onClick={() => setDeleteConfirm(acc)}
-                            className="bg-red-800/60 hover:bg-red-700 text-red-300 hover:text-white px-2 py-1 rounded text-xs font-bold border border-red-700/50">🗑️</button>
+                            className="bg-red-800/60 hover:bg-red-700 text-red-300 hover:text-white px-2 md:px-3 py-1 md:py-2.5 rounded text-xs md:text-sm font-bold border border-red-700/50">🗑️</button>
                         )}
                       </div>
                     </div>
@@ -106,8 +106,8 @@ export function CajaScreen({
                   <div className="flex items-center justify-between gap-2">
                     <div>{payBadge(o.paymentMethod)}</div>
                     <div className="flex gap-1.5">
-                      <button onClick={() => setViewItemsOrder(o)} className="bg-slate-600 hover:bg-slate-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold">📋 Ver</button>
-                      <button onClick={() => imprimirTiquete(o, zona)} className="bg-blue-700 hover:bg-blue-800 text-white px-3 py-1.5 rounded-lg text-xs font-bold">🖨️</button>
+                      <button onClick={() => setViewItemsOrder(o)} className="bg-slate-600 hover:bg-slate-500 text-white px-3 md:px-5 py-1.5 md:py-2.5 rounded-lg text-xs md:text-sm font-bold">📋 Ver</button>
+                      <button onClick={() => imprimirTiquete(o, zona)} className="bg-blue-700 hover:bg-blue-800 text-white px-3 md:px-5 py-1.5 md:py-2.5 rounded-lg text-xs md:text-sm font-bold">🖨️</button>
                     </div>
                   </div>
                 </div>
