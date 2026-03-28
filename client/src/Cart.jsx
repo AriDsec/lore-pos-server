@@ -76,17 +76,25 @@ export function ShoppingCart({
                     </button>
                   )}
                 </div>
-                <div className="flex items-center gap-1 bg-slate-900/50 rounded-md px-1 py-0.5 mb-1">
-                  {!isOthersMesera ? (<>
-                    <button onClick={() => updateQuantity(item.id, item.quantity - 1)} className="p-1 hover:bg-slate-700 rounded">
-                      <Minus size={11} className="text-slate-400" />
-                    </button>
-                    <span className="flex-1 text-center text-white font-bold text-xs">{item.quantity}</span>
-                    <button onClick={() => updateQuantity(item.id, item.quantity + 1)} className="p-1 hover:bg-slate-700 rounded">
-                      <Plus size={11} className="text-slate-400" />
-                    </button>
-                  </>) : (
-                    <span className="flex-1 text-center text-slate-400 text-xs py-1">x{item.quantity}</span>
+                <div className="flex items-center gap-2 mb-1">
+                  {!isOthersMesera ? (
+                    <div className="flex items-center gap-2 flex-1">
+                      <button
+                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                        className="w-8 h-8 md:w-12 md:h-12 flex items-center justify-center bg-slate-700 hover:bg-slate-600 active:bg-[#94cb47]/30 rounded-xl border border-slate-600 transition flex-shrink-0">
+                        <Minus size={13} className="text-slate-300 md:hidden" />
+                        <Minus size={18} className="text-slate-300 hidden md:block" />
+                      </button>
+                      <span className="flex-1 text-center text-white font-bold text-sm md:text-xl">{item.quantity}</span>
+                      <button
+                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                        className="w-8 h-8 md:w-12 md:h-12 flex items-center justify-center bg-slate-700 hover:bg-slate-600 active:bg-[#94cb47]/30 rounded-xl border border-slate-600 transition flex-shrink-0">
+                        <Plus size={13} className="text-slate-300 md:hidden" />
+                        <Plus size={18} className="text-slate-300 hidden md:block" />
+                      </button>
+                    </div>
+                  ) : (
+                    <span className="flex-1 text-center text-slate-400 text-xs md:text-base py-1">x{item.quantity}</span>
                   )}
                 </div>
                 <input
@@ -94,7 +102,7 @@ export function ShoppingCart({
                   placeholder="Notas..."
                   value={item.notes || ''}
                   onChange={(e) => updateNotes(item.id, e.target.value.slice(0, 80))} maxLength={80}
-                  className="w-full bg-slate-900/50 border border-[#94cb47]/20 text-white text-xs rounded p-1 focus:outline-none focus:border-[#94cb47] placeholder-slate-600"
+                  className="w-full bg-slate-900/50 border border-[#94cb47]/20 text-white text-xs md:text-base rounded p-1 md:p-2.5 focus:outline-none focus:border-[#94cb47] placeholder-slate-600"
                 />
               </div>
             ))}
