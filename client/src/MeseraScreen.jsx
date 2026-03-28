@@ -110,7 +110,7 @@ export function MeseraScreen({
         <div className="flex-1 overflow-y-auto">
           {menuCenterJSX}
         </div>
-        <div style={{width: "min(460px, 38vw)", flexShrink: 0, height: "100%", display: "flex", flexDirection: "column", gap: "10px"}}>
+        <div style={{width: "min(520px, 40vw)", flexShrink: 0, height: "100%", display: "flex", flexDirection: "column", gap: "10px"}}>
           <div style={{flex: 1, overflowY: "auto", minHeight: 0}}>
             <ShoppingCart {...cartProps} mobileVisible="landscape" />
           </div>
