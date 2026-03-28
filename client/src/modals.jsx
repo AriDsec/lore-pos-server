@@ -647,15 +647,15 @@ export function PinLoginScreen({ isLandscape, syncError, loading, onLogin }) {
 export function SelectorScreen({ isLandscape, syncError, loading, onSelect, onBack }) {
   const meseras = ['Mari', 'Mile', 'Lin', 'Temp Bar', 'Guido Bar'];
   return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-slate-900 to-black flex flex-col items-center justify-center p-4 overflow-y-auto">
+    <div className="min-h-screen bg-gradient-to-br from-black via-slate-900 to-black flex flex-col items-center justify-center p-4 md:p-8 overflow-y-auto">
       {isLandscape ? (
-        <div className="flex items-center gap-5 mb-5 w-full max-w-3xl">
-          <img src="/logo.png" alt="LORE" className="w-24 h-24 object-contain drop-shadow-2xl flex-shrink-0" />
+        <div className="flex items-center gap-5 mb-6 w-full max-w-3xl md:max-w-5xl">
+          <img src="/logo.png" alt="LORE" className="w-24 h-24 md:w-32 md:h-32 object-contain drop-shadow-2xl flex-shrink-0" />
           <div style={{ fontFamily: "'Cinzel', serif", letterSpacing: '0.14em' }}
-            className="text-white/75 text-2xl font-normal drop-shadow-lg flex-1">
+            className="text-white/75 text-2xl md:text-4xl font-normal drop-shadow-lg flex-1">
             Sistema de Pedidos
           </div>
-          <button onClick={onBack} className="flex items-center gap-1.5 bg-slate-700/60 hover:bg-slate-600 text-slate-300 hover:text-white text-sm font-medium px-3 py-1.5 rounded-lg transition border border-slate-600 flex-shrink-0">← PIN</button>
+          <button onClick={onBack} className="flex items-center gap-1.5 bg-slate-700/60 hover:bg-slate-600 text-slate-300 hover:text-white text-sm md:text-base font-medium px-3 md:px-5 py-1.5 md:py-2.5 rounded-lg transition border border-slate-600 flex-shrink-0">← PIN</button>
         </div>
       ) : (
         <div className="flex flex-col items-center mb-5 w-full max-w-md">
@@ -667,29 +667,29 @@ export function SelectorScreen({ isLandscape, syncError, loading, onSelect, onBa
         </div>
       )}
       {syncError && (
-        <div className="bg-red-900/60 border border-red-500 rounded-xl p-3 mb-3 text-red-200 text-sm text-center w-full max-w-2xl">
+        <div className="bg-red-900/60 border border-red-500 rounded-xl p-3 mb-3 text-red-200 text-sm md:text-base text-center w-full max-w-2xl md:max-w-5xl">
           ⚠️ {syncError}
         </div>
       )}
-      <div className={`w-full ${isLandscape ? 'grid grid-cols-3 gap-3 max-w-3xl' : 'grid grid-cols-2 gap-3 max-w-md'}`}>
-        <div className="bg-slate-800/80 backdrop-blur border border-[#94cb47]/40 rounded-2xl p-4 shadow-2xl">
-          <h2 className="text-[#94cb47] font-bold text-sm mb-2">🍺 ZONA BAR</h2>
-          <button onClick={() => onSelect('Caja Bar')} className="w-full bg-[#94cb47] hover:bg-[#7ab035] text-white font-bold py-2.5 rounded-xl transition shadow-lg mb-2">💰 Caja Bar</button>
-          <div className="space-y-2">
+      <div className={`w-full ${isLandscape ? 'grid grid-cols-3 gap-4 max-w-3xl md:max-w-5xl' : 'grid grid-cols-2 gap-3 max-w-md'}`}>
+        <div className="bg-slate-800/80 backdrop-blur border border-[#94cb47]/40 rounded-2xl p-4 md:p-7 shadow-2xl">
+          <h2 className="text-[#94cb47] font-bold text-sm md:text-lg mb-3">🍺 ZONA BAR</h2>
+          <button onClick={() => onSelect('Caja Bar')} className="w-full bg-[#94cb47] hover:bg-[#7ab035] text-white font-bold py-2.5 md:py-4 md:text-lg rounded-xl transition shadow-lg mb-3">💰 Caja Bar</button>
+          <div className="space-y-2 md:space-y-3">
             {meseras.filter(m => m !== 'Guido Bar').map(m => (
-              <button key={m} onClick={() => onSelect(m)} className="w-full bg-slate-700/60 hover:bg-slate-600 text-[#94cb47] py-2 rounded-lg transition font-medium text-sm">{m}</button>
+              <button key={m} onClick={() => onSelect(m)} className="w-full bg-slate-700/60 hover:bg-slate-600 text-[#94cb47] py-2 md:py-3.5 md:text-base rounded-lg transition font-medium text-sm">{m}</button>
             ))}
-            <button onClick={() => onSelect('Guido Bar')} className="w-full bg-slate-700/60 hover:bg-slate-600 text-[#94cb47] py-2 rounded-lg transition font-medium text-sm border border-[#94cb47]/30">👑 Guido</button>
+            <button onClick={() => onSelect('Guido Bar')} className="w-full bg-slate-700/60 hover:bg-slate-600 text-[#94cb47] py-2 md:py-3.5 md:text-base rounded-lg transition font-medium text-sm border border-[#94cb47]/30">👑 Guido</button>
           </div>
         </div>
-        <div className="bg-slate-800/80 backdrop-blur border border-[#94cb47]/40 rounded-2xl p-4 shadow-2xl">
-          <h2 className="text-[#94cb47] font-bold text-sm mb-2">🍽️ ZONA RESTAURANTE</h2>
-          <button onClick={() => onSelect('Caja Restaurante')} className="w-full bg-[#94cb47] hover:bg-[#7ab035] text-white font-bold py-2.5 rounded-xl transition shadow-lg mb-2">💰 Caja</button>
-          <button onClick={() => onSelect('Tablet Restaurante')} className="w-full bg-[#94cb47]/90 hover:bg-[#7ab035] text-white font-bold py-2.5 rounded-xl transition shadow-lg mb-2">📱 Tomar Pedidos</button>
-          <button onClick={() => onSelect('Cocina')} className="w-full bg-[#94cb47]/90 hover:bg-[#7ab035] text-white font-bold py-2.5 rounded-xl transition shadow-lg">👨‍🍳 Cocina</button>
+        <div className="bg-slate-800/80 backdrop-blur border border-[#94cb47]/40 rounded-2xl p-4 md:p-7 shadow-2xl">
+          <h2 className="text-[#94cb47] font-bold text-sm md:text-lg mb-3">🍽️ ZONA RESTAURANTE</h2>
+          <button onClick={() => onSelect('Caja Restaurante')} className="w-full bg-[#94cb47] hover:bg-[#7ab035] text-white font-bold py-2.5 md:py-4 md:text-lg rounded-xl transition shadow-lg mb-3">💰 Caja</button>
+          <button onClick={() => onSelect('Tablet Restaurante')} className="w-full bg-[#94cb47]/90 hover:bg-[#7ab035] text-white font-bold py-2.5 md:py-4 md:text-lg rounded-xl transition shadow-lg mb-3">📱 Tomar Pedidos</button>
+          <button onClick={() => onSelect('Cocina')} className="w-full bg-[#94cb47]/90 hover:bg-[#7ab035] text-white font-bold py-2.5 md:py-4 md:text-lg rounded-xl transition shadow-lg">👨‍🍳 Cocina</button>
         </div>
-        <div className={`bg-slate-800/80 backdrop-blur border border-[#94cb47]/40 rounded-2xl p-4 shadow-2xl flex flex-col justify-between gap-3 ${!isLandscape ? "col-span-2" : ""}`}>
-          <button onClick={() => onSelect('__admin__')} className="w-full bg-[#94cb47]/90 hover:bg-[#7ab035] text-white font-bold py-2.5 rounded-xl transition shadow-lg">📊 Panel Admin</button>
+        <div className={`bg-slate-800/80 backdrop-blur border border-[#94cb47]/40 rounded-2xl p-4 md:p-7 shadow-2xl flex flex-col justify-between gap-3 ${!isLandscape ? "col-span-2" : ""}`}>
+          <button onClick={() => onSelect('__admin__')} className="w-full bg-[#94cb47]/90 hover:bg-[#7ab035] text-white font-bold py-2.5 md:py-4 md:text-lg rounded-xl transition shadow-lg">📊 Panel Admin</button>
           {!isLandscape && <button onClick={onBack} className="w-full flex items-center justify-center gap-2 bg-slate-700/60 hover:bg-slate-600 text-slate-300 hover:text-white font-medium py-2.5 rounded-xl transition border border-slate-600 text-sm">← Volver al PIN</button>}
         </div>
       </div>
