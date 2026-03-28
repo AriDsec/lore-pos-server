@@ -96,11 +96,16 @@ export function MeseraScreen({
         if (readyOrders.length === 0) return null;
         const mesas = readyOrders.map(o => o.barra || (o.table ? `Mesa ${o.table}` : '')).filter(Boolean).join(' · ');
         return (
-          <div className="bg-[#94cb47] px-4 py-2 flex items-center gap-2">
-            <span className="text-black font-bold text-sm animate-pulse">🔔</span>
-            <span className="text-black font-bold text-sm flex-1">
-              {readyOrders.length} pedido{readyOrders.length > 1 ? 's' : ''} listo{readyOrders.length > 1 ? 's' : ''} — {mesas}
-            </span>
+          <div className="bg-[#94cb47] overflow-hidden">
+            <div className="flex items-center gap-2 px-4 py-2.5 md:py-4">
+              <span className="text-black font-black text-sm md:text-xl animate-pulse">🔔</span>
+              <span className="text-black font-black text-sm md:text-xl flex-1">
+                {readyOrders.length} pedido{readyOrders.length > 1 ? 's' : ''} listo{readyOrders.length > 1 ? 's' : ''}
+              </span>
+            </div>
+            <div className="bg-black/20 px-4 pb-2.5 md:pb-4">
+              <span className="text-black/80 font-bold text-xs md:text-base">{mesas}</span>
+            </div>
           </div>
         );
       })()}
@@ -115,19 +120,32 @@ export function MeseraScreen({
             <ShoppingCart {...cartProps} mobileVisible="landscape" />
           </div>
           {/* Pedidos listos debajo del carrito en landscape */}
-          {kitchenOrders.filter(o => o.status === 'ready').length > 0 && (
-            <div className="bg-[#94cb47]/10 border border-[#94cb47]/40 rounded-xl p-3 flex-shrink-0">
-              <div className="text-[#94cb47] font-bold text-xs mb-2">
-                🔔 {kitchenOrders.filter(o => o.status === 'ready').length} pedido{kitchenOrders.filter(o => o.status === 'ready').length > 1 ? 's' : ''} listo{kitchenOrders.filter(o => o.status === 'ready').length > 1 ? 's' : ''}
-              </div>
-              {kitchenOrders.filter(o => o.status === 'ready').map((o, i) => (
-                <div key={i} className="text-white text-xs py-1 border-t border-[#94cb47]/20">
-                  <span className="font-bold">{o.barra || (o.table ? `Mesa ${o.table}` : '')}</span>
-                  {o.clientName && <span className="text-slate-400"> — {o.clientName}</span>}
+          {(() => {
+            const ready = kitchenOrders.filter(o => o.status === 'ready');
+            if (ready.length === 0) return null;
+            return (
+              <div className="bg-[#94cb47] rounded-xl overflow-hidden flex-shrink-0 shadow-lg">
+                <div className="flex items-center gap-2 px-4 py-2.5 md:py-3">
+                  <span className="text-black font-black text-sm md:text-lg animate-pulse">🔔</span>
+                  <span className="text-black font-black text-sm md:text-lg flex-1">
+                    {ready.length} pedido{ready.length > 1 ? 's' : ''} listo{ready.length > 1 ? 's' : ''}
+                  </span>
                 </div>
-              ))}
-            </div>
-          )}
+                <div className="bg-black/20 px-4 pb-3 space-y-1.5">
+                  {ready.map((o, i) => (
+                    <div key={i} className="flex items-center gap-2">
+                      <span className="text-black font-bold text-sm md:text-base">
+                        {o.barra || (o.table ? `Mesa ${o.table}` : '')}
+                      </span>
+                      {o.clientName && (
+                        <span className="text-black/70 text-sm md:text-base">— {o.clientName}</span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
         </div>
       </div>
 
