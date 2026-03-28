@@ -4,13 +4,57 @@ const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
 require('dotenv').config();
+const rateLimit = require('express-rate-limit');
+
+// ── Sanitización de inputs ──
+const sanitizeStr = (val, maxLen = 200) => {
+  if (val === null || val === undefined) return null;
+  return String(val).trim().slice(0, maxLen).replace(/[${}\[\]]/g, '');
+};
+const sanitizeNum = (val, fallback = null) => {
+  const n = Number(val);
+  return isFinite(n) ? n : fallback;
+};
+const sanitizeStatus = (val, allowed, fallback) =>
+  allowed.includes(val) ? val : fallback;
 
 const app = express();
+
+// ── Rate Limiting ──
+// General: 200 requests per 15 min per IP (covers normal sync usage)
+const generalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 200,
+  standardHeaders: 'draft-8',
+  legacyHeaders: false,
+  message: { error: 'Demasiadas solicitudes, intenta más tarde.' },
+});
+
+// Write operations: 60 requests per 15 min (create/update/close accounts)
+const writeLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 60,
+  standardHeaders: 'draft-8',
+  legacyHeaders: false,
+  message: { error: 'Demasiadas solicitudes de escritura, intenta más tarde.' },
+});
+
+// Admin: 30 requests per 15 min (clear-day, config changes)
+const adminLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 30,
+  standardHeaders: 'draft-8',
+  legacyHeaders: false,
+  message: { error: 'Demasiadas solicitudes administrativas, intenta más tarde.' },
+});
+
+app.use('/api', generalLimiter);
 
 app.use(cors());
 app.use(express.json());
 
 // Conectar a MongoDB
+mongoose.set('strictQuery', true);
 mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -100,20 +144,36 @@ app.get('/api/accounts/:zone/closed', async (req, res) => {
   } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
-app.post('/api/accounts', async (req, res) => {
+app.post('/api/accounts', writeLimiter, async (req, res) => {
   try {
     const data = req.body;
-    const itemsWithBy = (data.items || []).map(item => ({ ...item, addedBy: item.addedBy || data.mesera }));
-    const newAccount = new Account({ ...data, items: itemsWithBy, createdAt: new Date(), lastUpdated: new Date(), status: 'open' });
+    const itemsWithBy = (data.items || []).map(item => ({
+      ...item,
+      name: sanitizeStr(item.name, 100),
+      notes: sanitizeStr(item.notes, 200),
+      addedBy: sanitizeStr(item.addedBy || data.mesera, 50),
+      price: sanitizeNum(item.price, 0),
+      quantity: sanitizeNum(item.quantity, 1),
+    }));
+    const newAccount = new Account({
+      ...data,
+      mesera: sanitizeStr(data.mesera, 50),
+      clientName: sanitizeStr(data.clientName, 100),
+      zone: sanitizeStatus(data.zone, ['bar','restaurante'], 'bar'),
+      table: sanitizeNum(data.table, null),
+      barra: sanitizeStr(data.barra, 50),
+      items: itemsWithBy,
+      createdAt: new Date(), lastUpdated: new Date(), status: 'open'
+    });
     await newAccount.save();
     res.status(201).json(newAccount);
   } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
-app.put('/api/accounts/:id', async (req, res) => {
+app.put('/api/accounts/:id', writeLimiter, async (req, res) => {
   try {
     const { items, total } = req.body;
-    const account = await Account.findOne({ id: req.params.id });
+    const account = await Account.findOne({ id: sanitizeStr(req.params.id, 100) });
     if (!account) return res.status(404).json({ error: 'Cuenta no encontrada' });
     account.items = items;
     account.total = total;
@@ -125,23 +185,24 @@ app.put('/api/accounts/:id', async (req, res) => {
   } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
-app.post('/api/accounts/:id/close', async (req, res) => {
+app.post('/api/accounts/:id/close', writeLimiter, async (req, res) => {
   try {
-    const account = await Account.findOne({ id: req.params.id });
+    const account = await Account.findOne({ id: sanitizeStr(req.params.id, 100) });
     if (!account) return res.status(404).json({ error: 'Cuenta no encontrada' });
     account.status = 'paid';
     account.closedAt = new Date();
-    account.paymentMethod = req.body.paymentMethod || 'efectivo';
+    const allowedMethods = ['efectivo','sinpe','tarjeta','mixto','efectivo_sinpe','tarjeta_sinpe'];
+    account.paymentMethod = sanitizeStatus(req.body.paymentMethod, allowedMethods, 'efectivo');
     // Si es pago combinado, guardar desglose
-    if (['mixto', 'efectivo_sinpe', 'tarjeta_sinpe'].includes(req.body.paymentMethod)) {
-      account.efectivoMixto = req.body.efectivoMixto || 0;
-      account.tarjetaMixto  = req.body.tarjetaMixto  || 0;
+    if (['mixto', 'efectivo_sinpe', 'tarjeta_sinpe'].includes(account.paymentMethod)) {
+      account.efectivoMixto = sanitizeNum(req.body.efectivoMixto, 0);
+      account.tarjetaMixto  = sanitizeNum(req.body.tarjetaMixto, 0);
     }
     // Si hay descuento, guardar total real cobrado y original
     if (req.body.totalCobrado !== undefined) {
       account.totalOriginal = account.total;
-      account.total = req.body.totalCobrado;
-      account.descuento = req.body.descuento || 0;
+      account.total = sanitizeNum(req.body.totalCobrado, account.total);
+      account.descuento = sanitizeNum(req.body.descuento, 0);
     }
     await account.save();
     res.json(account);
@@ -156,7 +217,7 @@ app.get('/api/kitchen/:zone', async (req, res) => {
   } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
-app.post('/api/kitchen', async (req, res) => {
+app.post('/api/kitchen', writeLimiter, async (req, res) => {
   try {
     const newOrder = new KitchenOrder({ ...req.body, createdAt: new Date() });
     await newOrder.save();
@@ -166,9 +227,9 @@ app.post('/api/kitchen', async (req, res) => {
 
 app.put('/api/kitchen/:id', async (req, res) => {
   try {
-    const order = await KitchenOrder.findOne({ id: req.params.id });
+    const order = await KitchenOrder.findOne({ id: sanitizeStr(req.params.id, 100) });
     if (!order) return res.status(404).json({ error: 'Pedido no encontrado' });
-    order.status = req.body.status;
+    order.status = sanitizeStatus(req.body.status, ['pending','ready','delivered'], order.status);
     await order.save();
     res.json(order);
   } catch (error) { res.status(500).json({ error: error.message }); }
@@ -176,14 +237,14 @@ app.put('/api/kitchen/:id', async (req, res) => {
 
 app.delete('/api/accounts/:id', async (req, res) => {
   try {
-    await Account.deleteOne({ id: req.params.id });
+    await Account.deleteOne({ id: sanitizeStr(req.params.id, 100) });
     res.json({ deleted: true });
   } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
 app.delete('/api/kitchen/:id', async (req, res) => {
   try {
-    await KitchenOrder.deleteOne({ id: req.params.id });
+    await KitchenOrder.deleteOne({ id: sanitizeStr(req.params.id, 100) });
     res.json({ deleted: true });
   } catch (error) { res.status(500).json({ error: error.message }); }
 });
@@ -200,7 +261,7 @@ app.get('/api/reports/:zone', async (req, res) => {
 });
 
 // ============ ADMIN — LIMPIAR DÍA ============
-app.delete('/api/admin/clear-day', async (req, res) => {
+app.delete('/api/admin/clear-day', adminLimiter, async (req, res) => {
   try {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -229,16 +290,16 @@ app.get('/api/access-log', async (req, res) => {
 // ── Configuración global ──────────────────────────────────────────
 app.get('/api/config/:key', async (req, res) => {
   try {
-    const doc = await Config.findOne({ key: req.params.key });
+    const doc = await Config.findOne({ key: sanitizeStr(req.params.key, 50) });
     res.json(doc ? { value: doc.value } : { value: null });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-app.post('/api/config/:key', async (req, res) => {
+app.post('/api/config/:key', adminLimiter, async (req, res) => {
   try {
     const { value } = req.body;
     const doc = await Config.findOneAndUpdate(
-      { key: req.params.key },
+      { key: sanitizeStr(req.params.key, 50) },
       { value, updatedAt: new Date() },
       { upsert: true, new: true }
     );
