@@ -106,11 +106,11 @@ export function MeseraScreen({
       })()}
 
       {/* ── Landscape: flex — menú flexible / carrito ancho fijo ── */}
-      <div className={`${isLandscape ? "flex" : "hidden"} gap-3 p-3 w-full overflow-hidden`} style={{height: "calc(100vh - 64px)"}}>
+      <div className={`${isLandscape ? "flex" : "hidden"} gap-4 p-4 w-full overflow-hidden`} style={{height: "calc(100vh - 64px)"}}>
         <div className="flex-1 overflow-y-auto">
           {menuCenterJSX}
         </div>
-        <div style={{width: "380px", flexShrink: 0, height: "100%", display: "flex", flexDirection: "column", gap: "8px"}}>
+        <div style={{width: "min(460px, 38vw)", flexShrink: 0, height: "100%", display: "flex", flexDirection: "column", gap: "10px"}}>
           <div style={{flex: 1, overflowY: "auto", minHeight: 0}}>
             <ShoppingCart {...cartProps} mobileVisible="landscape" />
           </div>
