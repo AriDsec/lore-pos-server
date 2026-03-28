@@ -27,17 +27,20 @@ export default function RestaurantePOS() {
 
   // Servicio 10% — estado reactivo, persiste en servidor + localStorage como fallback
   const [servicioActivoGlobal, setServicioActivoGlobal] = useState(() => {
+    const esSabado = new Date().getDay() === 6;
+    if (esSabado) return true; // Sábado siempre activo por defecto
     const saved = localStorage.getItem('lore_servicio');
-    return saved !== null ? saved === 'true' : new Date().getDay() === 6;
+    return saved !== null ? saved === 'true' : false;
   });
 
   // Al iniciar, sincronizar con el servidor
   useEffect(() => {
+    const esSabado = new Date().getDay() === 6;
     api.getConfig('servicio_activo').then(({ value }) => {
-      if (value !== null && value !== undefined) {
-        setServicioActivoGlobal(value);
-        localStorage.setItem('lore_servicio', String(value));
-      }
+      // Si es sábado y el servidor tiene false guardado de otro día, ignorarlo
+      const valorFinal = esSabado ? (value !== false) : (value === true);
+      setServicioActivoGlobal(valorFinal);
+      localStorage.setItem('lore_servicio', String(valorFinal));
     }).catch(() => {}); // si falla usa localStorage
   }, []);
 
