@@ -631,6 +631,19 @@ export default function RestaurantePOS() {
     />;
   }
 
+  // Guard contra renders intermedios durante logout
+  if (!currentUser || !userRole || !currentZone) {
+    return (
+      <>
+        <Toast toasts={toasts} offline={!!syncError} />
+        {showSelector
+          ? <SelectorScreen isLandscape={isLandscape} syncError={syncError} loading={loading} onSelect={handleSelectorLogin} onBack={() => { setShowSelector(false); setAdminUser(null); localStorage.removeItem('lore_admin'); }} />
+          : <PinLoginScreen isLandscape={isLandscape} syncError={syncError} loading={loading} onLogin={loginWithPin} onShowSelector={() => setShowSelector(true)} />
+        }
+      </>
+    );
+  }
+
   if (userRole === 'mesera') {
     return (
       <>
