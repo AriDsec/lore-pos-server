@@ -102,6 +102,7 @@ const accountSchema = new mongoose.Schema({
   createdAt: Date,
   lastUpdated: Date,
   status: { type: String, default: 'open' },
+  pendingNote: String,
   closedAt: Date,
   paymentMethod: { type: String, default: 'efectivo' },
   locationLabel: String,
@@ -139,7 +140,7 @@ const Config = mongoose.model('Config', configSchema);
 
 app.get('/api/accounts/:zone/open', async (req, res) => {
   try {
-    const accounts = await Account.find({ zone: req.params.zone, status: 'open' });
+    const accounts = await Account.find({ zone: req.params.zone, status: { $in: ['open', 'pending_payment'] } });
     res.json(accounts);
   } catch (error) { res.status(500).json({ error: error.message }); }
 });
@@ -276,6 +277,17 @@ app.get('/api/reports/:zone', async (req, res) => {
 });
 
 // ============ ADMIN — LIMPIAR DÍA ============
+app.put('/api/accounts/:id/pending', async (req, res) => {
+  try {
+    const account = await Account.findOne({ id: sanitizeStr(req.params.id, 100) });
+    if (!account) return res.status(404).json({ error: 'Cuenta no encontrada' });
+    account.status = account.status === 'pending_payment' ? 'open' : 'pending_payment';
+    account.pendingNote = sanitizeStr(req.body.note || '', 100);
+    await account.save();
+    res.json(account);
+  } catch (error) { res.status(500).json({ error: error.message }); }
+});
+
 app.delete('/api/admin/clear-day', adminLimiter, async (req, res) => {
   try {
     const today = new Date();
