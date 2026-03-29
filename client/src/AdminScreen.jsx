@@ -82,9 +82,12 @@ export function AdminScreen({ barPaid, restPaid, loading, onLogout, setPaidOrder
   // Saldo: positivo = Bar le paga al Restaurante, negativo = Restaurante le paga al Bar
   const deudaBar = barFoodTotal - restAlcoholTotal;
 
-  // Cálculo del servicio 10% — solo bar, ya incluido en precios
-  // Si precio = base * 1.10, entonces servicio = precio - base = precio * (1/11)
-  const totalServicio = servicioActivo ? Math.round(totalBarCobrado / 11) : 0;
+  // Cálculo del servicio 10% — solo cuentas de MESA en bar (no barras)
+  // El 10% solo se aplica en mesas, entonces solo esas cuentas lo tienen incluido
+  const totalMesasBar = barPaid
+    .filter(o => o.table && o.table > 0)
+    .reduce((s, o) => s + o.total, 0);
+  const totalServicio = servicioActivo ? Math.round(totalMesasBar / 11) : 0;
   const porMesera     = numMeseras > 0 ? Math.round(totalServicio / numMeseras) : 0;
 
   const countMethod = (arr, m) => arr.filter(o => (o.paymentMethod || 'efectivo') === m).length;
@@ -333,7 +336,7 @@ ${countMethod(restPaid,'tarjeta_sinpe')>0?`<span style="background:#1e1b4b;color
               <div className="bg-slate-800/60 rounded-xl p-4 border border-slate-700 flex flex-wrap justify-between items-center gap-2">
                 <div>
                   <div className="text-slate-300 text-sm">Servicio extraído del total Bar</div>
-                  <div className="text-xs text-slate-500">₡{totalBarCobrado.toLocaleString()} ÷ 11 (10% ya incluido en precios)</div>
+                  <div className="text-xs text-slate-500">₡{totalMesasBar.toLocaleString()} en mesas ÷ 11 (10% ya incluido)</div>
                 </div>
                 <div className="text-xl font-bold text-[#94cb47]">₡{totalServicio.toLocaleString()}</div>
               </div>
