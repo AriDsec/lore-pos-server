@@ -12,9 +12,9 @@ export function ItemsModal({ order, onClose }) {
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
       <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-6 shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
         <h2 className="text-xl font-bold text-[#94cb47] mb-1">{order.clientName || 'Sin nombre'}</h2>
-        <p className="text-slate-400 text-sm mb-4">{order.locationLabel || order.barra || (order.table ? `Mesa ${order.table}` : '-')}</p>
+        <p className="text-slate-400 text-sm mb-4">{order.locationLabel || order.barra || ((order.table && order.table > 0) ? `Mesa ${order.table}` : '' : '-')}</p>
         <div className="bg-slate-800/50 rounded-xl p-3 mb-4 border border-slate-700 space-y-1">
-          {order.items.map((item, i) => (
+          {(order.items||[]).map((item, i) => (
             <div key={i} className="py-2 border-b border-slate-700/50 last:border-0">
               <div className="flex justify-between text-white">
                 <span>{item.quantity}x {item.name}</span>
@@ -27,7 +27,7 @@ export function ItemsModal({ order, onClose }) {
         </div>
         <div className="bg-gradient-to-r from-[#94cb47]/30 to-[#7ab035]/30 rounded-xl p-4 border border-[#94cb47]/50 mb-4">
           <div className="text-slate-300 text-sm">TOTAL</div>
-          <div className="text-3xl font-bold text-[#94cb47]">₡{order.total.toLocaleString()}</div>
+          <div className="text-3xl font-bold text-[#94cb47]">₡{(order.total||0).toLocaleString()}</div>
         </div>
         <button onClick={onClose} className="w-full bg-gradient-to-r from-slate-600 to-slate-700 hover:from-slate-700 hover:to-slate-800 text-white font-bold py-3 rounded-lg transition">Cerrar</button>
       </div>
@@ -51,7 +51,7 @@ export function SplitModal({ account, onConfirm, onClose }) {
     setSplitQty(prev => ({ ...prev, [itemId]: n }));
   };
 
-  const totalSplit = account.items.reduce((s, i) => {
+  const totalSplit = (account.items||[]).reduce((s, i) => {
     const q = splitQty[i.id] || 0;
     return s + i.price * q;
   }, 0);
@@ -80,13 +80,13 @@ export function SplitModal({ account, onConfirm, onClose }) {
           <h2 className="text-xl font-bold text-[#94cb47] flex items-center gap-2">✂️ Separar Cuenta</h2>
           {splitError && <div className="bg-red-900/40 border border-red-500/50 text-red-300 text-xs rounded-lg px-3 py-2 mt-2">⚠️ {splitError}</div>}
           <p className="text-slate-400 text-xs mt-1">
-            {account.clientName || 'Sin nombre'} · {account.locationLabel || account.barra || (account.table != null ? `Mesa ${account.table}` : 'Barra')}
+            {account.clientName || 'Sin nombre'} · {account.locationLabel || account.barra || ((account.table && account.table > 0) ? `Mesa ${account.table}` : 'Barra')}
           </p>
           <p className="text-slate-500 text-xs mt-1">Indica cuántos de cada item van a la cuenta nueva</p>
         </div>
 
         <div className="flex-1 overflow-y-auto space-y-2 min-h-0">
-          {account.items.map(item => {
+          {(account.items||[]).map(item => {
             const sq = splitQty[item.id] || 0;
             return (
               <div key={item.id} className={`rounded-xl border p-3 transition-all ${sq > 0 ? 'bg-[#94cb47]/10 border-[#94cb47]/50' : 'bg-slate-700/40 border-slate-600'}`}>
@@ -211,11 +211,11 @@ export function BillModal({ order, onClose, onPay, zona }) {
         </div>
         <div className="border-b border-[#94cb47]/30 mb-4 pb-3 space-y-1">
           <div className="text-white text-sm"><span className="text-slate-400">Cliente: </span><span className="font-bold">{order.clientName || 'Sin nombre'}</span></div>
-          <div className="text-white text-sm"><span className="text-slate-400">Mesa: </span><span className="font-bold">{order.locationLabel || order.barra || (order.table ? `Mesa ${order.table}` : '-')}</span></div>
+          <div className="text-white text-sm"><span className="text-slate-400">Mesa: </span><span className="font-bold">{order.locationLabel || order.barra || ((order.table && order.table > 0) ? `Mesa ${order.table}` : '' : '-')}</span></div>
           {order.mesera && <div className="text-white text-sm"><span className="text-slate-400">Mesera: </span><span className="font-bold">{order.mesera}</span></div>}
         </div>
         <div className="bg-slate-800/50 rounded-xl p-3 mb-4 border border-slate-700 space-y-1 max-h-48 overflow-y-auto">
-          {order.items.map((item, i) => (
+          {(order.items||[]).map((item, i) => (
             <div key={i} className="py-1.5 border-b border-slate-700/50 last:border-0">
               <div className="flex justify-between text-white text-sm">
                 <span>{item.quantity}x {item.name}</span>
