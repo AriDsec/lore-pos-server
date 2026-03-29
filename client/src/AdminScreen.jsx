@@ -87,8 +87,9 @@ export function AdminScreen({ barPaid, restPaid, loading, onLogout, setPaidOrder
   const totalMesasBar = barPaid
     .filter(o => o.table && o.table > 0)
     .reduce((s, o) => s + o.total, 0);
-  const totalServicio = servicioActivo ? Math.round(totalMesasBar / 11) : 0;
-  const porMesera     = numMeseras > 0 ? Math.round(totalServicio / numMeseras) : 0;
+  const roundDown50 = (n) => Math.floor(n / 50) * 50;
+  const totalServicio = servicioActivo ? roundDown50(totalMesasBar / 11) : 0;
+  const porMesera     = numMeseras > 0 ? roundDown50(totalServicio / numMeseras) : 0;
 
   const countMethod = (arr, m) => arr.filter(o => (o.paymentMethod || 'efectivo') === m).length;
   const sumMethod   = (arr, m) => arr.filter(o => (o.paymentMethod || 'efectivo') === m).reduce((s, o) => s + o.total, 0);
