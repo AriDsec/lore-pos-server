@@ -155,6 +155,11 @@ app.get('/api/accounts/:zone/closed', async (req, res) => {
 app.post('/api/accounts', writeLimiter, async (req, res) => {
   try {
     const data = req.body;
+    // Idempotencia — si ya existe una cuenta con este ID, devolverla sin crear duplicado
+    if (data.id) {
+      const existing = await Account.findOne({ id: sanitizeStr(data.id, 100) });
+      if (existing) return res.json(existing);
+    }
     const itemsWithBy = (data.items || []).map(item => ({
       ...item,
       name: sanitizeStr(item.name, 100),
