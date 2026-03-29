@@ -202,6 +202,8 @@ app.post('/api/accounts/:id/close', writeLimiter, async (req, res) => {
   try {
     const account = await Account.findOne({ id: sanitizeStr(req.params.id, 100) });
     if (!account) return res.status(404).json({ error: 'Cuenta no encontrada' });
+    // Idempotencia — si ya está pagada, devolverla sin re-cobrar
+    if (account.status === 'paid') return res.json(account);
     account.status = 'paid';
     account.closedAt = new Date();
     const allowedMethods = ['efectivo','sinpe','tarjeta','mixto','efectivo_sinpe','tarjeta_sinpe'];
