@@ -508,6 +508,21 @@ export default function RestaurantePOS() {
     }
   };
 
+  const handleMarkPending = async (account) => {
+    setLoading(true);
+    try {
+      await api.markPendingPayment(account.id || account._id);
+      const fresh = await api.getOpenAccounts(currentZone);
+      setOpenAccounts(fresh);
+      const isPending = account.status !== 'pending_payment';
+      showToast(isPending ? 'Cuenta marcada como pago pendiente' : 'Cuenta restaurada a abierta');
+    } catch (err) {
+      showToast('Error: ' + err.message, 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleDeleteAccount = async (account) => {
     setLoading(true);
     try {
@@ -662,11 +677,11 @@ export default function RestaurantePOS() {
   }
 
   if (userRole === 'caja' && currentZone === 'bar') {
-    return <><Toast toasts={toasts} offline={!!syncError} /><CajaScreen zona="bar" zonaNombre="Bar" accounts={barAccounts} paid={barPaid} loading={loading} billOrder={billOrder} setBillOrder={setBillOrder} viewItemsOrder={viewItemsOrder} setViewItemsOrder={setViewItemsOrder} splitOrder={splitOrder} setSplitOrder={setSplitOrder} onSplit={handleSplitAccount} onLogout={handleLogout} onPay={payAccount} onDelete={handleDeleteAccount} /></>;
+    return <><Toast toasts={toasts} offline={!!syncError} /><CajaScreen zona="bar" zonaNombre="Bar" accounts={barAccounts} paid={barPaid} loading={loading} billOrder={billOrder} setBillOrder={setBillOrder} viewItemsOrder={viewItemsOrder} setViewItemsOrder={setViewItemsOrder} splitOrder={splitOrder} setSplitOrder={setSplitOrder} onSplit={handleSplitAccount} onLogout={handleLogout} onPay={payAccount} onDelete={handleDeleteAccount} onMarkPending={handleMarkPending} /></>;
   }
 
   if (userRole === 'caja' && currentZone === 'restaurante') {
-    return <><Toast toasts={toasts} offline={!!syncError} /><CajaScreen zona="restaurante" zonaNombre="Restaurante" accounts={restAccounts} paid={restPaid} loading={loading} billOrder={billOrder} setBillOrder={setBillOrder} viewItemsOrder={viewItemsOrder} setViewItemsOrder={setViewItemsOrder} splitOrder={splitOrder} setSplitOrder={setSplitOrder} onSplit={handleSplitAccount} onLogout={handleLogout} onPay={payAccount} onDelete={handleDeleteAccount} /></>;
+    return <><Toast toasts={toasts} offline={!!syncError} /><CajaScreen zona="restaurante" zonaNombre="Restaurante" accounts={restAccounts} paid={restPaid} loading={loading} billOrder={billOrder} setBillOrder={setBillOrder} viewItemsOrder={viewItemsOrder} setViewItemsOrder={setViewItemsOrder} splitOrder={splitOrder} setSplitOrder={setSplitOrder} onSplit={handleSplitAccount} onLogout={handleLogout} onPay={payAccount} onDelete={handleDeleteAccount} onMarkPending={handleMarkPending} /></>;
   }
 
   return <><Toast toasts={toasts} offline={!!syncError} /><AdminScreen barPaid={barPaid} restPaid={restPaid} loading={loading} onLogout={handleLogout} setPaidOrders={setPaidOrders} showToast={showToast} /></>;
