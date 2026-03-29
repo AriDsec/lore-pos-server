@@ -133,7 +133,7 @@ export function CajaScreen({
 
         {/* ── Cuentas Abiertas ── */}
         {(() => {
-          const normales = accounts.filter(a => a.type !== 'direct');
+          const normales = accounts.filter(a => a.type !== 'direct' && a.status !== 'pending_payment');
           return (
             <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-5 shadow-2xl">
               <h3 className="text-[#94cb47] font-bold text-lg mb-4">Cuentas Abiertas ({normales.length})</h3>
@@ -148,21 +148,19 @@ export function CajaScreen({
                           <div className="text-slate-400 text-xs md:text-sm">{acc.mesera} · {acc.items.length} items</div>
                         </div>
                         <div className="flex flex-col gap-1.5 items-end">
-                          <span className="text-[#94cb47] font-bold text-sm md:text-lg">₡{acc.total.toLocaleString()}</span>
-                          <div className="flex flex-col items-end gap-1.5">
+                          <div className="flex flex-col items-end gap-2">
+                            <span className="text-[#94cb47] font-bold text-sm">₡{acc.total.toLocaleString()}</span>
                             <div className="flex items-center gap-1.5">
-                              <button onClick={() => setViewItemsOrder(acc)} className="bg-slate-600 hover:bg-slate-500 text-white px-2.5 py-1 rounded text-xs font-bold">Items</button>
+                              <button onClick={() => setViewItemsOrder(acc)} className="bg-slate-700 hover:bg-slate-600 text-slate-300 px-3 py-1.5 rounded-lg text-xs font-semibold transition">Items</button>
                               {acc.items.length > 1 && (
-                                <button onClick={() => setSplitOrder(acc)} className="bg-orange-700 hover:bg-orange-600 text-white px-2.5 py-1 rounded text-xs font-bold">Separar</button>
+                                <button onClick={() => setSplitOrder(acc)} className="bg-orange-700/80 hover:bg-orange-600 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition">Separar</button>
                               )}
-                              <button onClick={() => setBillOrder(acc)} className="bg-[#94cb47] hover:bg-[#7ab035] text-black px-2.5 py-1 rounded text-xs font-bold">Cobrar</button>
-                            </div>
-                            <div className="flex items-center gap-1.5">
+                              <button onClick={() => setBillOrder(acc)} className="bg-[#94cb47] hover:bg-[#7ab035] text-black px-3 py-1.5 rounded-lg text-xs font-bold transition">Cobrar</button>
                               {onMarkPending && (
-                                <button onClick={() => onMarkPending(acc)} className="bg-slate-700 hover:bg-slate-600 text-slate-400 hover:text-white px-2.5 py-1 rounded text-xs font-bold border border-slate-600">Pendiente</button>
+                                <button onClick={() => onMarkPending(acc)} className="bg-slate-800 hover:bg-slate-700 text-slate-500 hover:text-slate-300 px-3 py-1.5 rounded-lg text-xs font-semibold transition border border-slate-700">Pendiente</button>
                               )}
                               {onDelete && (
-                                <button onClick={() => setDeleteConfirm(acc)} className="bg-red-800/60 hover:bg-red-700 text-red-300 hover:text-white px-2 py-1 rounded text-xs font-bold border border-red-700/50">🗑️</button>
+                                <button onClick={() => setDeleteConfirm(acc)} className="bg-red-900/40 hover:bg-red-800/60 text-red-500 hover:text-red-300 p-1.5 rounded-lg transition border border-red-900/50">🗑️</button>
                               )}
                             </div>
                           </div>
