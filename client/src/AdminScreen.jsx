@@ -112,11 +112,11 @@ export function AdminScreen({ barPaid, restPaid, loading, onLogout, setPaidOrder
     const sortedRest = [...restPaid].sort((a,b) => new Date(a.closedAt) - new Date(b.closedAt));
     const cuentasBarHTML  = sortedBar.map(o => {
       const hora = o.closedAt ? new Date(o.closedAt).toLocaleTimeString('es-CR',{hour:'2-digit',minute:'2-digit'}) : '';
-      return `<tr><td>${hora}</td><td>${o.mesera}</td><td>${o.locationLabel || o.barra || 'Mesa ' + o.table}${o.clientName ? ' — ' + o.clientName : ''}</td><td style="text-align:center">${methodLabel(o.paymentMethod)}</td><td style="text-align:right">&#x20A1;${o.total.toLocaleString()}${o.descuento > 0 ? ` <span style="color:#d97706;font-size:10px">(-&#x20A1;${o.descuento.toLocaleString()})</span>` : ''}</td></tr>`;
+      return `<tr><td>${hora}</td><td>${o.mesera}</td><td>${o.locationLabel || o.barra || (o.table && o.table > 0) ? 'Mesa ' + o.table : ''}${o.clientName ? ' — ' + o.clientName : ''}</td><td style="text-align:center">${methodLabel(o.paymentMethod)}</td><td style="text-align:right">&#x20A1;${o.total.toLocaleString()}${o.descuento > 0 ? ` <span style="color:#d97706;font-size:10px">(-&#x20A1;${o.descuento.toLocaleString()})</span>` : ''}</td></tr>`;
     }).join('');
     const cuentasRestHTML = sortedRest.map(o => {
       const hora = o.closedAt ? new Date(o.closedAt).toLocaleTimeString('es-CR',{hour:'2-digit',minute:'2-digit'}) : '';
-      return `<tr><td>${hora}</td><td>${o.mesera}</td><td>${o.locationLabel || o.barra || 'Mesa ' + o.table}${o.clientName ? ' — ' + o.clientName : ''}</td><td style="text-align:center">${methodLabel(o.paymentMethod)}</td><td style="text-align:right">&#x20A1;${o.total.toLocaleString()}${o.descuento > 0 ? ` <span style="color:#d97706;font-size:10px">(-&#x20A1;${o.descuento.toLocaleString()})</span>` : ''}</td></tr>`;
+      return `<tr><td>${hora}</td><td>${o.mesera}</td><td>${o.locationLabel || o.barra || (o.table && o.table > 0) ? 'Mesa ' + o.table : ''}${o.clientName ? ' — ' + o.clientName : ''}</td><td style="text-align:center">${methodLabel(o.paymentMethod)}</td><td style="text-align:right">&#x20A1;${o.total.toLocaleString()}${o.descuento > 0 ? ` <span style="color:#d97706;font-size:10px">(-&#x20A1;${o.descuento.toLocaleString()})</span>` : ''}</td></tr>`;
     }).join('');
 
     const html = `<!DOCTYPE html>
@@ -373,7 +373,7 @@ ${countMethod(restPaid,'tarjeta_sinpe')>0?`<span style="background:#1e1b4b;color
                       <div className="flex justify-between items-start gap-2">
                         <div className="min-w-0 flex-1">
                           <div className="text-white text-sm font-bold truncate">
-                            {o.locationLabel || o.barra || (o.table ? `Mesa ${o.table}` : '-')}{o.clientName ? ` — ${o.clientName}` : ''}
+                            {o.locationLabel || o.barra || ((o.table && o.table > 0) ? (o.table && o.table > 0) ? `Mesa ${o.table}` : '' : '-')}{o.clientName ? ` — ${o.clientName}` : ''}
                           </div>
                           <div className="text-slate-400 text-xs">👤 {o.mesera}{o.closedAt ? ` · ${new Date(o.closedAt).toLocaleTimeString('es-CR',{hour:'2-digit',minute:'2-digit'})}` : ''}</div>
                         </div>
