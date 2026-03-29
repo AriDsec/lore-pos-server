@@ -544,9 +544,9 @@ export function ReadyOrdersPanel({ kitchenOrders, mesera }) {
       <div className="p-4 space-y-2">
         {readyOrders.map(order => (
           <div key={order.id} className="bg-slate-800/70 rounded-lg p-3 border border-[#94cb47]/50">
-            <div className="font-bold text-[#94cb47] mb-1">{order.locationLabel || (order.barra ? order.barra : (order.table ? `Mesa ${order.table}` : "Sin mesa"))}</div>
+            <div className="font-bold text-[#94cb47] mb-1">{order.locationLabel || (order.barra ? order.barra : ((order.table && order.table > 0) ? `Mesa ${order.table}` : '' : "Sin mesa"))}</div>
             {order.clientName && <div className="text-sm text-[#94cb47]/80 mb-1">👤 {order.clientName}</div>}
-            <div className="text-xs text-slate-400">{order.items.map(i => `${i.quantity}x ${i.name}`).join(', ')}</div>
+            <div className="text-xs text-slate-400">{(order.items||[]).map(i => `${i.quantity}x ${i.name}`).join(', ')}</div>
           </div>
         ))}
       </div>
