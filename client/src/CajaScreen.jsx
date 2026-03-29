@@ -55,7 +55,7 @@ export function CajaScreen({
             </div>
 
             <div className="bg-gradient-to-r from-[#94cb47]/20 to-[#7ab035]/20 border border-[#94cb47]/30 rounded-2xl p-6 shadow-2xl">
-              <div className="text-white/80 text-base">💰 Total Cobrado Hoy — {zonaNombre}</div>
+              <div className="text-white/80 text-base">Total Cobrado Hoy — {zonaNombre}</div>
               <div className="text-4xl font-bold text-white">₡{totalCobrado.toLocaleString()}</div>
             </div>
           </>
@@ -76,7 +76,7 @@ export function CajaScreen({
                   <div key={acc._id || acc.id} className="bg-[#94cb47]/10 rounded-xl p-4 md:p-5 flex flex-wrap justify-between items-center gap-3 border border-[#94cb47]/30">
                     <div>
                       <div className="text-white font-bold md:text-lg">{acc.barra || ((acc.table && acc.table > 0) ? `Mesa ${acc.table}` : acc.locationLabel || 'Barra')}{acc.clientName ? ` — ${acc.clientName}` : ''}</div>
-                      <div className="text-slate-400 text-xs md:text-sm">👤 {acc.mesera} · {acc.items.length} items</div>
+                      <div className="text-slate-400 text-xs md:text-sm">{acc.mesera} · {acc.items.length} items</div>
                       {acc.pendingNote && <div className="text-[#94cb47]/70 text-xs mt-0.5">{acc.pendingNote}</div>}
                     </div>
                     <div className="flex flex-col gap-1.5 items-end">
@@ -108,7 +108,7 @@ export function CajaScreen({
                   <div key={acc._id || acc.id} className="bg-slate-700/40 rounded-xl p-4 md:p-5 flex flex-wrap justify-between items-center gap-3 border border-slate-600/50">
                     <div>
                       <div className="text-white font-bold md:text-lg">{acc.locationLabel || acc.barra || 'Barra'}{acc.clientName && acc.clientName !== 'Cliente General' ? ` — ${acc.clientName}` : ''}</div>
-                      <div className="text-slate-400 text-xs md:text-sm">👤 {acc.mesera} · {acc.items.length} items</div>
+                      <div className="text-slate-400 text-xs md:text-sm">{acc.mesera} · {acc.items.length} items</div>
                     </div>
                     <div className="flex flex-col gap-1.5 items-end">
                       <span className="text-[#94cb47] font-bold text-sm md:text-lg">₡{acc.total.toLocaleString()}</span>
@@ -145,7 +145,7 @@ export function CajaScreen({
                       <div key={acc._id || acc.id} className="bg-slate-700/50 rounded-xl p-4 md:p-5 flex flex-wrap justify-between items-center gap-3 border border-slate-600">
                         <div>
                           <div className="text-white font-bold md:text-lg">{acc.barra || ((acc.table && acc.table > 0) ? `Mesa ${acc.table}` : acc.locationLabel || 'Barra')}{acc.clientName ? ` — ${acc.clientName}` : ''}</div>
-                          <div className="text-slate-400 text-xs md:text-sm">👤 {acc.mesera} · {acc.items.length} items</div>
+                          <div className="text-slate-400 text-xs md:text-sm">{acc.mesera} · {acc.items.length} items</div>
                         </div>
                         <div className="flex flex-col gap-1.5 items-end">
                           <span className="text-[#94cb47] font-bold text-sm md:text-lg">₡{acc.total.toLocaleString()}</span>
@@ -155,9 +155,12 @@ export function CajaScreen({
                               <button onClick={() => setSplitOrder(acc)} className="bg-orange-700 hover:bg-orange-600 text-white px-2.5 md:px-4 py-1 md:py-2.5 rounded text-xs md:text-sm font-bold">Separar</button>
                             )}
                             <button onClick={() => setBillOrder(acc)} className="bg-[#94cb47] hover:bg-[#7ab035] text-black px-2.5 md:px-4 py-1 md:py-2.5 rounded text-xs md:text-sm font-bold">Cobrar</button>
+                            {onMarkPending && (
+                              <button onClick={() => onMarkPending(acc)} className="bg-slate-700 hover:bg-slate-600 text-slate-300 px-2.5 md:px-4 py-1 md:py-2.5 rounded text-xs md:text-sm font-bold border border-slate-600">Pendiente</button>
+                            )}
                             {onDelete && (
                               <button onClick={() => setDeleteConfirm(acc)}
-                                className="bg-red-800/60 hover:bg-red-700 text-red-300 hover:text-white px-2 md:px-3 py-1 md:py-2.5 rounded text-xs md:text-sm font-bold border border-red-700/50">🗑️</button>
+                                className="bg-red-800/60 hover:bg-red-700 text-red-300 hover:text-white px-2 md:px-3 py-1 md:py-2.5 rounded text-xs md:text-sm font-bold border border-red-700/50">Borrar</button>
                             )}
                           </div>
                         </div>
@@ -171,7 +174,7 @@ export function CajaScreen({
         })()}
 
         <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-5 shadow-2xl">
-          <h3 className="text-[#94cb47] font-bold text-lg mb-4">✅ Historial Pagadas ({paid.length})</h3>
+          <h3 className="text-[#94cb47] font-bold text-lg mb-4">Historial Pagadas ({paid.length})</h3>
           {paid.length === 0 ? <p className="text-slate-500 text-sm">Sin pagos aún</p> : (
             <div className="space-y-3">
               {[...paid].sort((a, b) => new Date(b.closedAt) - new Date(a.closedAt)).map(o => (
@@ -184,7 +187,7 @@ export function CajaScreen({
                         {o.clientName ? <span className="text-slate-300"> — {o.clientName}</span> : ''}
                       </div>
                       <div className="text-slate-400 text-xs mt-0.5">
-                        👤 {o.mesera}
+                        {o.mesera}
                         {o.closedAt && <span className="ml-2 text-slate-500">· {new Date(o.closedAt).toLocaleTimeString('es-CR', { hour: '2-digit', minute: '2-digit' })}</span>}
                       </div>
                     </div>
