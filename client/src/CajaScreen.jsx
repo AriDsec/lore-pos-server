@@ -149,19 +149,22 @@ export function CajaScreen({
                         </div>
                         <div className="flex flex-col gap-1.5 items-end">
                           <span className="text-[#94cb47] font-bold text-sm md:text-lg">₡{acc.total.toLocaleString()}</span>
-                          <div className="flex items-center gap-1.5">
-                            <button onClick={() => setViewItemsOrder(acc)} className="bg-slate-600 hover:bg-slate-500 text-white px-2.5 md:px-4 py-1 md:py-2.5 rounded text-xs md:text-sm font-bold">Items</button>
-                            {acc.items.length > 1 && (
-                              <button onClick={() => setSplitOrder(acc)} className="bg-orange-700 hover:bg-orange-600 text-white px-2.5 md:px-4 py-1 md:py-2.5 rounded text-xs md:text-sm font-bold">Separar</button>
-                            )}
-                            <button onClick={() => setBillOrder(acc)} className="bg-[#94cb47] hover:bg-[#7ab035] text-black px-2.5 md:px-4 py-1 md:py-2.5 rounded text-xs md:text-sm font-bold">Cobrar</button>
-                            {onMarkPending && (
-                              <button onClick={() => onMarkPending(acc)} className="bg-slate-700 hover:bg-slate-600 text-slate-300 px-2.5 md:px-4 py-1 md:py-2.5 rounded text-xs md:text-sm font-bold border border-slate-600">Pendiente</button>
-                            )}
-                            {onDelete && (
-                              <button onClick={() => setDeleteConfirm(acc)}
-                                className="bg-red-800/60 hover:bg-red-700 text-red-300 hover:text-white px-2 md:px-3 py-1 md:py-2.5 rounded text-xs md:text-sm font-bold border border-red-700/50">Borrar</button>
-                            )}
+                          <div className="flex flex-col items-end gap-1.5">
+                            <div className="flex items-center gap-1.5">
+                              <button onClick={() => setViewItemsOrder(acc)} className="bg-slate-600 hover:bg-slate-500 text-white px-2.5 py-1 rounded text-xs font-bold">Items</button>
+                              {acc.items.length > 1 && (
+                                <button onClick={() => setSplitOrder(acc)} className="bg-orange-700 hover:bg-orange-600 text-white px-2.5 py-1 rounded text-xs font-bold">Separar</button>
+                              )}
+                              <button onClick={() => setBillOrder(acc)} className="bg-[#94cb47] hover:bg-[#7ab035] text-black px-2.5 py-1 rounded text-xs font-bold">Cobrar</button>
+                            </div>
+                            <div className="flex items-center gap-1.5">
+                              {onMarkPending && (
+                                <button onClick={() => onMarkPending(acc)} className="bg-slate-700 hover:bg-slate-600 text-slate-400 hover:text-white px-2.5 py-1 rounded text-xs font-bold border border-slate-600">Pendiente</button>
+                              )}
+                              {onDelete && (
+                                <button onClick={() => setDeleteConfirm(acc)} className="bg-red-800/60 hover:bg-red-700 text-red-300 hover:text-white px-2 py-1 rounded text-xs font-bold border border-red-700/50">🗑️</button>
+                              )}
+                            </div>
                           </div>
                         </div>
                       </div>
