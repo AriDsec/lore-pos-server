@@ -159,6 +159,8 @@ export default function RestaurantePOS() {
     if (cartItems.length === 0 || currentZone !== 'bar' || !servicioActivoGlobal) return;
     const esmesa = !!selectedTable && !selectedBarra;
     setCartItems(prev => prev.map(item => {
+      // Si el estado ya es correcto, no recalcular
+      if (!!item.conServicio === esmesa) return item;
       // Recalcular desde el precio base original
       const basePrice = item.conServicio
         ? Math.round(item.price / 1.10)  // revertir el 10% si ya lo tenía
