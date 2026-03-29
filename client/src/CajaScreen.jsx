@@ -142,28 +142,30 @@ export function CajaScreen({
                 : (
                   <div className="space-y-3">
                     {normales.map(acc => (
-                      <div key={acc._id || acc.id} className="bg-slate-700/50 rounded-xl p-4 md:p-5 flex flex-wrap justify-between items-center gap-3 border border-slate-600">
-                        <div>
-                          <div className="text-white font-bold md:text-lg">{acc.barra || ((acc.table && acc.table > 0) ? `Mesa ${acc.table}` : acc.locationLabel || 'Barra')}{acc.clientName ? ` — ${acc.clientName}` : ''}</div>
-                          <div className="text-slate-400 text-xs md:text-sm">{acc.mesera} · {acc.items.length} items</div>
-                        </div>
-                        <div className="flex flex-col gap-1.5 items-end">
-                          <div className="flex flex-col items-end gap-2">
-                            <span className="text-[#94cb47] font-bold text-sm">₡{acc.total.toLocaleString()}</span>
-                            <div className="flex items-center gap-1.5">
-                              <button onClick={() => setViewItemsOrder(acc)} className="bg-slate-700 hover:bg-slate-600 text-slate-300 px-3 py-1.5 rounded-lg text-xs font-semibold transition">Items</button>
-                              {acc.items.length > 1 && (
-                                <button onClick={() => setSplitOrder(acc)} className="bg-orange-700/80 hover:bg-orange-600 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition">Separar</button>
-                              )}
-                              <button onClick={() => setBillOrder(acc)} className="bg-[#94cb47] hover:bg-[#7ab035] text-black px-3 py-1.5 rounded-lg text-xs font-bold transition">Cobrar</button>
-                              {onMarkPending && (
-                                <button onClick={() => onMarkPending(acc)} className="bg-slate-800 hover:bg-slate-700 text-slate-500 hover:text-slate-300 px-3 py-1.5 rounded-lg text-xs font-semibold transition border border-slate-700">Pendiente</button>
-                              )}
-                              {onDelete && (
-                                <button onClick={() => setDeleteConfirm(acc)} className="bg-red-900/40 hover:bg-red-800/60 text-red-500 hover:text-red-300 p-1.5 rounded-lg transition border border-red-900/50">🗑️</button>
-                              )}
-                            </div>
+                      <div key={acc._id || acc.id} className="bg-slate-700/50 rounded-xl p-4 border border-slate-600">
+                        {/* Fila superior: nombre + total + basurero */}
+                        <div className="flex justify-between items-start mb-3">
+                          <div className="flex-1 min-w-0 pr-3">
+                            <div className="text-white font-bold text-sm leading-snug">{acc.barra || ((acc.table && acc.table > 0) ? `Mesa ${acc.table}` : acc.locationLabel || 'Barra')}{acc.clientName ? ` — ${acc.clientName}` : ''}</div>
+                            <div className="text-slate-400 text-xs mt-0.5">{acc.mesera} · {acc.items.length} items</div>
                           </div>
+                          <div className="flex items-center gap-2 flex-shrink-0">
+                            <span className="text-[#94cb47] font-bold text-sm">₡{acc.total.toLocaleString()}</span>
+                            {onDelete && (
+                              <button onClick={() => setDeleteConfirm(acc)} className="w-7 h-7 flex items-center justify-center bg-red-900/30 hover:bg-red-800/60 text-red-400 hover:text-red-200 rounded-lg border border-red-900/40 transition text-xs">🗑️</button>
+                            )}
+                          </div>
+                        </div>
+                        {/* Fila inferior: botones */}
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <button onClick={() => setViewItemsOrder(acc)} className="bg-slate-700 hover:bg-slate-600 text-slate-300 px-3 py-1.5 rounded-lg text-xs font-semibold transition">Items</button>
+                          {acc.items.length > 1 && (
+                            <button onClick={() => setSplitOrder(acc)} className="bg-orange-700/80 hover:bg-orange-600 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition">Separar</button>
+                          )}
+                          <button onClick={() => setBillOrder(acc)} className="bg-[#94cb47] hover:bg-[#7ab035] text-black px-3 py-1.5 rounded-lg text-xs font-bold transition">Cobrar</button>
+                          {onMarkPending && (
+                            <button onClick={() => onMarkPending(acc)} className="bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-slate-200 px-3 py-1.5 rounded-lg text-xs font-semibold transition border border-slate-700">+ tarde</button>
+                          )}
                         </div>
                       </div>
                     ))}
