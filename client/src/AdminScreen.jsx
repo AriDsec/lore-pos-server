@@ -377,7 +377,7 @@ ${countMethod(restPaid,'tarjeta_sinpe')>0?`<span style="background:#1e1b4b;color
                       <div className="flex justify-between items-start gap-2">
                         <div className="min-w-0 flex-1">
                           <div className="text-white text-sm font-bold truncate">
-                            {o.locationLabel || o.barra || ((o.table && o.table > 0) ? (o.table && o.table > 0) ? `Mesa ${o.table}` : '' : '-')}{o.clientName ? ` — ${o.clientName}` : ''}
+                            {o.locationLabel || o.barra || ((o.table && o.table > 0) ? `Mesa ${o.table}` : '-')}{o.clientName ? ` — ${o.clientName}` : ''}
                           </div>
                           <div className="text-slate-400 text-xs">👤 {o.mesera}{o.closedAt ? ` · ${new Date(o.closedAt).toLocaleTimeString('es-CR',{hour:'2-digit',minute:'2-digit'})}` : ''}</div>
                         </div>
