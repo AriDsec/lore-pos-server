@@ -13,7 +13,7 @@ function KitchenCard({ order, colorScheme, onReady, onDelivered }) {
       <div className="flex justify-between items-start mb-4">
         <div>
           <div className="text-2xl font-bold text-white">
-            {order.locationLabel || (order.barra ? order.barra : (order.table ? `Mesa ${order.table}` : 'Sin mesa'))}
+            {order.locationLabel || (order.barra ? order.barra : ((order.table && order.table > 0) ? `Mesa ${order.table}` : 'Sin mesa'))}
           </div>
           <div className="text-xs text-slate-400 flex items-center gap-2">
           👤 {order.mesera}
