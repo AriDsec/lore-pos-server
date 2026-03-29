@@ -38,7 +38,7 @@ function KitchenCard({ order, colorScheme, onReady, onDelivered }) {
         </div>
       </div>
       <div className="bg-slate-800/50 rounded-xl p-4 mb-4 border border-slate-700">
-        {order.items.map((item, i) => (
+        {(order.items||[]).map((item, i) => (
           <div key={i} className="text-white/90 text-sm py-2 border-b border-slate-700/50 last:border-0">
             <div className="flex justify-between">
               <span className="font-medium">{item.quantity}x</span>
