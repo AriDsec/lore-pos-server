@@ -337,6 +337,10 @@ export default function RestaurantePOS() {
     if (cartItems.length === 0) { showToast('El carrito está vacío', 'warning'); return; }
     // En restaurante nunca debe haber barra
     if (currentZone === 'restaurante' && selectedBarra) setSelectedBarra(null);
+    // Avisar si el servicio debería aplicar pero no hay mesa seleccionada
+    if (servicioActivoGlobal && currentZone === 'bar' && !selectedTable && !selectedBarra) {
+      showToast('El 10% de servicio aplica en mesas — selecciona una mesa o confirma que es barra', 'warning');
+    }
     if (!orderType) { showToast('Selecciona el tipo de pedido', 'warning'); return; }
     if (orderType === 'dine-in' && (currentZone === 'restaurante' ? !selectedTable : (!selectedTable && !selectedBarra))) { showToast('Selecciona una mesa o barra', 'warning'); return; }
     if (!clientName.trim()) { showToast('Ingresa un nombre o seña', 'warning'); return; }
