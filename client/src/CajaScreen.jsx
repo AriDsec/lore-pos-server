@@ -53,7 +53,7 @@ export function CajaScreen({
                 {accounts.map(acc => (
                   <div key={acc._id || acc.id} className="bg-slate-700/50 rounded-xl p-4 md:p-5 flex flex-wrap justify-between items-center gap-3 border border-slate-600">
                     <div>
-                      <div className="text-white font-bold md:text-lg">{acc.barra || (acc.table != null ? `Mesa ${acc.table}` : acc.locationLabel || 'Barra')}{acc.clientName ? ` — ${acc.clientName}` : ''}</div>
+                      <div className="text-white font-bold md:text-lg">{acc.barra || ((acc.table && acc.table > 0) ? `Mesa ${acc.table}` : acc.locationLabel || 'Barra')}{acc.clientName ? ` — ${acc.clientName}` : ''}</div>
                       <div className="text-slate-400 text-xs md:text-sm">👤 {acc.mesera} · {acc.items.length} items</div>
                     </div>
                     <div className="flex flex-col gap-1.5 items-end">
