@@ -105,7 +105,7 @@ export function imprimirTiquete(order, zona) {
                    : 'Efectivo';
 
   const ubicacion = order.locationLabel || order.barra
-    || (order.table != null ? `Mesa ${order.table}` : '');
+    || ((order.table && order.table > 0) ? `Mesa ${order.table}` : '');
 
   const linea = (texto = '', ancho = 40) => texto.padEnd(ancho, ' ');
   const separador = '-'.repeat(40);
@@ -122,7 +122,7 @@ export function imprimirTiquete(order, zona) {
 `;
   });
 
-  const totalStr = `&#x20A1;${order.total.toLocaleString()}`;
+  const totalStr = `&#x20A1;${(order.total||0).toLocaleString()}`;
   const hayDescuento = order.descuento && order.descuento > 0;
   const totalOriginalStr = hayDescuento ? `&#x20A1;${order.totalOriginal.toLocaleString()}` : null;
   const descuentoStr = hayDescuento ? `&#x20A1;${order.descuento.toLocaleString()}` : null;
