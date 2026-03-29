@@ -271,7 +271,7 @@ app.get('/api/reports/:zone', async (req, res) => {
     const closedAccounts = await Account.find({ zone: req.params.zone, status: 'paid', closedAt: { $gte: today } });
     const totalSales = closedAccounts.reduce((sum, acc) => sum + acc.total, 0);
     const foodTotal = closedAccounts.reduce((sum, acc) =>
-      sum + acc.items.filter(i => i.category === 'food').reduce((s, i) => s + i.price * i.quantity, 0), 0);
+      sum + (acc.items||[]).filter(i => i.category === 'food').reduce((s, i) => s + i.price * i.quantity, 0), 0);
     res.json({ zone: req.params.zone, totalSales, foodTotal, drinksTotal: totalSales - foodTotal, accountsPaid: closedAccounts.length, accounts: closedAccounts });
   } catch (error) { res.status(500).json({ error: error.message }); }
 });
