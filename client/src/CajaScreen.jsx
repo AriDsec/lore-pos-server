@@ -17,6 +17,7 @@ export function CajaScreen({
 }) {
   const { totalCobrado, foodCobrado, drinkCobrado } = CajaStats({ paid });
   const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [showStats, setShowStats] = useState(false);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-slate-900 to-black">
@@ -24,25 +25,41 @@ export function CajaScreen({
       <Header mesera={`Caja ${zonaNombre}`} zona="Caja" onLogout={onLogout} />
       <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-5">
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-5 shadow-2xl">
-            <div className="text-slate-400 text-sm md:text-base">Cuentas Pagadas</div>
-            <div className="text-3xl md:text-4xl font-bold text-white mt-2">{paid.length}</div>
+        {/* Toggle de estadísticas */}
+        <button
+          onClick={() => setShowStats(s => !s)}
+          className="w-full flex items-center justify-between bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 rounded-2xl px-5 py-4 shadow-2xl transition hover:border-[#94cb47]/40"
+        >
+          <div className="flex items-center gap-3">
+            <span className="text-slate-400 text-sm md:text-base font-medium">Resumen del día</span>
+            <span className="text-slate-600 text-xs">{paid.length} cuentas cobradas</span>
           </div>
-          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-5 shadow-2xl">
-            <div className="text-slate-400 text-sm md:text-base">Total Comida</div>
-            <div className="text-2xl md:text-3xl font-bold text-[#94cb47] mt-2">₡{foodCobrado.toLocaleString()}</div>
-          </div>
-          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-5 shadow-2xl">
-            <div className="text-slate-400 text-sm md:text-base">Total Bebidas</div>
-            <div className="text-2xl md:text-3xl font-bold text-[#94cb47] mt-2">₡{drinkCobrado.toLocaleString()}</div>
-          </div>
-        </div>
+          <span className={`text-slate-400 text-sm transition-transform duration-200 ${showStats ? 'rotate-180' : ''}`}>▾</span>
+        </button>
 
-        <div className="bg-gradient-to-r from-[#94cb47]/20 to-[#7ab035]/20 border border-[#94cb47]/30 rounded-2xl p-6 shadow-2xl">
-          <div className="text-white/80 text-base">💰 Total Cobrado Hoy — {zonaNombre}</div>
-          <div className="text-4xl font-bold text-white">₡{totalCobrado.toLocaleString()}</div>
-        </div>
+        {showStats && (
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-5 shadow-2xl">
+                <div className="text-slate-400 text-sm md:text-base">Cuentas Pagadas</div>
+                <div className="text-3xl md:text-4xl font-bold text-white mt-2">{paid.length}</div>
+              </div>
+              <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-5 shadow-2xl">
+                <div className="text-slate-400 text-sm md:text-base">Total Comida</div>
+                <div className="text-2xl md:text-3xl font-bold text-[#94cb47] mt-2">₡{foodCobrado.toLocaleString()}</div>
+              </div>
+              <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-5 shadow-2xl">
+                <div className="text-slate-400 text-sm md:text-base">Total Bebidas</div>
+                <div className="text-2xl md:text-3xl font-bold text-[#94cb47] mt-2">₡{drinkCobrado.toLocaleString()}</div>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-r from-[#94cb47]/20 to-[#7ab035]/20 border border-[#94cb47]/30 rounded-2xl p-6 shadow-2xl">
+              <div className="text-white/80 text-base">💰 Total Cobrado Hoy — {zonaNombre}</div>
+              <div className="text-4xl font-bold text-white">₡{totalCobrado.toLocaleString()}</div>
+            </div>
+          </>
+        )}
 
         {/* ── Cobros Directos ── */}
         {(() => {
