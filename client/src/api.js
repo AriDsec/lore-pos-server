@@ -72,6 +72,12 @@ export const deleteKitchenOrder = (id) =>
 
 // ── REPORTES ──────────────────────────────────
 
+export const markPendingPayment = (id, note = '') =>
+  fetch(`${BASE}/accounts/${id}/pending`, {
+    method: 'PUT', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ note })
+  }).then(handleResponse);
+
 export const deleteAccount = (id) =>
   fetch(`${BASE}/accounts/${id}`, { method: 'DELETE' }).then(handleResponse);
 
