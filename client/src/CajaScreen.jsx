@@ -44,25 +44,24 @@ export function CajaScreen({
           <div className="text-4xl font-bold text-white">₡{totalCobrado.toLocaleString()}</div>
         </div>
 
-        <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-5 shadow-2xl">
-          <h3 className="text-[#94cb47] font-bold text-lg mb-4">📂 Cuentas Abiertas ({accounts.length})</h3>
-          {accounts.length === 0
-            ? <p className="text-slate-500 text-sm">No hay cuentas abiertas</p>
-            : (
+        {/* ── Cobros Directos ── */}
+        {(() => {
+          const directas = accounts.filter(a => a.type === 'direct');
+          if (directas.length === 0) return null;
+          return (
+            <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-slate-600/50 p-5 shadow-2xl">
+              <h3 className="text-slate-300 font-bold text-lg mb-4">Cobros Directos ({directas.length})</h3>
               <div className="space-y-3">
-                {accounts.map(acc => (
-                  <div key={acc._id || acc.id} className="bg-slate-700/50 rounded-xl p-4 md:p-5 flex flex-wrap justify-between items-center gap-3 border border-slate-600">
+                {directas.map(acc => (
+                  <div key={acc._id || acc.id} className="bg-slate-700/40 rounded-xl p-4 md:p-5 flex flex-wrap justify-between items-center gap-3 border border-slate-600/50">
                     <div>
-                      <div className="text-white font-bold md:text-lg">{acc.barra || ((acc.table && acc.table > 0) ? `Mesa ${acc.table}` : acc.locationLabel || 'Barra')}{acc.clientName ? ` — ${acc.clientName}` : ''}</div>
+                      <div className="text-white font-bold md:text-lg">{acc.locationLabel || acc.barra || 'Barra'}{acc.clientName && acc.clientName !== 'Cliente General' ? ` — ${acc.clientName}` : ''}</div>
                       <div className="text-slate-400 text-xs md:text-sm">👤 {acc.mesera} · {acc.items.length} items</div>
                     </div>
                     <div className="flex flex-col gap-1.5 items-end">
                       <span className="text-[#94cb47] font-bold text-sm md:text-lg">₡{acc.total.toLocaleString()}</span>
                       <div className="flex items-center gap-1.5">
                         <button onClick={() => setViewItemsOrder(acc)} className="bg-slate-600 hover:bg-slate-500 text-white px-2.5 md:px-4 py-1 md:py-2.5 rounded text-xs md:text-sm font-bold">Items</button>
-                        {acc.items.length > 1 && (
-                          <button onClick={() => setSplitOrder(acc)} className="bg-orange-700 hover:bg-orange-600 text-white px-2.5 md:px-4 py-1 md:py-2.5 rounded text-xs md:text-sm font-bold">Separar</button>
-                        )}
                         <button onClick={() => setBillOrder(acc)} className="bg-[#94cb47] hover:bg-[#7ab035] text-black px-2.5 md:px-4 py-1 md:py-2.5 rounded text-xs md:text-sm font-bold">Cobrar</button>
                         {onDelete && (
                           <button onClick={() => setDeleteConfirm(acc)}
@@ -73,9 +72,48 @@ export function CajaScreen({
                   </div>
                 ))}
               </div>
-            )
-          }
-        </div>
+            </div>
+          );
+        })()}
+
+        {/* ── Cuentas Abiertas ── */}
+        {(() => {
+          const normales = accounts.filter(a => a.type !== 'direct');
+          return (
+            <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-5 shadow-2xl">
+              <h3 className="text-[#94cb47] font-bold text-lg mb-4">Cuentas Abiertas ({normales.length})</h3>
+              {normales.length === 0
+                ? <p className="text-slate-500 text-sm">No hay cuentas abiertas</p>
+                : (
+                  <div className="space-y-3">
+                    {normales.map(acc => (
+                      <div key={acc._id || acc.id} className="bg-slate-700/50 rounded-xl p-4 md:p-5 flex flex-wrap justify-between items-center gap-3 border border-slate-600">
+                        <div>
+                          <div className="text-white font-bold md:text-lg">{acc.barra || ((acc.table && acc.table > 0) ? `Mesa ${acc.table}` : acc.locationLabel || 'Barra')}{acc.clientName ? ` — ${acc.clientName}` : ''}</div>
+                          <div className="text-slate-400 text-xs md:text-sm">👤 {acc.mesera} · {acc.items.length} items</div>
+                        </div>
+                        <div className="flex flex-col gap-1.5 items-end">
+                          <span className="text-[#94cb47] font-bold text-sm md:text-lg">₡{acc.total.toLocaleString()}</span>
+                          <div className="flex items-center gap-1.5">
+                            <button onClick={() => setViewItemsOrder(acc)} className="bg-slate-600 hover:bg-slate-500 text-white px-2.5 md:px-4 py-1 md:py-2.5 rounded text-xs md:text-sm font-bold">Items</button>
+                            {acc.items.length > 1 && (
+                              <button onClick={() => setSplitOrder(acc)} className="bg-orange-700 hover:bg-orange-600 text-white px-2.5 md:px-4 py-1 md:py-2.5 rounded text-xs md:text-sm font-bold">Separar</button>
+                            )}
+                            <button onClick={() => setBillOrder(acc)} className="bg-[#94cb47] hover:bg-[#7ab035] text-black px-2.5 md:px-4 py-1 md:py-2.5 rounded text-xs md:text-sm font-bold">Cobrar</button>
+                            {onDelete && (
+                              <button onClick={() => setDeleteConfirm(acc)}
+                                className="bg-red-800/60 hover:bg-red-700 text-red-300 hover:text-white px-2 md:px-3 py-1 md:py-2.5 rounded text-xs md:text-sm font-bold border border-red-700/50">🗑️</button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )
+              }
+            </div>
+          );
+        })()}
 
         <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-5 shadow-2xl">
           <h3 className="text-[#94cb47] font-bold text-lg mb-4">✅ Historial Pagadas ({paid.length})</h3>
@@ -87,7 +125,7 @@ export function CajaScreen({
                   <div className="flex justify-between items-start gap-2 mb-2">
                     <div className="min-w-0">
                       <div className="text-white font-bold text-sm leading-tight">
-                        {o.locationLabel || o.barra || (o.table != null ? `Mesa ${o.table}` : '—')}
+                        {o.locationLabel || o.barra || ((o.table && o.table > 0) ? `Mesa ${o.table}` : '—')}
                         {o.clientName ? <span className="text-slate-300"> — {o.clientName}</span> : ''}
                       </div>
                       <div className="text-slate-400 text-xs mt-0.5">
@@ -130,7 +168,7 @@ export function CajaScreen({
               </p>
               <div className="bg-slate-700/60 rounded-xl p-3 mt-3 text-left">
                 <div className="text-white font-bold text-sm">
-                  {deleteConfirm.barra || (deleteConfirm.table != null ? `Mesa ${deleteConfirm.table}` : '—')}
+                  {deleteConfirm.barra || ((deleteConfirm.table && deleteConfirm.table > 0) ? `Mesa ${deleteConfirm.table}` : '—')}
                   {deleteConfirm.clientName ? ` — ${deleteConfirm.clientName}` : ''}
                 </div>
                 <div className="text-slate-400 text-xs mt-0.5">
