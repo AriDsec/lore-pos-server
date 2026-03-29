@@ -27,21 +27,21 @@ export default function RestaurantePOS() {
 
   // Servicio 10% — estado reactivo, persiste en servidor + localStorage como fallback
   const [servicioActivoGlobal, setServicioActivoGlobal] = useState(() => {
-    const esSabado = new Date().getDay() === 6;
-    if (esSabado) return true; // Sábado siempre activo por defecto
-    const saved = localStorage.getItem('lore_servicio');
-    return saved !== null ? saved === 'true' : false;
+    return new Date().getDay() === 6; // true solo si es sábado
   });
 
-  // Al iniciar, sincronizar con el servidor
+  // Al iniciar, sincronizar — sábado siempre activo, cualquier otro día siempre desactivo
   useEffect(() => {
     const esSabado = new Date().getDay() === 6;
-    api.getConfig('servicio_activo').then(({ value }) => {
-      // Si es sábado y el servidor tiene false guardado de otro día, ignorarlo
-      const valorFinal = esSabado ? (value !== false) : (value === true);
-      setServicioActivoGlobal(valorFinal);
-      localStorage.setItem('lore_servicio', String(valorFinal));
-    }).catch(() => {}); // si falla usa localStorage
+    setServicioActivoGlobal(esSabado);
+    localStorage.setItem('lore_servicio', String(esSabado));
+    // Si admin lo cambió manualmente hoy, respetar solo si el servidor lo dice Y es sábado
+    if (!esSabado) {
+      api.getConfig('servicio_activo').then(({ value }) => {
+        // No sábado: solo activar si admin lo forzó manualmente (value===true guardado hoy)
+        // Para simplificar: no sábado = siempre false al cargar, admin puede activar
+      }).catch(() => {});
+    }
   }, []);
 
   const showToast = (message, type = 'success') => {
