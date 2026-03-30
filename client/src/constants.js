@@ -243,6 +243,8 @@ export const MENU = {
       { id: 'r_jugo_tomate', name: 'Jugo de Tomate', price: 1500, category: 'soda' },
       { id: 'r_aloe', name: 'Aloe', price: 2000, category: 'soda' },
       { id: 'r_red_bull', name: 'Red Bull', price: 2000, category: 'soda' },
+      { id: 'r_batido_agua', name: 'Batido de agua', price: 1000, category: 'batido' },
+      { id: 'r_batido_leche', name: 'Batido de leche', price: 1500, category: 'batido' },
     ],
     'Arroz con': [
       { id: 'f_arroz_pollo', name: 'Arroz con Pollo', price: 3900, category: 'food' },
