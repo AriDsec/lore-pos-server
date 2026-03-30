@@ -209,6 +209,7 @@ export default function RestaurantePOS() {
 
   const handleLogout = () => {
     localStorage.removeItem('lore_session');
+    setLoading(false); // resetear loading para evitar pantalla negra
     const wasAdmin = adminUser !== null;
     setCurrentUser(null); setUserRole(null); setCurrentZone(null);
     if (wasAdmin) localStorage.setItem('lore_admin', adminUser);
@@ -409,7 +410,7 @@ export default function RestaurantePOS() {
               // Si eligió crear nueva, continuar normalmente
               setLoading(true);
               try {
-                await api.createAccount({ id: `acc-${currentZone}-${currentUser}-${Date.now()}`, zone: currentZone, mesera: currentUser, items: [...cartItems], total, type: orderType, table: (selectedTable && Number(selectedTable) > 0) ? Number(selectedTable) : null, barra: currentZone === 'bar' ? selectedBarra : null, clientName, foodItems, drinkItems: cartItems.filter(i => ['alcoholic','beverage','soda'].includes(i.category)), status: 'open', createdAt: new Date() });
+                await api.createAccount({ id: `acc-${currentZone}-${currentUser}-${Date.now()}`, zone: currentZone, mesera: currentUser, items: [...cartItems], total, type: orderType, table: (selectedTable && Number(selectedTable) > 0) ? Number(selectedTable) : null, barra: currentZone === 'bar' ? selectedBarra : null, clientName, foodItems, drinkItems: cartItems.filter(i => ['alcoholic','beverage','soda','batido'].includes(i.category)), status: 'open', createdAt: new Date() });
                 if (foodItems.length > 0) {
                   await api.createKitchenOrder({ id: `k-${Date.now()}`, zone: currentZone, mesera: currentUser, items: foodItems, table: (selectedTable && Number(selectedTable) > 0) ? Number(selectedTable) : null, barra: currentZone === 'bar' ? (selectedBarra || null) : null, clientName: clientName || '', locationLabel: selectedBarra ? selectedBarra : ((selectedTable && Number(selectedTable) > 0) ? `Mesa ${selectedTable}` : orderType === 'takeout' ? 'Para llevar' : 'Sin mesa'), status: 'pending', createdAt: new Date() });
                 }
@@ -427,7 +428,7 @@ export default function RestaurantePOS() {
           return;
         }
 
-        await api.createAccount({ id: `acc-${currentZone}-${currentUser}-${Date.now()}`, zone: currentZone, mesera: currentUser, items: [...cartItems], total, type: orderType, table: (selectedTable && Number(selectedTable) > 0) ? Number(selectedTable) : null, barra: currentZone === 'bar' ? selectedBarra : null, clientName, foodItems, drinkItems: cartItems.filter(i => ['alcoholic','beverage','soda'].includes(i.category)), status: 'open', createdAt: new Date() });
+        await api.createAccount({ id: `acc-${currentZone}-${currentUser}-${Date.now()}`, zone: currentZone, mesera: currentUser, items: [...cartItems], total, type: orderType, table: (selectedTable && Number(selectedTable) > 0) ? Number(selectedTable) : null, barra: currentZone === 'bar' ? selectedBarra : null, clientName, foodItems, drinkItems: cartItems.filter(i => ['alcoholic','beverage','soda','batido'].includes(i.category)), status: 'open', createdAt: new Date() });
         if (foodItems.length > 0) {
           await api.createKitchenOrder({ id: `k-${Date.now()}`, zone: currentZone, mesera: currentUser, items: foodItems, table: (selectedTable && Number(selectedTable) > 0) ? Number(selectedTable) : null, barra: currentZone === 'bar' ? (selectedBarra || null) : null, clientName: clientName || '', locationLabel: selectedBarra ? selectedBarra : ((selectedTable && Number(selectedTable) > 0) ? `Mesa ${selectedTable}` : orderType === 'takeout' ? 'Para llevar' : 'Sin mesa'), status: 'pending', createdAt: new Date() });
         }
@@ -457,7 +458,7 @@ export default function RestaurantePOS() {
         items: [...cartItems], total, type: 'direct',
         table: (selectedTable && Number(selectedTable) > 0) ? Number(selectedTable) : null, barra: currentZone === 'bar' ? (selectedBarra || null) : null,
         locationLabel: location, clientName: 'Cliente General',
-        foodItems, drinkItems: cartItems.filter(i => ['alcoholic','beverage','soda'].includes(i.category)),
+        foodItems, drinkItems: cartItems.filter(i => ['alcoholic','beverage','soda','batido'].includes(i.category)),
         status: 'open', createdAt: new Date(),
       });
       if (foodItems.length > 0) {
@@ -567,7 +568,7 @@ export default function RestaurantePOS() {
         locationLabel: account.locationLabel || null,
         clientName: account.clientName || '',
         foodItems: newItems.filter(i => i.category === 'food'),
-        drinkItems: newItems.filter(i => ['alcoholic','beverage','soda'].includes(i.category)),
+        drinkItems: newItems.filter(i => ['alcoholic','beverage','soda','batido'].includes(i.category)),
         status: 'open',
         createdAt: new Date(),
       });
@@ -639,6 +640,19 @@ export default function RestaurantePOS() {
         <Toast toasts={toasts} offline={!!syncError} />
         {showSelector
           ? <SelectorScreen isLandscape={isLandscape} syncError={syncError} loading={loading} onSelect={handleSelectorLogin} onBack={() => { setShowSelector(false); setAdminUser(null); localStorage.removeItem('lore_admin'); }} />
+          : <PinLoginScreen isLandscape={isLandscape} syncError={syncError} loading={loading} onLogin={loginWithPin} onShowSelector={() => setShowSelector(true)} />
+        }
+      </>
+    );
+  }
+
+  // Guard contra renders intermedios durante logout — debe estar ANTES de todos los renders por rol
+  if (!currentUser || !userRole || !currentZone) {
+    return (
+      <>
+        <Toast toasts={toasts} offline={!!syncError} />
+        {showSelector
+          ? <SelectorScreen isLandscape={isLandscape} syncError={syncError} loading={loading} adminUser={adminUser} onSelect={handleSelectorLogin} onBack={() => { setShowSelector(false); setAdminUser(null); localStorage.removeItem('lore_admin'); }} />
           : <PinLoginScreen isLandscape={isLandscape} syncError={syncError} loading={loading} onLogin={loginWithPin} onShowSelector={() => setShowSelector(true)} />
         }
       </>
