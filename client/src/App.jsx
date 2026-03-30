@@ -619,6 +619,7 @@ export default function RestaurantePOS() {
         isLandscape={isLandscape}
         syncError={syncError}
         loading={loading}
+        adminUser={adminUser}
         onSelect={handleSelectorLogin}
         onBack={() => { setShowSelector(false); setAdminUser(null); localStorage.removeItem('lore_admin'); }}
       />;
@@ -697,5 +698,5 @@ export default function RestaurantePOS() {
     return <><Toast toasts={toasts} offline={!!syncError} /><CajaScreen zona="restaurante" zonaNombre="Restaurante" accounts={restAccounts} paid={restPaid} loading={loading} billOrder={billOrder} setBillOrder={setBillOrder} viewItemsOrder={viewItemsOrder} setViewItemsOrder={setViewItemsOrder} splitOrder={splitOrder} setSplitOrder={setSplitOrder} onSplit={handleSplitAccount} onLogout={handleLogout} onPay={payAccount} onDelete={handleDeleteAccount} onMarkPending={handleMarkPending} /></>;
   }
 
-  return <><Toast toasts={toasts} offline={!!syncError} /><AdminScreen barPaid={barPaid} restPaid={restPaid} loading={loading} onLogout={handleLogout} setPaidOrders={setPaidOrders} showToast={showToast} /></>;
+  return <><Toast toasts={toasts} offline={!!syncError} /><AdminScreen barPaid={barPaid} restPaid={restPaid} loading={loading} onLogout={handleLogout} setPaidOrders={setPaidOrders} showToast={showToast} adminUser={adminUser} /></>;
 }
