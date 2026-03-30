@@ -644,53 +644,130 @@ export function PinLoginScreen({ isLandscape, syncError, loading, onLogin }) {
 // SELECTOR SCREEN (Admin)
 // ─────────────────────────────────────────────
 
-export function SelectorScreen({ isLandscape, syncError, loading, onSelect, onBack }) {
+export function SelectorScreen({ isLandscape, syncError, loading, onSelect, onBack, adminUser }) {
   const meseras = ['Mari', 'Mile', 'Lin', 'Temp Bar', 'Guido Bar'];
+
+  // Determine which menu to show based on who logged in
+  const isSuperAdmin = adminUser === 'Ariel';
+  const isBarAdmin = adminUser === 'Guido' || adminUser === 'Lindsey';
+  const isRestAdmin = adminUser === 'Aaron';
+
+  const Header = () => (
+    <div className="flex items-center justify-between w-full mb-8">
+      <div className="flex items-center gap-4">
+        <img src="/logo.png" alt="LORE" className="w-16 h-16 md:w-20 md:h-20 object-contain drop-shadow-2xl flex-shrink-0" />
+        <div>
+          <div style={{ fontFamily: "'Cinzel', serif", letterSpacing: '0.12em' }}
+            className="text-white text-xl md:text-3xl font-normal">Sistema de Pedidos</div>
+          <div className="text-slate-500 text-xs md:text-sm mt-0.5">Centro Social El Higuerón</div>
+        </div>
+      </div>
+      <button onClick={onBack}
+        className="bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white text-sm font-medium px-4 py-2 rounded-lg transition border border-slate-700">
+        ← PIN
+      </button>
+    </div>
+  );
+
+  const SectionLabel = ({ children }) => (
+    <div className="text-slate-500 text-xs font-semibold uppercase tracking-widest mb-3">{children}</div>
+  );
+
+  const PrimaryBtn = ({ onClick, children }) => (
+    <button onClick={onClick}
+      className="w-full bg-[#94cb47] hover:bg-[#7ab035] active:bg-[#6a9c2e] text-black font-bold py-5 md:py-6 rounded-2xl transition shadow-lg text-base md:text-xl">
+      {children}
+    </button>
+  );
+
+  const SecondaryBtn = ({ onClick, children }) => (
+    <button onClick={onClick}
+      className="w-full bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-[#94cb47] font-semibold py-4 md:py-5 rounded-2xl transition border border-slate-700 text-sm md:text-lg">
+      {children}
+    </button>
+  );
+
+  // ── Bar Admin Menu (Guido, Lindsey) ──────────────────────────────
+  if (isBarAdmin) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-black via-slate-900 to-black flex flex-col items-center justify-center p-6 md:p-12">
+        <div className="w-full max-w-lg md:max-w-2xl">
+          <Header />
+          <div className="space-y-3">
+            <SectionLabel>Bar</SectionLabel>
+            <PrimaryBtn onClick={() => onSelect('Caja Bar')}>Caja Bar</PrimaryBtn>
+            <PrimaryBtn onClick={() => onSelect('__admin__')}>Panel Admin</PrimaryBtn>
+            <div className="pt-2">
+              <SectionLabel>Meseras</SectionLabel>
+              <div className="grid grid-cols-2 gap-3">
+                {meseras.filter(m => m !== 'Guido Bar').map(m => (
+                  <SecondaryBtn key={m} onClick={() => onSelect(m)}>{m}</SecondaryBtn>
+                ))}
+                <SecondaryBtn onClick={() => onSelect('Guido Bar')}>Guido Bar</SecondaryBtn>
+              </div>
+            </div>
+          </div>
+        </div>
+        {loading && <Spinner />}
+      </div>
+    );
+  }
+
+  // ── Restaurante Admin Menu (Aaron) ───────────────────────────────
+  if (isRestAdmin) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-black via-slate-900 to-black flex flex-col items-center justify-center p-6 md:p-12">
+        <div className="w-full max-w-lg md:max-w-2xl">
+          <Header />
+          <div className="space-y-3">
+            <SectionLabel>Restaurante</SectionLabel>
+            <PrimaryBtn onClick={() => onSelect('Caja Restaurante')}>Caja</PrimaryBtn>
+            <PrimaryBtn onClick={() => onSelect('Tablet Restaurante')}>Tomar Pedidos</PrimaryBtn>
+            <PrimaryBtn onClick={() => onSelect('Cocina')}>Cocina</PrimaryBtn>
+            <div className="pt-2">
+              <PrimaryBtn onClick={() => onSelect('__admin__')}>Panel Admin</PrimaryBtn>
+            </div>
+          </div>
+        </div>
+        {loading && <Spinner />}
+      </div>
+    );
+  }
+
+  // ── Super Admin Menu (Ariel) + fallback ──────────────────────────
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-slate-900 to-black flex flex-col items-center justify-center p-4 md:p-8 overflow-y-auto">
-      {isLandscape ? (
-        <div className="flex items-center gap-5 mb-6 w-full max-w-3xl md:max-w-5xl">
-          <img src="/logo.png" alt="LORE" className="w-24 h-24 md:w-32 md:h-32 object-contain drop-shadow-2xl flex-shrink-0" />
-          <div style={{ fontFamily: "'Cinzel', serif", letterSpacing: '0.14em' }}
-            className="text-white/75 text-2xl md:text-4xl font-normal drop-shadow-lg flex-1">
-            Sistema de Pedidos
+      <div className="w-full max-w-4xl md:max-w-6xl">
+        <Header />
+        {syncError && (
+          <div className="bg-red-900/60 border border-red-500 rounded-xl p-3 mb-6 text-red-200 text-sm text-center">
+            {syncError}
           </div>
-          <button onClick={onBack} className="flex items-center gap-1.5 bg-slate-700/60 hover:bg-slate-600 text-slate-300 hover:text-white text-sm md:text-base font-medium px-3 md:px-5 py-1.5 md:py-2.5 rounded-lg transition border border-slate-600 flex-shrink-0">← PIN</button>
-        </div>
-      ) : (
-        <div className="flex flex-col items-center mb-5 w-full max-w-md">
-          <img src="/logo.png" alt="LORE" className="w-32 h-32 object-contain drop-shadow-2xl mb-2" />
-          <div style={{ fontFamily: "'Cinzel', serif", letterSpacing: '0.12em' }}
-            className="text-white/70 text-lg font-normal mb-3">
-            Sistema de Pedidos
+        )}
+        <div className={`grid gap-4 ${isLandscape ? 'grid-cols-3' : 'grid-cols-1 sm:grid-cols-2'}`}>
+          {/* Bar */}
+          <div className="bg-slate-800/80 backdrop-blur border border-[#94cb47]/30 rounded-2xl p-5 md:p-8 space-y-3">
+            <SectionLabel>Zona Bar</SectionLabel>
+            <PrimaryBtn onClick={() => onSelect('Caja Bar')}>Caja Bar</PrimaryBtn>
+            <div className="grid grid-cols-2 gap-2">
+              {meseras.filter(m => m !== 'Guido Bar').map(m => (
+                <SecondaryBtn key={m} onClick={() => onSelect(m)}>{m}</SecondaryBtn>
+              ))}
+              <SecondaryBtn onClick={() => onSelect('Guido Bar')}>Guido Bar</SecondaryBtn>
+            </div>
           </div>
-        </div>
-      )}
-      {syncError && (
-        <div className="bg-red-900/60 border border-red-500 rounded-xl p-3 mb-3 text-red-200 text-sm md:text-base text-center w-full max-w-2xl md:max-w-5xl">
-          ⚠️ {syncError}
-        </div>
-      )}
-      <div className={`w-full ${isLandscape ? 'grid grid-cols-3 gap-4 max-w-3xl md:max-w-5xl' : 'grid grid-cols-2 gap-3 max-w-md'}`}>
-        <div className="bg-slate-800/80 backdrop-blur border border-[#94cb47]/40 rounded-2xl p-4 md:p-7 shadow-2xl">
-          <h2 className="text-[#94cb47] font-bold text-sm md:text-lg mb-3">🍺 ZONA BAR</h2>
-          <button onClick={() => onSelect('Caja Bar')} className="w-full bg-[#94cb47] hover:bg-[#7ab035] text-white font-bold py-2.5 md:py-4 md:text-lg rounded-xl transition shadow-lg mb-3">💰 Caja Bar</button>
-          <div className="space-y-2 md:space-y-3">
-            {meseras.filter(m => m !== 'Guido Bar').map(m => (
-              <button key={m} onClick={() => onSelect(m)} className="w-full bg-slate-700/60 hover:bg-slate-600 text-[#94cb47] py-2 md:py-3.5 md:text-base rounded-lg transition font-medium text-sm">{m}</button>
-            ))}
-            <button onClick={() => onSelect('Guido Bar')} className="w-full bg-slate-700/60 hover:bg-slate-600 text-[#94cb47] py-2 md:py-3.5 md:text-base rounded-lg transition font-medium text-sm border border-[#94cb47]/30">👑 Guido</button>
+          {/* Restaurante */}
+          <div className="bg-slate-800/80 backdrop-blur border border-[#94cb47]/30 rounded-2xl p-5 md:p-8 space-y-3">
+            <SectionLabel>Zona Restaurante</SectionLabel>
+            <PrimaryBtn onClick={() => onSelect('Caja Restaurante')}>Caja</PrimaryBtn>
+            <PrimaryBtn onClick={() => onSelect('Tablet Restaurante')}>Tomar Pedidos</PrimaryBtn>
+            <PrimaryBtn onClick={() => onSelect('Cocina')}>Cocina</PrimaryBtn>
           </div>
-        </div>
-        <div className="bg-slate-800/80 backdrop-blur border border-[#94cb47]/40 rounded-2xl p-4 md:p-7 shadow-2xl">
-          <h2 className="text-[#94cb47] font-bold text-sm md:text-lg mb-3">🍽️ ZONA RESTAURANTE</h2>
-          <button onClick={() => onSelect('Caja Restaurante')} className="w-full bg-[#94cb47] hover:bg-[#7ab035] text-white font-bold py-2.5 md:py-4 md:text-lg rounded-xl transition shadow-lg mb-3">💰 Caja</button>
-          <button onClick={() => onSelect('Tablet Restaurante')} className="w-full bg-[#94cb47]/90 hover:bg-[#7ab035] text-white font-bold py-2.5 md:py-4 md:text-lg rounded-xl transition shadow-lg mb-3">📱 Tomar Pedidos</button>
-          <button onClick={() => onSelect('Cocina')} className="w-full bg-[#94cb47]/90 hover:bg-[#7ab035] text-white font-bold py-2.5 md:py-4 md:text-lg rounded-xl transition shadow-lg">👨‍🍳 Cocina</button>
-        </div>
-        <div className={`bg-slate-800/80 backdrop-blur border border-[#94cb47]/40 rounded-2xl p-4 md:p-7 shadow-2xl flex flex-col justify-between gap-3 ${!isLandscape ? "col-span-2" : ""}`}>
-          <button onClick={() => onSelect('__admin__')} className="w-full bg-[#94cb47]/90 hover:bg-[#7ab035] text-white font-bold py-2.5 md:py-4 md:text-lg rounded-xl transition shadow-lg">📊 Panel Admin</button>
-          {!isLandscape && <button onClick={onBack} className="w-full flex items-center justify-center gap-2 bg-slate-700/60 hover:bg-slate-600 text-slate-300 hover:text-white font-medium py-2.5 rounded-xl transition border border-slate-600 text-sm">← Volver al PIN</button>}
+          {/* Admin */}
+          <div className={`bg-slate-800/80 backdrop-blur border border-[#94cb47]/30 rounded-2xl p-5 md:p-8 space-y-3 ${!isLandscape ? 'sm:col-span-2' : ''}`}>
+            <SectionLabel>Administración</SectionLabel>
+            <PrimaryBtn onClick={() => onSelect('__admin__')}>Panel Admin</PrimaryBtn>
+          </div>
         </div>
       </div>
       {loading && <Spinner />}
