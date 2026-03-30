@@ -16,7 +16,11 @@ function StatRow({ label, value }) {
   );
 }
 
-export function AdminScreen({ barPaid, restPaid, loading, onLogout, setPaidOrders, showToast }) {
+export function AdminScreen({ barPaid, restPaid, loading, onLogout, setPaidOrders, showToast, adminUser }) {
+  const isSuperAdmin = adminUser === 'Ariel';
+  const isBarAdmin   = adminUser === 'Guido' || adminUser === 'Lindsey';
+  const isRestAdmin  = adminUser === 'Aaron';
+
   const [viewItemsOrder, setViewItemsOrder] = useState(null);
   const [accessLog, setAccessLog] = useState([]);
   const [showConfirmLimpiar, setShowConfirmLimpiar] = useState(false);
@@ -74,10 +78,14 @@ export function AdminScreen({ barPaid, restPaid, loading, onLogout, setPaidOrder
       .reduce((a, i) => a + i.price * i.quantity, 0), 0);
 
   // Bebidas alcohólicas y cervezas que el Restaurante vendió → son del inventario del Bar → Restaurante le debe al Bar
-  // Excluye soda (batidos, refrescos, sin alcohol) porque esos son del Restaurante
+  // Bebidas de inventario del bar vendidas por restaurante
+  // Todas las sodas/beverages/alcoholic son del bar, excepto batidos (no tienen ID propio)
   const restAlcoholTotal = restPaid.reduce((s, o) =>
-    s + (o.items||[]).filter(i => ['alcoholic', 'beverage'].includes(i.category))
-      .reduce((a, i) => a + i.price * i.quantity, 0), 0);
+    s + (o.items||[]).filter(i =>
+      i.category === 'alcoholic' ||
+      i.category === 'beverage' ||
+      i.category === 'soda'
+    ).reduce((a, i) => a + i.price * i.quantity, 0), 0);
 
   // Saldo: positivo = Bar le paga al Restaurante, negativo = Restaurante le paga al Bar
   const deudaBar = barFoodTotal - restAlcoholTotal;
@@ -176,7 +184,7 @@ td { padding:6px 8px;border-bottom:1px solid #f0f0f0; }
 </div>
 <div class="liquidacion"><h2>🍺 Liquidación con Bar</h2>
   <div class="row"><span class="label">Comida vendida por Bar (cocinada por Restaurante)</span><span class="val">&#x20A1;${barFoodTotal.toLocaleString()}</span></div>
-  <div class="row"><span class="label">Licores y cervezas vendidos por Restaurante (inventario Bar)</span><span class="val">&#x20A1;${restAlcoholTotal.toLocaleString()}</span></div>
+  <div class="row"><span class="label">Bebidas vendidas por Restaurante (inventario Bar)</span><span class="val">&#x20A1;${restAlcoholTotal.toLocaleString()}</span></div>
   <div class="saldo-final"><div><div style="font-weight:bold">SALDO FINAL</div><div style="font-size:11px;color:#666">${deudaBar >= 0 ? '📤 Bar nos paga' : '📥 Nosotros le pagamos al Bar'}</div></div><div class="saldo-monto">&#x20A1;${Math.abs(deudaBar).toLocaleString()}</div></div>
 </div>
 ${barPaid.length > 0 ? `<div class="section-title">📋 Detalle — Bar (${barPaid.length})</div>
@@ -236,8 +244,10 @@ ${countMethod(restPaid,'tarjeta_sinpe')>0?`<span style="background:#1e1b4b;color
 
         <div className="bg-gradient-to-r from-[#94cb47]/20 to-[#7ab035]/20 border border-[#94cb47]/30 rounded-2xl p-6 shadow-2xl flex flex-wrap justify-between items-center gap-4">
           <div>
-            <div className="text-white/80 text-base">💰 Total del Día</div>
-            <div className="text-4xl md:text-6xl font-bold text-white mt-1">₡{grandTotal.toLocaleString()}</div>
+            <div className="text-white/80 text-base">Total del Día</div>
+            <div className="text-4xl md:text-6xl font-bold text-white mt-1">
+              ₡{(isBarAdmin ? totalBarCobrado : isRestAdmin ? totalRestCobrado : grandTotal).toLocaleString()}
+            </div>
             {totalDescuentos > 0 && (
               <div className="text-amber-400 text-sm mt-1">
                 Descuentos aplicados: -₡{totalDescuentos.toLocaleString()}
@@ -247,16 +257,21 @@ ${countMethod(restPaid,'tarjeta_sinpe')>0?`<span style="background:#1e1b4b;color
           <button onClick={descargarCierrePDF} className="bg-white/20 hover:bg-white/30 text-white font-bold px-6 py-3 rounded-xl transition flex items-center gap-2 border border-white/30">
             📄 Descargar Cierre del Día
           </button>
-          <button
-            onClick={() => { setShowConfirmLimpiar(true); setConfirmInput(''); }}
-            className="bg-red-900/40 hover:bg-red-900/70 text-red-300 font-bold px-6 py-3 rounded-xl transition flex items-center gap-2 border border-red-500/40"
-          >
-            🗑️ Limpiar Día
-          </button>
+          {isSuperAdmin && (
+            <button
+              onClick={() => { setShowConfirmLimpiar(true); setConfirmInput(''); }}
+              className="bg-red-900/40 hover:bg-red-900/70 text-red-300 font-bold px-6 py-3 rounded-xl transition flex items-center gap-2 border border-red-500/40"
+            >
+              Limpiar Día
+            </button>
+          )}
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {[['🍺 Bar', barPaid, totalBarCobrado], ['🍽️ Restaurante', restPaid, totalRestCobrado]].map(([titulo, paid, total]) => (
+          {[
+            !isRestAdmin && ['Bar', barPaid, totalBarCobrado],
+            !isBarAdmin  && ['Restaurante', restPaid, totalRestCobrado],
+          ].filter(Boolean).map(([titulo, paid, total]) => (
             <div key={titulo} className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-4 shadow-2xl space-y-3">
               <h3 className="text-white font-bold text-xl">{titulo}</h3>
               <StatRow label="Cuentas cobradas" value={paid.length} />
