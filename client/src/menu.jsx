@@ -349,14 +349,14 @@ export function MenuPanel({ menu, licores, onSelectItem, onModalChange }) {
     items.map(i => ({ ...i, cat }))
   );
   const comidaItems = allItems.filter(i => i.category === 'food');
-  const bebidaItems = allItems.filter(i => ['beverage', 'soda'].includes(i.category));
+  const bebidaItems = allItems.filter(i => ['beverage', 'soda', 'batido'].includes(i.category));
 
   // Agrupar por categoría para mostrar
   const comidaGroups = Object.fromEntries(
     Object.entries(menu).filter(([, items]) => items.some(i => i.category === 'food'))
   );
   const bebidaGroups = Object.fromEntries(
-    Object.entries(menu).filter(([, items]) => items.some(i => ['beverage', 'soda'].includes(i.category)))
+    Object.entries(menu).filter(([, items]) => items.some(i => ['beverage', 'soda', 'batido'].includes(i.category)))
   );
 
   // Búsqueda global
@@ -386,7 +386,7 @@ export function MenuPanel({ menu, licores, onSelectItem, onModalChange }) {
     <div className="space-y-2">
       {Object.entries(groups).map(([cat, items]) => {
         const filtered = items.filter(i =>
-          category === 'food' ? i.category === 'food' : ['beverage', 'soda'].includes(i.category)
+          category === 'food' ? i.category === 'food' : ['beverage', 'soda', 'batido'].includes(i.category)
         );
         if (filtered.length === 0) return null;
         const isOpen = expandedCat === cat;
