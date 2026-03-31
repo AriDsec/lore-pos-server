@@ -237,14 +237,18 @@ export default function RestaurantePOS() {
 
   const registerFailedAttempt = () => {
     const data = JSON.parse(localStorage.getItem('lore_lockout') || '{}');
-    const attempts = (data.attempts || 0) + 1;
+    // Si el último intento fue hace más de 30 minutos, resetear el contador
+    const ahora = Date.now();
+    const muyViejo = data.lastAttempt && (ahora - data.lastAttempt) > 30 * 60 * 1000;
+    const attempts = muyViejo ? 1 : (data.attempts || 0) + 1;
     if (attempts >= 5) {
       localStorage.setItem('lore_lockout', JSON.stringify({
         attempts,
-        until: Date.now() + 10 * 60 * 1000, // 10 minutos
+        until: ahora + 10 * 60 * 1000,
+        lastAttempt: ahora,
       }));
     } else {
-      localStorage.setItem('lore_lockout', JSON.stringify({ attempts }));
+      localStorage.setItem('lore_lockout', JSON.stringify({ attempts, lastAttempt: ahora }));
     }
     return attempts >= 5;
   };
@@ -252,9 +256,11 @@ export default function RestaurantePOS() {
   const clearLockout = () => localStorage.removeItem('lore_lockout');
 
   const loginWithPin = async (pin) => {
-    if (checkLockout()) return 'bloqueado';
     const entry = Object.entries(PINES).find(([, v]) => v.pin === pin);
+    // Verificar PIN primero — si es correcto, limpiar lockout y continuar sin importar intentos
     if (!entry) {
+      // PIN incorrecto — verificar lockout y registrar intento
+      if (checkLockout()) return 'bloqueado';
       const locked = registerFailedAttempt();
       if (locked) {
         const data = JSON.parse(localStorage.getItem('lore_lockout') || '{}');
