@@ -226,15 +226,45 @@ export default function RestaurantePOS() {
     }
   };
 
+  // ── PIN lockout — 5 intentos fallidos = bloqueo de 10 minutos ──
+  const checkLockout = () => {
+    const data = JSON.parse(localStorage.getItem('lore_lockout') || '{}');
+    if (!data.until) return false;
+    if (Date.now() < data.until) return true;
+    localStorage.removeItem('lore_lockout');
+    return false;
+  };
+
+  const registerFailedAttempt = () => {
+    const data = JSON.parse(localStorage.getItem('lore_lockout') || '{}');
+    const attempts = (data.attempts || 0) + 1;
+    if (attempts >= 5) {
+      localStorage.setItem('lore_lockout', JSON.stringify({
+        attempts,
+        until: Date.now() + 10 * 60 * 1000, // 10 minutos
+      }));
+    } else {
+      localStorage.setItem('lore_lockout', JSON.stringify({ attempts }));
+    }
+    return attempts >= 5;
+  };
+
+  const clearLockout = () => localStorage.removeItem('lore_lockout');
+
   const loginWithPin = async (pin) => {
+    if (checkLockout()) return 'bloqueado';
     const entry = Object.entries(PINES).find(([, v]) => v.pin === pin);
-    if (!entry) return false;
+    if (!entry) {
+      const locked = registerFailedAttempt();
+      return locked ? 'bloqueado' : false;
+    }
     const [name, { role }] = entry;
     if (role === 'admin') {
       setAdminUser(name);
       setShowSelector(true);
       localStorage.setItem('lore_admin', name);
       api.logAccess(name, pin, 'login');
+      clearLockout();
       return true;
     }
     // Verificar si la mesera está activa
