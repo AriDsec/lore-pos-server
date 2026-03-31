@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Plus, Minus, Trash2, ChevronDown, Search, Clock, Package } from 'lucide-react';
+import { Plus, Minus, ChevronDown, Search, Clock } from 'lucide-react';
 import { LICORES, OTROS, ADICIONALES_COCINA } from './constants.js';
 
 // ─────────────────────────────────────────────
