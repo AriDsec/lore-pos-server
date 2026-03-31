@@ -256,7 +256,12 @@ export default function RestaurantePOS() {
     const entry = Object.entries(PINES).find(([, v]) => v.pin === pin);
     if (!entry) {
       const locked = registerFailedAttempt();
-      return locked ? 'bloqueado' : false;
+      if (locked) {
+        const data = JSON.parse(localStorage.getItem('lore_lockout') || '{}');
+        const mins = Math.ceil((data.until - Date.now()) / 60000);
+        return `bloqueado:${mins}`;
+      }
+      return false;
     }
     const [name, { role }] = entry;
     if (role === 'admin') {
