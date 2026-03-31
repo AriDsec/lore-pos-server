@@ -284,7 +284,7 @@ export default function RestaurantePOS() {
       if (config && config.value) {
         const activas = config.value;
         if (activas[name] === false) {
-          return 'bloqueado';
+          return 'desactivada';
         }
       }
     }
