@@ -13,7 +13,6 @@ export function ShoppingCart({
   const selectedAcc = selectedAccount ? openAccounts.find(a => a.id === selectedAccount || a._id === selectedAccount) : null;
   const isOthersMesera = selectedAcc && selectedAcc.mesera && currentUser && selectedAcc.mesera !== currentUser;
   const total = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  const isLandscapeMode = mobileVisible === 'landscape';
 
   if (!mobileVisible) return null;
 
@@ -48,7 +47,7 @@ export function ShoppingCart({
             <option value="">➕ Nueva Cuenta</option>
             {openAccounts.map(acc => (
               <option key={acc.id} value={acc.id}>
-                {acc.barra ? acc.barra : `Mesa ${acc.table}`}{acc.clientName ? ` — ${acc.clientName}` : ''}
+                {acc.barra ? acc.barra : (acc.table && acc.table > 0) ? `Mesa ${acc.table}` : 'Sin mesa'}{acc.clientName ? ` — ${acc.clientName}` : ''}
               </option>
             ))}
           </select>
