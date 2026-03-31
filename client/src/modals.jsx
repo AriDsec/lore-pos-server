@@ -539,9 +539,30 @@ export function PinLoginScreen({ isLandscape, syncError, loading, onLogin }) {
   const [loginError, setLoginError] = useState(false);
   const [loginBloqueado, setLoginBloqueado] = useState(false);
   const [attempting, setAttempting] = useState(false);
+  const [tiempoRestante, setTiempoRestante] = useState('');
+  const [intentos, setIntentos] = useState(0);
+
+  // Check lockout on mount and update timer
+  useEffect(() => {
+    const checkAndUpdate = () => {
+      const data = JSON.parse(localStorage.getItem('lore_lockout') || '{}');
+      if (data.until && Date.now() < data.until) {
+        setLoginBloqueado(true);
+        const mins = Math.ceil((data.until - Date.now()) / 60000);
+        setTiempoRestante(`${mins} min`);
+      } else {
+        setLoginBloqueado(false);
+        setTiempoRestante('');
+        setIntentos(data.attempts || 0);
+      }
+    };
+    checkAndUpdate();
+    const interval = setInterval(checkAndUpdate, 10000);
+    return () => clearInterval(interval);
+  }, []);
 
   const loginHandleDigit = async (d) => {
-    if (loginPin.length >= 4 || attempting) return;
+    if (loginPin.length >= 4 || attempting || loginBloqueado) return;
     const loginNext = loginPin + d;
     setPin(loginNext);
     setLoginError(false);
@@ -552,6 +573,9 @@ export function PinLoginScreen({ isLandscape, syncError, loading, onLogin }) {
         const loginOk = await onLogin(loginNext);
         if (loginOk === 'bloqueado') {
           setLoginBloqueado(true);
+          const data = JSON.parse(localStorage.getItem('lore_lockout') || '{}');
+          const mins = Math.ceil((data.until - Date.now()) / 60000);
+          setTiempoRestante(`${mins} min`);
           setPin('');
         } else if (!loginOk) {
           setLoginError(true);
@@ -580,7 +604,10 @@ export function PinLoginScreen({ isLandscape, syncError, loading, onLogin }) {
         ))}
       </div>
       {loginError && <p className="text-red-400 text-center text-xs mb-3">PIN incorrecto</p>}
-      {loginBloqueado && <p className="text-[#94cb47] text-center text-xs mb-3 font-bold">Acceso no disponible hoy — contacta al administrador</p>}
+      {loginBloqueado
+        ? <p className="text-red-400 text-center text-xs mb-3 font-semibold">Demasiados intentos — espera {tiempoRestante}</p>
+        : intentos > 0 && <p className="text-slate-500 text-center text-xs mb-3">{5 - intentos} intento{5 - intentos !== 1 ? 's' : ''} restante{5 - intentos !== 1 ? 's' : ''}</p>
+      }
       <div className="grid grid-cols-3 gap-2">
         {[1,2,3,4,5,6,7,8,9].map(d => (
           <button key={d} onClick={() => loginHandleDigit(String(d))}
