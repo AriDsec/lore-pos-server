@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { PINES, meseras as MESERAS } from './constants.js';
 import { payBadge, imprimirTiquete } from './ui.jsx';
 
