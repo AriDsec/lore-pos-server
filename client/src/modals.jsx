@@ -537,6 +537,7 @@ export function PinModal({ userName, onSuccess, onCancel }) {
 export function PinLoginScreen({ isLandscape, syncError, loading, onLogin }) {
   const [loginPin, setPin] = useState('');
   const [loginError, setLoginError] = useState(false);
+  const [mensajeError, setMensajeError] = useState('PIN incorrecto');
   const [loginBloqueado, setLoginBloqueado] = useState(false);
   const [attempting, setAttempting] = useState(false);
   const [tiempoRestante, setTiempoRestante] = useState('');
@@ -567,11 +568,16 @@ export function PinLoginScreen({ isLandscape, syncError, loading, onLogin }) {
     setPin(loginNext);
     setLoginError(false);
     setLoginBloqueado(false);
+    setMensajeError('PIN incorrecto');
     if (loginNext.length === 4) {
       setAttempting(true);
       setTimeout(async () => {
         const loginOk = await onLogin(loginNext);
-        if (typeof loginOk === 'string' && loginOk.startsWith('bloqueado')) {
+        if (loginOk === 'desactivada') {
+          setLoginError(true);
+          setMensajeError('Acceso desactivado — contacta al administrador');
+          setPin('');
+        } else if (typeof loginOk === 'string' && loginOk.startsWith('bloqueado')) {
           setLoginBloqueado(true);
           const mins = loginOk.split(':')[1] || '10';
           setTiempoRestante(`${mins} min`);
@@ -606,7 +612,7 @@ export function PinLoginScreen({ isLandscape, syncError, loading, onLogin }) {
           }`} />
         ))}
       </div>
-      {loginError && <p className="text-red-400 text-center text-xs mb-3">PIN incorrecto</p>}
+      {loginError && <p className="text-red-400 text-center text-xs mb-3">{mensajeError}</p>}
       {loginBloqueado
         ? <p className="text-red-400 text-center text-xs mb-3 font-semibold">Demasiados intentos — espera {tiempoRestante}</p>
         : intentos > 0 && <p className="text-slate-500 text-center text-xs mb-3">{5 - intentos} intento{5 - intentos !== 1 ? 's' : ''} restante{5 - intentos !== 1 ? 's' : ''}</p>
