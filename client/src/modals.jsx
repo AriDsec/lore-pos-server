@@ -571,11 +571,11 @@ export function PinLoginScreen({ isLandscape, syncError, loading, onLogin }) {
       setAttempting(true);
       setTimeout(async () => {
         const loginOk = await onLogin(loginNext);
-        if (loginOk === 'bloqueado') {
+        if (typeof loginOk === 'string' && loginOk.startsWith('bloqueado')) {
           setLoginBloqueado(true);
-          const data = JSON.parse(localStorage.getItem('lore_lockout') || '{}');
-          const mins = Math.ceil((data.until - Date.now()) / 60000);
+          const mins = loginOk.split(':')[1] || '10';
           setTiempoRestante(`${mins} min`);
+          setIntentos(5);
           setPin('');
         } else if (!loginOk) {
           setLoginError(true);
