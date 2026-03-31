@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Utensils, Package } from 'lucide-react';
+import { Utensils } from 'lucide-react';
 import { Header } from './ui.jsx';
 import { MenuPanel, OtrosPanel } from './menu.jsx';
 import { SplitModal } from './modals.jsx';
@@ -94,7 +94,7 @@ export function MeseraScreen({
       {(() => {
         const readyOrders = kitchenOrders.filter(o => o.status === 'ready');
         if (readyOrders.length === 0) return null;
-        const mesas = readyOrders.map(o => o.barra || (o.table ? `Mesa ${o.table}` : '')).filter(Boolean).join(' · ');
+        const mesas = readyOrders.map(o => o.barra || ((o.table && o.table > 0) ? `Mesa ${o.table}` : '')).filter(Boolean).join(' · ');
         return (
           <div className="bg-[#94cb47] overflow-hidden">
             <div className="flex items-center gap-2 px-4 py-2.5 md:py-4">
@@ -135,7 +135,7 @@ export function MeseraScreen({
                   {ready.map((o, i) => (
                     <div key={i} className="flex items-center gap-2">
                       <span className="text-black font-bold text-sm md:text-base">
-                        {o.barra || (o.table ? `Mesa ${o.table}` : '')}
+                        {o.barra || ((o.table && o.table > 0) ? `Mesa ${o.table}` : '')}
                       </span>
                       {o.clientName && (
                         <span className="text-black/70 text-sm md:text-base">— {o.clientName}</span>
