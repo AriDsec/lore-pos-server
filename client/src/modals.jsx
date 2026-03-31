@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { PINES, meseras as MESERAS } from './constants.js';
-import { payBadge, imprimirTiquete } from './ui.jsx';
+import { PINES } from './constants.js';
+import { imprimirTiquete } from './ui.jsx';
 
 // ─────────────────────────────────────────────
 // MODALS — ItemsModal, SplitModal, BillModal, PinModal, PinLoginScreen, SelectorScreen
@@ -580,6 +580,9 @@ export function PinLoginScreen({ isLandscape, syncError, loading, onLogin }) {
         } else if (!loginOk) {
           setLoginError(true);
           setPin('');
+          // Actualizar contador de intentos inmediatamente
+          const data = JSON.parse(localStorage.getItem('lore_lockout') || '{}');
+          setIntentos(data.attempts || 0);
         }
         setAttempting(false);
       }, 200);
