@@ -4,7 +4,7 @@ export function ShoppingCart({
   cartItems, updateQuantity, removeFromCart, updateNotes, completeOrder,
   orderType, setOrderType, selectedTable, setSelectedTable,
   selectedBarra, setSelectedBarra, clientName, setClientName,
-  barras, maxTables, tables,
+  barras, maxTables, tables, modoRestaurante,
   openAccounts, selectedAccount, onSelectAccount,
   mobileVisible, onDirectPay, isBar, onSplit,
   currentUser, aplicaServicio, loading,
@@ -124,7 +124,7 @@ export function ShoppingCart({
 
             {/* Mesa + Barra — Barra solo en bar */}
             {orderType === 'dine-in' && (
-              <div className={isBar ? "grid grid-cols-2 gap-2" : "grid grid-cols-1"}>
+              <div className={(isBar && !modoRestaurante) ? "grid grid-cols-2 gap-2" : "grid grid-cols-1"}>
                 <div>
                   <label className="text-slate-400 text-xs md:text-lg mb-0.5 block">Mesa</label>
                   <select value={selectedTable || ''} onChange={(e) => { setSelectedTable(e.target.value ? Number(e.target.value) : null); setSelectedBarra(null); }}
@@ -135,7 +135,7 @@ export function ShoppingCart({
                     ))}
                   </select>
                 </div>
-                {isBar && (
+                {isBar && !modoRestaurante && (
                   <div>
                     <label className="text-slate-400 text-xs md:text-lg mb-0.5 block">Barra</label>
                     <select value={selectedBarra || ''} onChange={(e) => { setSelectedBarra(e.target.value); setSelectedTable(null); }}
@@ -174,7 +174,7 @@ export function ShoppingCart({
                 ✂️ Separar Cuenta
               </button>
             )}
-            {isBar && onDirectPay && !selectedAccount && (
+            {isBar && !modoRestaurante && onDirectPay && !selectedAccount && (
               <button onClick={onDirectPay}
                 className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl transition text-sm">
                 💵 Cobro Directo
