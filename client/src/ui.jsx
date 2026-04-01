@@ -100,9 +100,13 @@ export function imprimirTiquete(order, zona) {
   const fecha = now.toLocaleDateString('es-CR', { day: '2-digit', month: '2-digit', year: 'numeric' });
   const hora  = now.toLocaleTimeString('es-CR', { hour: '2-digit', minute: '2-digit' });
 
-  const metodoPago = order.paymentMethod === 'sinpe'   ? 'SINPE Móvil'
-                   : order.paymentMethod === 'tarjeta' ? 'Tarjeta'
-                   : 'Efectivo';
+  const metodoPago =
+    order.paymentMethod === 'sinpe'          ? 'SINPE Móvil' :
+    order.paymentMethod === 'tarjeta'        ? 'Tarjeta' :
+    order.paymentMethod === 'mixto'          ? `Efectivo &#x20A1;${(order.efectivoMixto||0).toLocaleString()} + Tarjeta &#x20A1;${(order.tarjetaMixto||0).toLocaleString()}` :
+    order.paymentMethod === 'efectivo_sinpe' ? `Efectivo &#x20A1;${(order.efectivoMixto||0).toLocaleString()} + SINPE &#x20A1;${(order.tarjetaMixto||0).toLocaleString()}` :
+    order.paymentMethod === 'tarjeta_sinpe'  ? `Tarjeta &#x20A1;${(order.efectivoMixto||0).toLocaleString()} + SINPE &#x20A1;${(order.tarjetaMixto||0).toLocaleString()}` :
+    'Efectivo';
 
   const ubicacion = order.locationLabel || order.barra
     || ((order.table && order.table > 0) ? `Mesa ${order.table}` : '');
@@ -190,7 +194,9 @@ export function imprimirTiquete(order, zona) {
 <table style="width:100%;font-size:11px">
   <tr><td>Fecha:</td><td class="derecha">${fecha}</td></tr>
   <tr><td>Hora:</td><td class="derecha">${hora}</td></tr>
-  ${ubicacion ? `<tr><td>Mesa/Barra:</td><td class="derecha">${ubicacion}</td></tr>` : ''}
+  <tr><td>Zona:</td><td class="derecha">${esBar ? 'Bar' : 'Restaurante'}</td></tr>
+  ${ubicacion ? `<tr><td>Ubicación:</td><td class="derecha">${ubicacion}</td></tr>` : ''}
+  ${order.type === 'takeout' ? `<tr><td>Tipo:</td><td class="derecha bold">PARA LLEVAR</td></tr>` : ''}
   ${order.clientName ? `<tr><td>Cliente:</td><td class="derecha">${order.clientName}</td></tr>` : ''}
   ${order.mesera ? `<tr><td>Atendió:</td><td class="derecha">${order.mesera}</td></tr>` : ''}
 </table>
