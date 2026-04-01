@@ -55,7 +55,7 @@ export function MeseraScreen({
   // Panel central con secciones y buscador global
   const [menuTab, setMenuTab] = useState('productos');
 
-  const menuCenterJSX = (() => (
+  const MenuCenter = () => (
     <div className="space-y-3">
       <div className="flex gap-1.5">
         {[
@@ -96,7 +96,7 @@ export function MeseraScreen({
         </button>
       )}
     </div>
-  ))();
+  );
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-slate-900 to-black flex flex-col">
@@ -132,7 +132,7 @@ export function MeseraScreen({
       {/* ── Landscape: flex — menú flexible / carrito ancho fijo ── */}
       <div className={`${isLandscape ? "flex" : "hidden"} gap-4 p-4 w-full overflow-hidden`} style={{height: "calc(100vh - 64px)"}}>
         <div className="flex-1 overflow-y-auto">
-          {menuCenterJSX}
+          <MenuCenter />
         </div>
         <div style={{width: "min(520px, 40vw)", flexShrink: 0, height: "100%", display: "flex", flexDirection: "column", gap: "10px"}}>
           <div style={{flex: 1, overflowY: "auto", minHeight: 0}}>
