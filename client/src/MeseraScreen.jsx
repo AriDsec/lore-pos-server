@@ -15,7 +15,7 @@ export function MeseraScreen({
   onDirectPay, isBar, tables,
   splitOrder, setSplitOrder, onSplit,
   onModalChange, aplicaServicio, loading,
-  modoRestaurante, setModoRestaurante,
+  modoRestaurante, onToggleModoRestaurante,
   mesaConflict, setMesaConflict, onAddToExisting,
 }) {
   const [mobileTab, setMobileTab] = useState('menu');
@@ -78,9 +78,9 @@ export function MeseraScreen({
       {menuTab === 'productos' && <MenuPanel menu={menu} licores={licores} onSelectItem={addToCart} onModalChange={onModalChange} />}
       {menuTab === 'otros'     && <OtrosPanel onAddToCart={addToCart} onModalChange={onModalChange} />}
       {/* Toggle modo restaurante — solo visible para meseras de bar */}
-      {isBar && setModoRestaurante && (
+      {isBar && onToggleModoRestaurante && (
         <button
-          onClick={() => { setModoRestaurante(v => !v); setSelectedTable(null); setSelectedBarra(null); }}
+          onClick={onToggleModoRestaurante}
           className={`w-full flex items-center justify-between px-4 py-3 rounded-xl border transition ${
             modoRestaurante
               ? 'bg-[#94cb47]/15 border-[#94cb47]/50'
