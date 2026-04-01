@@ -45,7 +45,7 @@ export function ShoppingCart({
             className="w-full bg-slate-700 border border-[#94cb47]/30 text-white rounded-lg p-2 text-xs focus:outline-none"
           >
             <option value="">➕ Nueva Cuenta</option>
-            {openAccounts.map(acc => (
+            {openAccounts.filter(a => a.status !== 'pending_payment').map(acc => (
               <option key={acc.id} value={acc.id}>
                 {acc.barra ? acc.barra : (acc.table && acc.table > 0) ? `Mesa ${acc.table}` : 'Sin mesa'}{acc.clientName ? ` — ${acc.clientName}` : ''}
               </option>
