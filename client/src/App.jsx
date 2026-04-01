@@ -391,7 +391,7 @@ export default function RestaurantePOS() {
     if (!clientName.trim()) { showToast('Ingresa un nombre o seña', 'warning'); return; }
     if (clientName.trim().toLowerCase() === 'cliente general') { showToast('Usa un nombre real, no "Cliente General"', 'warning'); return; }
     const total = cartItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
-    const foodItems = cartItems.filter(i => i.category === 'food' || (i.category === 'otro' && i.kitchen));
+    const foodItems = cartItems.filter(i => i.category === 'food' || i.category === 'batido' || (i.category === 'otro' && i.kitchen));
     setLoading(true);
     try {
       if (selectedAccount) {
@@ -487,7 +487,7 @@ export default function RestaurantePOS() {
     if (loading) return;
     if (cartItems.length === 0) { showToast('El carrito está vacío', 'warning'); return; }
     const total = cartItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
-    const foodItems = cartItems.filter(i => i.category === 'food' || (i.category === 'otro' && i.kitchen));
+    const foodItems = cartItems.filter(i => i.category === 'food' || i.category === 'batido' || (i.category === 'otro' && i.kitchen));
     const location = selectedBarra ? selectedBarra : ((selectedTable && Number(selectedTable) > 0) ? `Mesa ${selectedTable}` : 'Barra');
     setLoading(true);
     try {
@@ -606,7 +606,7 @@ export default function RestaurantePOS() {
         barra: account.barra || null,
         locationLabel: account.locationLabel || null,
         clientName: account.clientName || '',
-        foodItems: newItems.filter(i => i.category === 'food'),
+        foodItems: newItems.filter(i => i.category === 'food' || i.category === 'batido' || (i.category === 'otro' && i.kitchen)),
         drinkItems: newItems.filter(i => ['alcoholic','beverage','soda','batido'].includes(i.category)),
         status: 'open',
         createdAt: new Date(),
