@@ -78,6 +78,9 @@ export const markPendingPayment = (id, note = '') =>
     body: JSON.stringify({ note })
   }).then(handleResponse);
 
+export const clearBar        = () => fetch(`${BASE}/admin/clear-bar`, { method: 'DELETE' }).then(handleResponse);
+export const clearRestaurante = () => fetch(`${BASE}/admin/clear-restaurante`, { method: 'DELETE' }).then(handleResponse);
+
 export const deleteAccount = (id) =>
   fetch(`${BASE}/accounts/${id}`, { method: 'DELETE' }).then(handleResponse);
 
