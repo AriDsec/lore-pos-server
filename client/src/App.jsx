@@ -105,10 +105,8 @@ export default function RestaurantePOS() {
           prevReadyIds.current = new Set(kitchen.filter(o => o.status === 'ready').map(o => o.id));
         }
         if (silent) {
-          // Detectar pedidos nuevos o adicionales (sonido de nuevo pedido — para saber que se mandó)
+          // Detectar pedidos nuevos (solo actualizar refs — el sonido de nuevo pedido es solo para cocina)
           const allIds = new Set(kitchen.map(o => o.id));
-          const brandNew = kitchen.filter(o => !prevKitchenIds.current.has(o.id));
-          if (brandNew.length > 0) sonidoPedidoNuevo();
           prevKitchenIds.current = allIds;
 
           // Detectar pedidos recién marcados como listos (sonido diferente)
