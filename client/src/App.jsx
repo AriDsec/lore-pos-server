@@ -494,7 +494,7 @@ export default function RestaurantePOS() {
       }
       const fresh = await api.getOpenAccounts(currentZone);
       setOpenAccounts(fresh);
-      setCartItems([]); setSelectedTable(null); setSelectedBarra(null); setClientName(''); setOrderType(null); setSelectedAccount(null);
+      setCartItems([]); setSelectedTable(null); setSelectedBarra(null); setClientName(''); setOrderType(null); setSelectedAccount(null); setModoRestaurante(false);
     } catch (err) {
       showToast('Error al guardar: ' + err.message, 'error');
     } finally {
@@ -640,7 +640,6 @@ export default function RestaurantePOS() {
       setLoading(false);
     }
   };
-
 
   const markOrderReady = async (orderId) => {
     const order = kitchenOrders.find(o => o.id === orderId);
