@@ -110,8 +110,8 @@ export function MeseraScreen({
         </div>
       )}
 
-      {/* Banner pedidos listos — fijo arriba, no empuja contenido */}
-      {(() => {
+      {/* Banner pedidos listos — no mostrar en Tablet Restaurante, esa persona es la misma que usa cocina */}
+      {currentUser !== 'Tablet Restaurante' && (() => {
         const readyOrders = kitchenOrders.filter(o => o.status === 'ready');
         if (readyOrders.length === 0) return null;
         const mesas = readyOrders.map(o => o.barra || ((o.table && o.table > 0) ? `Mesa ${o.table}` : '')).filter(Boolean).join(' · ');
