@@ -24,6 +24,8 @@ export function AdminScreen({ barPaid, restPaid, loading, onLogout, setPaidOrder
   const [viewItemsOrder, setViewItemsOrder] = useState(null);
   const [accessLog, setAccessLog] = useState([]);
   const [showConfirmLimpiar, setShowConfirmLimpiar] = useState(false);
+  const [showConfirmLimpiarBar, setShowConfirmLimpiarBar] = useState(false);
+  const [showConfirmLimpiarRest, setShowConfirmLimpiarRest] = useState(false);
   const [confirmInput, setConfirmInput] = useState('');
 
   // Servicio 10% — automático los sábados, persiste en localStorage
@@ -258,11 +260,21 @@ ${countMethod(restPaid,'tarjeta_sinpe')>0?`<span style="background:#1e1b4b;color
             📄 Descargar Cierre del Día
           </button>
           {isSuperAdmin && (
-            <button
-              onClick={() => { setShowConfirmLimpiar(true); setConfirmInput(''); }}
-              className="bg-red-900/40 hover:bg-red-900/70 text-red-300 font-bold px-6 py-3 rounded-xl transition flex items-center gap-2 border border-red-500/40"
-            >
+            <button onClick={() => { setShowConfirmLimpiar(true); setConfirmInput(''); }}
+              className="bg-red-900/40 hover:bg-red-900/70 text-red-300 font-bold px-6 py-3 rounded-xl transition flex items-center gap-2 border border-red-500/40">
               Limpiar Día
+            </button>
+          )}
+          {(isSuperAdmin || isBarAdmin) && (
+            <button onClick={() => { setShowConfirmLimpiarBar(true); setConfirmInput(''); }}
+              className="bg-red-900/40 hover:bg-red-900/70 text-red-300 font-bold px-6 py-3 rounded-xl transition flex items-center gap-2 border border-red-500/40">
+              Limpiar Bar
+            </button>
+          )}
+          {(isSuperAdmin || isRestAdmin) && (
+            <button onClick={() => { setShowConfirmLimpiarRest(true); setConfirmInput(''); }}
+              className="bg-red-900/40 hover:bg-red-900/70 text-red-300 font-bold px-6 py-3 rounded-xl transition flex items-center gap-2 border border-red-500/40">
+              Limpiar Restaurante
             </button>
           )}
         </div>
@@ -503,6 +515,70 @@ ${countMethod(restPaid,'tarjeta_sinpe')>0?`<span style="background:#1e1b4b;color
                 className={`flex-1 font-bold py-3 rounded-xl transition ${confirmInput === 'LIMPIAR' ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-slate-700 text-slate-500 cursor-not-allowed'}`}
               >
                 🗑️ Confirmar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal limpiar Bar */}
+      {showConfirmLimpiarBar && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border-2 border-red-500/60 p-6 shadow-2xl w-full max-w-sm">
+            <div className="text-center mb-5">
+              <h2 className="text-red-300 font-bold text-xl">Limpiar Bar</h2>
+              <p className="text-slate-400 text-sm mt-2">Borra cuentas pagadas y pedidos de cocina del Bar de hoy.</p>
+            </div>
+            <div className="mb-4">
+              <label className="text-slate-400 text-xs font-bold uppercase tracking-wide block mb-2">Escribe LIMPIAR para confirmar</label>
+              <input type="text" value={confirmInput} onChange={e => setConfirmInput(e.target.value)}
+                placeholder="LIMPIAR" autoFocus
+                className="w-full bg-slate-700 border border-red-500/40 text-white rounded-xl p-3 text-center font-bold tracking-widest focus:outline-none focus:border-red-400" />
+            </div>
+            <div className="flex gap-2">
+              <button onClick={() => { setShowConfirmLimpiarBar(false); setConfirmInput(''); }}
+                className="flex-1 bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 rounded-xl transition">Cancelar</button>
+              <button disabled={confirmInput !== 'LIMPIAR'}
+                onClick={() => {
+                  setShowConfirmLimpiarBar(false); setConfirmInput('');
+                  api.clearBar()
+                    .then(() => { setPaidOrders(p => p.filter(o => o.zone !== 'bar')); showToast('Bar limpiado'); })
+                    .catch(() => showToast('Error al limpiar', 'error'));
+                }}
+                className={`flex-1 font-bold py-3 rounded-xl transition ${confirmInput === 'LIMPIAR' ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-slate-700 text-slate-500 cursor-not-allowed'}`}>
+                Confirmar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal limpiar Restaurante */}
+      {showConfirmLimpiarRest && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border-2 border-red-500/60 p-6 shadow-2xl w-full max-w-sm">
+            <div className="text-center mb-5">
+              <h2 className="text-red-300 font-bold text-xl">Limpiar Restaurante</h2>
+              <p className="text-slate-400 text-sm mt-2">Borra cuentas pagadas y pedidos de cocina del Restaurante de hoy.</p>
+            </div>
+            <div className="mb-4">
+              <label className="text-slate-400 text-xs font-bold uppercase tracking-wide block mb-2">Escribe LIMPIAR para confirmar</label>
+              <input type="text" value={confirmInput} onChange={e => setConfirmInput(e.target.value)}
+                placeholder="LIMPIAR" autoFocus
+                className="w-full bg-slate-700 border border-red-500/40 text-white rounded-xl p-3 text-center font-bold tracking-widest focus:outline-none focus:border-red-400" />
+            </div>
+            <div className="flex gap-2">
+              <button onClick={() => { setShowConfirmLimpiarRest(false); setConfirmInput(''); }}
+                className="flex-1 bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 rounded-xl transition">Cancelar</button>
+              <button disabled={confirmInput !== 'LIMPIAR'}
+                onClick={() => {
+                  setShowConfirmLimpiarRest(false); setConfirmInput('');
+                  api.clearRestaurante()
+                    .then(() => { setPaidOrders(p => p.filter(o => o.zone !== 'restaurante')); showToast('Restaurante limpiado'); })
+                    .catch(() => showToast('Error al limpiar', 'error'));
+                }}
+                className={`flex-1 font-bold py-3 rounded-xl transition ${confirmInput === 'LIMPIAR' ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-slate-700 text-slate-500 cursor-not-allowed'}`}>
+                Confirmar
               </button>
             </div>
           </div>
