@@ -288,6 +288,26 @@ app.put('/api/accounts/:id/pending', async (req, res) => {
   } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
+// Limpiar solo zona bar
+app.delete('/api/admin/clear-bar', adminLimiter, async (req, res) => {
+  try {
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    const accounts = await Account.deleteMany({ zone: 'bar', status: 'paid', closedAt: { $gte: today } });
+    const kitchen = await KitchenOrder.deleteMany({ zone: 'bar', createdAt: { $gte: today } });
+    res.json({ deleted: accounts.deletedCount, kitchen: kitchen.deletedCount });
+  } catch (error) { res.status(500).json({ error: error.message }); }
+});
+
+// Limpiar solo zona restaurante
+app.delete('/api/admin/clear-restaurante', adminLimiter, async (req, res) => {
+  try {
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    const accounts = await Account.deleteMany({ zone: 'restaurante', status: 'paid', closedAt: { $gte: today } });
+    const kitchen = await KitchenOrder.deleteMany({ zone: 'restaurante', createdAt: { $gte: today } });
+    res.json({ deleted: accounts.deletedCount, kitchen: kitchen.deletedCount });
+  } catch (error) { res.status(500).json({ error: error.message }); }
+});
+
 app.delete('/api/admin/clear-day', adminLimiter, async (req, res) => {
   try {
     const today = new Date();
