@@ -55,7 +55,7 @@ export function MeseraScreen({
   // Panel central con secciones y buscador global
   const [menuTab, setMenuTab] = useState('productos');
 
-  const menuCenterJSX = (
+  const menuCenterJSX = (() => (
     <div className="space-y-3">
       <div className="flex gap-1.5">
         {[
@@ -96,7 +96,7 @@ export function MeseraScreen({
         </button>
       )}
     </div>
-  );
+  ))();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-slate-900 to-black flex flex-col">
