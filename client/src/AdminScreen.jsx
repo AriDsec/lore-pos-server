@@ -104,6 +104,109 @@ export function AdminScreen({ barPaid, restPaid, loading, onLogout, setPaidOrder
   const countMethod = (arr, m) => arr.filter(o => (o.paymentMethod || 'efectivo') === m).length;
   const sumMethod   = (arr, m) => arr.filter(o => (o.paymentMethod || 'efectivo') === m).reduce((s, o) => s + o.total, 0);
 
+  const imprimirHTML = (html) => {
+    const printDiv = document.createElement('div');
+    printDiv.id = 'lore-admin-print';
+    printDiv.style.cssText = 'display:none;';
+    const iframe = document.createElement('iframe');
+    iframe.style.cssText = 'width:100%;height:800px;border:none;';
+    printDiv.appendChild(iframe);
+    document.body.appendChild(printDiv);
+    const style = document.createElement('style');
+    style.id = 'lore-admin-print-style';
+    style.innerHTML = '@media print { body > *:not(#lore-admin-print) { display:none!important; } #lore-admin-print { display:block!important; } } @media screen { #lore-admin-print { display:none!important; } }';
+    document.head.appendChild(style);
+    const doc = iframe.contentDocument || iframe.contentWindow.document;
+    doc.open(); doc.write(html); doc.close();
+    setTimeout(() => {
+      try { iframe.contentWindow.print(); } catch(e) {}
+      setTimeout(() => {
+        try { document.body.removeChild(printDiv); } catch(e) {}
+        try { document.head.removeChild(style); } catch(e) {}
+      }, 1500);
+    }, 500);
+  };
+
+  const generarHTMLCierre = (titulo, paid, foodTotal, drinkTotal, totalCobrado, extraSections = '') => {
+    const now   = new Date();
+    const fecha = now.toLocaleDateString('es-CR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    const hora  = now.toLocaleTimeString('es-CR', { hour: '2-digit', minute: '2-digit' });
+    const sorted = [...paid].sort((a,b) => new Date(a.closedAt) - new Date(b.closedAt));
+    const descuentos = paid.reduce((s,o) => s + (o.descuento || 0), 0);
+    const cuentasHTML = sorted.map(o => {
+      const h = o.closedAt ? new Date(o.closedAt).toLocaleTimeString('es-CR',{hour:'2-digit',minute:'2-digit'}) : '';
+      return `<tr><td>${h}</td><td>${o.mesera}</td><td>${o.locationLabel || o.barra || ((o.table && o.table > 0) ? 'Mesa ' + o.table : '')}${o.clientName ? ' — ' + o.clientName : ''}</td><td style="text-align:center">${methodLabel(o.paymentMethod)}</td><td style="text-align:right">&#x20A1;${(o.total||0).toLocaleString()}${o.descuento > 0 ? ` <span style="color:#d97706;font-size:10px">(-&#x20A1;${o.descuento.toLocaleString()})</span>` : ''}</td></tr>`;
+    }).join('');
+    return `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>${titulo} — ${fecha}</title>
+<style>
+* { margin:0;padding:0;box-sizing:border-box; }
+body { font-family:Arial,sans-serif;font-size:13px;color:#1a1a1a;padding:30px; }
+.header { text-align:center;border-bottom:3px solid #059669;padding-bottom:16px;margin-bottom:24px; }
+.header h1 { font-size:28px;color:#94cb47;letter-spacing:4px; }
+.header p { color:#666;margin-top:4px; }
+.total-box { background:#94cb47;color:white;border-radius:12px;padding:20px;text-align:center;margin-bottom:24px; }
+.total-box .monto { font-size:36px;font-weight:bold;margin-top:4px; }
+.card { border:1px solid #ddd;border-radius:10px;padding:16px;margin-bottom:16px; }
+.card h2 { font-size:16px;color:#94cb47;margin-bottom:12px;border-bottom:1px solid #eee;padding-bottom:8px; }
+.row { display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f0f0f0; }
+.row:last-child { border:none; }
+.row .label { color:#666; }
+.row .val { font-weight:bold; }
+.total-row { display:flex;justify-content:space-between;background:#f0fde8;padding:10px 12px;border-radius:8px;margin-top:10px; }
+.total-row .val { color:#94cb47;font-weight:bold;font-size:16px; }
+.liquidacion { border:2px solid #f59e0b;border-radius:10px;padding:16px;margin-bottom:24px;background:#fffbeb; }
+.liquidacion h2 { color:#d97706;font-size:16px;margin-bottom:12px; }
+.saldo-final { background:#fff7ed;border:2px solid #f59e0b;border-radius:8px;padding:12px;margin-top:12px;display:flex;justify-content:space-between;align-items:center; }
+.saldo-monto { font-size:22px;font-weight:bold;color:#d97706; }
+table { width:100%;border-collapse:collapse;font-size:12px;margin-top:8px; }
+th { background:#f1f5f9;text-align:left;padding:8px; }
+td { padding:6px 8px;border-bottom:1px solid #f0f0f0; }
+.section-title { font-size:15px;font-weight:bold;color:#333;margin:20px 0 10px; }
+.badges { display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;font-size:12px; }
+.footer { text-align:center;color:#999;font-size:11px;margin-top:30px;border-top:1px solid #eee;padding-top:16px; }
+@media print { body { padding:15px; } }
+</style></head><body>
+<div class="header"><h1>LORE</h1><p>${titulo}</p><p style="color:#666;font-size:13px">${fecha}</p><p style="color:#999;font-size:12px">Generado a las ${hora}</p></div>
+<div class="total-box"><div>Total del Día — ${titulo}</div><div class="monto">&#x20A1;${totalCobrado.toLocaleString()}</div>${descuentos > 0 ? `<div style="font-size:12px;margin-top:4px;color:#fcd34d">Descuentos: -&#x20A1;${descuentos.toLocaleString()}</div>` : ''}</div>
+<div class="card"><h2>${titulo}</h2>
+  <div class="row"><span class="label">Cuentas cobradas</span><span class="val">${paid.length}</span></div>
+  <div class="row"><span class="label">Comida</span><span class="val">&#x20A1;${foodTotal.toLocaleString()}</span></div>
+  <div class="row"><span class="label">Bebidas</span><span class="val">&#x20A1;${drinkTotal.toLocaleString()}</span></div>
+  <div class="total-row"><span>Total</span><span class="val">&#x20A1;${totalCobrado.toLocaleString()}</span></div>
+</div>
+${extraSections}
+${paid.length > 0 ? `<div class="section-title">Detalle (${paid.length} cuentas)</div>
+<div class="badges">
+<span style="background:#14532d;color:#86efac;padding:3px 10px;border-radius:20px">Efectivo: ${countMethod(paid,'efectivo')} — &#x20A1;${sumMethod(paid,'efectivo').toLocaleString()}</span>
+${countMethod(paid,'sinpe')>0?`<span style="background:#1e3a5f;color:#93c5fd;padding:3px 10px;border-radius:20px">Sinpe: ${countMethod(paid,'sinpe')} — &#x20A1;${sumMethod(paid,'sinpe').toLocaleString()}</span>`:''}
+${countMethod(paid,'tarjeta')>0?`<span style="background:#3b1f6e;color:#d8b4fe;padding:3px 10px;border-radius:20px">Tarjeta: ${countMethod(paid,'tarjeta')} — &#x20A1;${sumMethod(paid,'tarjeta').toLocaleString()}</span>`:''}
+${countMethod(paid,'mixto')>0?`<span style="background:#78350f;color:#fcd34d;padding:3px 10px;border-radius:20px">Efectivo+Tarjeta: ${countMethod(paid,'mixto')} — &#x20A1;${sumMethod(paid,'mixto').toLocaleString()}</span>`:''}
+${countMethod(paid,'efectivo_sinpe')>0?`<span style="background:#134e4a;color:#5eead4;padding:3px 10px;border-radius:20px">Efectivo+Sinpe: ${countMethod(paid,'efectivo_sinpe')} — &#x20A1;${sumMethod(paid,'efectivo_sinpe').toLocaleString()}</span>`:''}
+${countMethod(paid,'tarjeta_sinpe')>0?`<span style="background:#1e1b4b;color:#a5b4fc;padding:3px 10px;border-radius:20px">Tarjeta+Sinpe: ${countMethod(paid,'tarjeta_sinpe')} — &#x20A1;${sumMethod(paid,'tarjeta_sinpe').toLocaleString()}</span>`:''}
+</div>
+<table><thead><tr><th>Hora</th><th>Mesera</th><th>Ubicación</th><th style="text-align:center">Pago</th><th style="text-align:right">Total</th></tr></thead><tbody>${cuentasHTML}</tbody></table>` : ''}
+<div class="footer">LORE POS — ${titulo} — ${fecha}</div>
+</body></html>`;
+  };
+
+  const descargarCierreBar = () => {
+    const barFoodTotal2 = barPaid.reduce((s,o) => s+(o.items||[]).filter(i=>isFood(i)).reduce((a,i)=>a+i.price*i.quantity,0),0);
+    const barDrinkTotal = barPaid.reduce((s,o) => s+(o.items||[]).filter(i=>isDrink(i)).reduce((a,i)=>a+i.price*i.quantity,0),0);
+    const servicioHTML = servicioActivo && totalServicio > 0 ? `
+      <div class="liquidacion"><h2>Servicio 10% — Meseras</h2>
+        <div class="row"><span class="label">Total mesas</span><span class="val">&#x20A1;${totalMesasBar.toLocaleString()}</span></div>
+        <div class="row"><span class="label">Servicio total</span><span class="val">&#x20A1;${totalServicio.toLocaleString()}</span></div>
+        <div class="saldo-final"><div><div style="font-weight:bold">Por mesera (${numMeseras})</div></div><div class="saldo-monto">&#x20A1;${porMesera.toLocaleString()}</div></div>
+      </div>` : '';
+    imprimirHTML(generarHTMLCierre('Cierre Bar', barPaid, barFoodTotal2, barDrinkTotal, totalBarCobrado, servicioHTML));
+  };
+
+  const descargarCierreRestaurante = () => {
+    const restFoodTotal  = restPaid.reduce((s,o) => s+(o.items||[]).filter(i=>isFood(i)).reduce((a,i)=>a+i.price*i.quantity,0),0);
+    const restDrinkTotal = restPaid.reduce((s,o) => s+(o.items||[]).filter(i=>isDrink(i)).reduce((a,i)=>a+i.price*i.quantity,0),0);
+    imprimirHTML(generarHTMLCierre('Cierre Restaurante', restPaid, restFoodTotal, restDrinkTotal, totalRestCobrado));
+  };
+
   const descargarCierrePDF = () => {
     const now   = new Date();
     const fecha = now.toLocaleDateString('es-CR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
@@ -212,30 +315,7 @@ ${countMethod(restPaid,'tarjeta_sinpe')>0?`<span style="background:#1e1b4b;color
 <div class="footer">LORE POS — Cierre de Caja ${fecha}</div>
 </body></html>`;
 
-    // Imprimir sin abrir ventana nueva — compatible con PWA Android
-    const printDiv = document.createElement('div');
-    printDiv.id = 'lore-admin-print';
-    printDiv.style.cssText = 'display:none;';
-    const iframe = document.createElement('iframe');
-    iframe.style.cssText = 'width:100%;height:800px;border:none;';
-    printDiv.appendChild(iframe);
-    document.body.appendChild(printDiv);
-
-    const style = document.createElement('style');
-    style.id = 'lore-admin-print-style';
-    style.innerHTML = '@media print { body > *:not(#lore-admin-print) { display:none!important; } #lore-admin-print { display:block!important; } } @media screen { #lore-admin-print { display:none!important; } }';
-    document.head.appendChild(style);
-
-    const doc = iframe.contentDocument || iframe.contentWindow.document;
-    doc.open(); doc.write(html); doc.close();
-
-    setTimeout(() => {
-      try { iframe.contentWindow.print(); } catch(e) {}
-      setTimeout(() => {
-        try { document.body.removeChild(printDiv); } catch(e) {}
-        try { document.head.removeChild(style); } catch(e) {}
-      }, 1500);
-    }, 500);
+    imprimirHTML(html);
   };
 
   return (
@@ -256,9 +336,23 @@ ${countMethod(restPaid,'tarjeta_sinpe')>0?`<span style="background:#1e1b4b;color
               </div>
             )}
           </div>
-          <button onClick={descargarCierrePDF} className="bg-white/20 hover:bg-white/30 text-white font-bold px-6 py-3 rounded-xl transition flex items-center gap-2 border border-white/30">
-            📄 Descargar Cierre del Día
-          </button>
+          <div className="flex flex-wrap gap-2">
+            {(isSuperAdmin || isBarAdmin) && (
+              <button onClick={descargarCierreBar} className="bg-white/20 hover:bg-white/30 text-white font-bold px-4 py-3 rounded-xl transition flex items-center gap-2 border border-white/30">
+                Cierre Bar
+              </button>
+            )}
+            {(isSuperAdmin || isRestAdmin) && (
+              <button onClick={descargarCierreRestaurante} className="bg-white/20 hover:bg-white/30 text-white font-bold px-4 py-3 rounded-xl transition flex items-center gap-2 border border-white/30">
+                Cierre Restaurante
+              </button>
+            )}
+            {isSuperAdmin && (
+              <button onClick={descargarCierrePDF} className="bg-white/20 hover:bg-white/30 text-white font-bold px-4 py-3 rounded-xl transition flex items-center gap-2 border border-white/30">
+                Cierre Completo
+              </button>
+            )}
+          </div>
           {isSuperAdmin && (
             <button onClick={() => { setShowConfirmLimpiar(true); setConfirmInput(''); }}
               className="bg-red-900/40 hover:bg-red-900/70 text-red-300 font-bold px-6 py-3 rounded-xl transition flex items-center gap-2 border border-red-500/40">
