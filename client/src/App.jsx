@@ -61,6 +61,17 @@ export default function RestaurantePOS() {
   const [paidOrders, setPaidOrders]       = useState([]);
   const [kitchenOrders, setKitchenOrders] = useState([]);
   const [selectedAccount, setSelectedAccount] = useState(null);
+
+  // Persistir carrito en sessionStorage — sobrevive recarga de página pero no cierre del browser
+  useEffect(() => {
+    try {
+      if (cartItems.length > 0) {
+        sessionStorage.setItem('lore_cart', JSON.stringify(cartItems));
+      } else {
+        sessionStorage.removeItem('lore_cart');
+      }
+    } catch {}
+  }, [cartItems]);
   const [modoRestaurante, setModoRestaurante] = useState(false);
 
   const [billOrder, setBillOrder]           = useState(null);
@@ -178,7 +189,7 @@ export default function RestaurantePOS() {
     const stillOpen = openAccounts.find(a => (a._id === selectedAccount || a.id === selectedAccount) && a.status === 'open');
     if (!stillOpen) {
       setSelectedAccount(null);
-      setCartItems([]); setSelectedTable(null); setSelectedBarra(null); setModoRestaurante(false);
+      setCartItems([]); setSelectedTable(null); setSelectedBarra(null); setModoRestaurante(false); sessionStorage.removeItem('lore_cart');
       setClientName(''); setOrderType(null);
       showToast('La cuenta fue cobrada por otra persona', 'warning');
     }
