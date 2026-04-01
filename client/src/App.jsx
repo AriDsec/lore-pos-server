@@ -61,6 +61,7 @@ export default function RestaurantePOS() {
   const [paidOrders, setPaidOrders]       = useState([]);
   const [kitchenOrders, setKitchenOrders] = useState([]);
   const [selectedAccount, setSelectedAccount] = useState(null);
+  const [modoRestaurante, setModoRestaurante] = useState(false);
 
   const [billOrder, setBillOrder]           = useState(null);
   const [viewItemsOrder, setViewItemsOrder] = useState(null);
@@ -177,7 +178,7 @@ export default function RestaurantePOS() {
     const stillOpen = openAccounts.find(a => (a._id === selectedAccount || a.id === selectedAccount) && a.status === 'open');
     if (!stillOpen) {
       setSelectedAccount(null);
-      setCartItems([]); setSelectedTable(null); setSelectedBarra(null);
+      setCartItems([]); setSelectedTable(null); setSelectedBarra(null); setModoRestaurante(false);
       setClientName(''); setOrderType(null);
       showToast('La cuenta fue cobrada por otra persona', 'warning');
     }
@@ -378,6 +379,7 @@ export default function RestaurantePOS() {
   const updateNotes = (id, notes) => setCartItems(prev => prev.map(i => i.id === id ? { ...i, notes } : i));
 
   const completeOrder = async () => {
+    const effectiveZone = (currentZone === 'bar' && modoRestaurante) ? 'restaurante' : currentZone;
     if (loading) return;
     if (cartItems.length === 0) { showToast('El carrito está vacío', 'warning'); return; }
     // En restaurante nunca debe haber barra
@@ -420,7 +422,7 @@ export default function RestaurantePOS() {
 
         if (itemsParaCocina.length > 0) {
           await api.createKitchenOrder({
-            id: `k-${Date.now()}`, zone: currentZone, mesera: currentUser,
+            id: `k-${Date.now()}`, zone: effectiveZone, mesera: currentUser,
             items: itemsParaCocina,
             table: (selectedTable && Number(selectedTable) > 0) ? Number(selectedTable) : null, barra: currentZone === 'bar' ? (selectedBarra || null) : null,
             clientName: clientName || '',
@@ -449,9 +451,9 @@ export default function RestaurantePOS() {
               // Si eligió crear nueva, continuar normalmente
               setLoading(true);
               try {
-                await api.createAccount({ id: `acc-${currentZone}-${currentUser}-${Date.now()}`, zone: currentZone, mesera: currentUser, items: [...cartItems], total, type: orderType, table: (selectedTable && Number(selectedTable) > 0) ? Number(selectedTable) : null, barra: currentZone === 'bar' ? selectedBarra : null, clientName, foodItems, drinkItems: cartItems.filter(i => ['alcoholic','beverage','soda','batido'].includes(i.category)), locationLabel: selectedBarra ? selectedBarra : ((selectedTable && Number(selectedTable) > 0) ? `Mesa ${selectedTable}` : orderType === 'takeout' ? 'Para llevar' : 'Sin mesa'), status: 'open', createdAt: new Date() });
+                await api.createAccount({ id: `acc-${currentZone}-${currentUser}-${Date.now()}`, zone: effectiveZone, mesera: currentUser, items: [...cartItems], total, type: orderType, table: (selectedTable && Number(selectedTable) > 0) ? Number(selectedTable) : null, barra: currentZone === 'bar' ? selectedBarra : null, clientName, foodItems, drinkItems: cartItems.filter(i => ['alcoholic','beverage','soda','batido'].includes(i.category)), locationLabel: selectedBarra ? selectedBarra : ((selectedTable && Number(selectedTable) > 0) ? `Mesa ${selectedTable}` : orderType === 'takeout' ? 'Para llevar' : 'Sin mesa'), status: 'open', createdAt: new Date() });
                 if (foodItems.length > 0) {
-                  await api.createKitchenOrder({ id: `k-${Date.now()}`, zone: currentZone, mesera: currentUser, items: foodItems, table: (selectedTable && Number(selectedTable) > 0) ? Number(selectedTable) : null, barra: currentZone === 'bar' ? (selectedBarra || null) : null, clientName: clientName || '', locationLabel: selectedBarra ? selectedBarra : ((selectedTable && Number(selectedTable) > 0) ? `Mesa ${selectedTable}` : orderType === 'takeout' ? 'Para llevar' : 'Sin mesa'), status: 'pending', createdAt: new Date() });
+                  await api.createKitchenOrder({ id: `k-${Date.now()}`, zone: effectiveZone, mesera: currentUser, items: foodItems, table: (selectedTable && Number(selectedTable) > 0) ? Number(selectedTable) : null, barra: currentZone === 'bar' ? (selectedBarra || null) : null, clientName: clientName || '', locationLabel: selectedBarra ? selectedBarra : ((selectedTable && Number(selectedTable) > 0) ? `Mesa ${selectedTable}` : orderType === 'takeout' ? 'Para llevar' : 'Sin mesa'), status: 'pending', createdAt: new Date() });
                 }
                 const fresh = await api.getOpenAccounts(currentZone);
                 setOpenAccounts(fresh);
@@ -467,9 +469,9 @@ export default function RestaurantePOS() {
           return;
         }
 
-        await api.createAccount({ id: `acc-${currentZone}-${currentUser}-${Date.now()}`, zone: currentZone, mesera: currentUser, items: [...cartItems], total, type: orderType, table: (selectedTable && Number(selectedTable) > 0) ? Number(selectedTable) : null, barra: currentZone === 'bar' ? selectedBarra : null, clientName, foodItems, drinkItems: cartItems.filter(i => ['alcoholic','beverage','soda','batido'].includes(i.category)), locationLabel: selectedBarra ? selectedBarra : ((selectedTable && Number(selectedTable) > 0) ? `Mesa ${selectedTable}` : orderType === 'takeout' ? 'Para llevar' : 'Sin mesa'), status: 'open', createdAt: new Date() });
+        await api.createAccount({ id: `acc-${currentZone}-${currentUser}-${Date.now()}`, zone: effectiveZone, mesera: currentUser, items: [...cartItems], total, type: orderType, table: (selectedTable && Number(selectedTable) > 0) ? Number(selectedTable) : null, barra: currentZone === 'bar' ? selectedBarra : null, clientName, foodItems, drinkItems: cartItems.filter(i => ['alcoholic','beverage','soda','batido'].includes(i.category)), locationLabel: selectedBarra ? selectedBarra : ((selectedTable && Number(selectedTable) > 0) ? `Mesa ${selectedTable}` : orderType === 'takeout' ? 'Para llevar' : 'Sin mesa'), status: 'open', createdAt: new Date() });
         if (foodItems.length > 0) {
-          await api.createKitchenOrder({ id: `k-${Date.now()}`, zone: currentZone, mesera: currentUser, items: foodItems, table: (selectedTable && Number(selectedTable) > 0) ? Number(selectedTable) : null, barra: currentZone === 'bar' ? (selectedBarra || null) : null, clientName: clientName || '', locationLabel: selectedBarra ? selectedBarra : ((selectedTable && Number(selectedTable) > 0) ? `Mesa ${selectedTable}` : orderType === 'takeout' ? 'Para llevar' : 'Sin mesa'), status: 'pending', createdAt: new Date() });
+          await api.createKitchenOrder({ id: `k-${Date.now()}`, zone: effectiveZone, mesera: currentUser, items: foodItems, table: (selectedTable && Number(selectedTable) > 0) ? Number(selectedTable) : null, barra: currentZone === 'bar' ? (selectedBarra || null) : null, clientName: clientName || '', locationLabel: selectedBarra ? selectedBarra : ((selectedTable && Number(selectedTable) > 0) ? `Mesa ${selectedTable}` : orderType === 'takeout' ? 'Para llevar' : 'Sin mesa'), status: 'pending', createdAt: new Date() });
         }
         showToast('Cuenta registrada');
       }
@@ -705,10 +707,11 @@ export default function RestaurantePOS() {
         {loading && <Spinner />}
         <MeseraScreen
           currentUser={currentUser} zona={currentZone === 'bar' ? 'Bar' : 'Restaurante'}
-          menu={currentZone === 'bar' ? MENU.bar : MENU.restaurante}
+          menu={modoRestaurante ? MENU.restaurante : (currentZone === 'bar' ? MENU.bar : MENU.restaurante)}
           licores={LICORES}
-          maxTables={currentZone === 'bar' ? 12 : 5}
-          tables={currentZone === 'bar' ? [0,1,2,3,4,5,6,7,8,9,10,11,12] : null}
+          maxTables={modoRestaurante ? 5 : (currentZone === 'bar' ? 12 : 5)}
+          tables={modoRestaurante ? null : (currentZone === 'bar' ? [0,1,2,3,4,5,6,7,8,9,10,11,12] : null)}
+          modoRestaurante={modoRestaurante} setModoRestaurante={setModoRestaurante}
           onLogout={handleLogout} addToCart={addToCart}
           cartItems={cartItems} updateQuantity={updateQuantity}
           removeFromCart={removeFromCart} updateNotes={updateNotes}
