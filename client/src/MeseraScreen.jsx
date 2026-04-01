@@ -194,7 +194,21 @@ export function MeseraScreen({
               </div>
               {menuTab === 'productos' && <MenuPanel menu={menu} licores={licores} onSelectItem={addToCart} onModalChange={onModalChange} />}
               {menuTab === 'otros'     && <OtrosPanel onAddToCart={addToCart} onModalChange={onModalChange} />}
-
+              {isBar && onToggleModoRestaurante && (
+        <button
+          onClick={onToggleModoRestaurante}
+          className={`w-full flex items-center justify-between px-4 py-3 rounded-xl border transition ${
+            modoRestaurante ? 'bg-[#94cb47]/15 border-[#94cb47]/50' : 'bg-slate-800/60 border-slate-700'
+          }`}
+        >
+          <span className={`text-sm font-semibold ${modoRestaurante ? 'text-[#94cb47]' : 'text-slate-500'}`}>
+            {modoRestaurante ? 'Modo Restaurante activo' : 'Atender mesa de restaurante'}
+          </span>
+          <div className={`w-10 h-5 rounded-full transition-colors relative flex-shrink-0 ${modoRestaurante ? 'bg-[#94cb47]' : 'bg-slate-600'}`}>
+            <div className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-all ${modoRestaurante ? 'left-5' : 'left-0.5'}`} />
+          </div>
+        </button>
+      )}
             </div>
           )}
           {mobileTab === 'carrito' && (
