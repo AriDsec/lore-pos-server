@@ -51,7 +51,12 @@ export default function RestaurantePOS() {
     setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), duration);
   };
 
-  const [cartItems, setCartItems]         = useState([]);
+  const [cartItems, setCartItems] = useState(() => {
+    try {
+      const saved = sessionStorage.getItem('lore_cart');
+      return saved ? JSON.parse(saved) : [];
+    } catch { return []; }
+  });
   const [selectedTable, setSelectedTable] = useState(null);
   const [selectedBarra, setSelectedBarra] = useState(null);
   const [clientName, setClientName]       = useState('');
