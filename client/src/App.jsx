@@ -586,9 +586,15 @@ export default function RestaurantePOS() {
     setLoading(true);
     try {
       await api.deleteAccount(account.id || account._id);
-      // También borrar los kitchen orders asociados a esta cuenta
-      const accId = account.id || account._id;
-      const kitchenToDelete = kitchenOrders.filter(o =>
+      // Borrar kitchen orders asociados — buscar en la zona correcta de la cuenta
+      const accountZone = account.zone || currentZone;
+      let allKitchen = kitchenOrders;
+      if (accountZone !== currentZone) {
+        // La cuenta es de otra zona (ej: mesera bar creó en modo restaurante)
+        const extraKitchen = await api.getKitchenOrders(accountZone).catch(() => []);
+        allKitchen = [...kitchenOrders, ...extraKitchen];
+      }
+      const kitchenToDelete = allKitchen.filter(o =>
         o.mesera === account.mesera &&
         (o.table === account.table || o.barra === account.barra) &&
         o.clientName === account.clientName
