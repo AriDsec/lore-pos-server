@@ -61,76 +61,6 @@ export function CajaScreen({
           </>
         )}
 
-        {/* ── Cuentas Pago Pendiente ── */}
-        {(() => {
-          const pendientes = accounts.filter(a => a.status === 'pending_payment');
-          if (pendientes.length === 0) return null;
-          return (
-            <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border-2 border-[#94cb47]/60 p-5 shadow-2xl">
-              <div className="flex items-center gap-3 mb-4">
-                <h3 className="text-[#94cb47] font-bold text-lg">Pago Pendiente ({pendientes.length})</h3>
-                <span className="text-slate-400 text-xs">No se borran al limpiar el día</span>
-              </div>
-              <div className="space-y-3">
-                {pendientes.map(acc => (
-                  <div key={acc._id || acc.id} className="bg-[#94cb47]/10 rounded-xl p-4 md:p-5 flex flex-wrap justify-between items-center gap-3 border border-[#94cb47]/30">
-                    <div>
-                      <div className="text-white font-bold text-base md:text-xl">{acc.locationLabel || acc.barra || ((acc.table && acc.table > 0) ? `Mesa ${acc.table}` : 'Sin ubicación')}{acc.clientName ? ` — ${acc.clientName}` : ''}</div>
-                      <div className="text-slate-400 text-sm md:text-base">{acc.mesera} · {(acc.items||[]).length} items</div>
-                      {acc.pendingNote && <div className="text-[#94cb47]/70 text-xs mt-0.5">{acc.pendingNote}</div>}
-                    </div>
-                    <div className="flex flex-col gap-1.5 items-end">
-                      <span className="text-[#94cb47] font-bold text-base md:text-xl">₡{(acc.total||0).toLocaleString()}</span>
-                      <div className="flex items-center gap-1.5">
-                        <button onClick={() => setViewItemsOrder(acc)} className="bg-slate-600 hover:bg-slate-500 text-white px-2.5 md:px-4 py-1 md:py-2.5 rounded text-xs md:text-sm font-bold">Items</button>
-                        <button onClick={() => setBillOrder(acc)} className="bg-[#94cb47] hover:bg-[#7ab035] text-black px-2.5 md:px-4 py-1 md:py-2.5 rounded text-xs md:text-sm font-bold">Cobrar</button>
-                        {onMarkPending && (
-                          <button onClick={() => onMarkPending(acc)} className="bg-slate-700 hover:bg-slate-600 text-slate-300 px-2.5 md:px-4 py-1 md:py-2.5 rounded text-xs md:text-sm font-bold border border-slate-600">Reabrir</button>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          );
-        })()}
-
-        {/* ── Cobros Directos ── */}
-        {(() => {
-          const directas = accounts.filter(a => a.type === 'direct');
-          if (directas.length === 0) return null;
-          return (
-            <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-slate-600/50 p-5 shadow-2xl">
-              <h3 className="text-slate-300 font-bold text-lg mb-4">Cobros Directos ({directas.length})</h3>
-              <div className="space-y-3">
-                {directas.map(acc => (
-                  <div key={acc._id || acc.id} className="bg-slate-700/40 rounded-xl p-4 md:p-5 flex flex-wrap justify-between items-center gap-3 border border-slate-600/50">
-                    <div>
-                      <div className="text-white font-bold text-base md:text-xl">{acc.locationLabel || acc.barra || 'Barra'}{acc.clientName && acc.clientName !== 'Cliente General' ? ` — ${acc.clientName}` : ''}</div>
-                      <div className="text-slate-400 text-sm md:text-base">{acc.mesera} · {(acc.items||[]).length} items</div>
-                    </div>
-                    <div className="flex flex-col gap-1.5 items-end">
-                      <span className="text-[#94cb47] font-bold text-base md:text-xl">₡{(acc.total||0).toLocaleString()}</span>
-                      <div className="flex items-center gap-1.5">
-                        <button onClick={() => setViewItemsOrder(acc)} className="bg-slate-600 hover:bg-slate-500 text-white px-2.5 md:px-4 py-1 md:py-2.5 rounded text-xs md:text-sm font-bold">Items</button>
-                        <button onClick={() => setBillOrder(acc)} className="bg-[#94cb47] hover:bg-[#7ab035] text-black px-2.5 md:px-4 py-1 md:py-2.5 rounded text-xs md:text-sm font-bold">Cobrar</button>
-                        {onMarkPending && (
-                          <button onClick={() => onMarkPending(acc)} className="bg-slate-700 hover:bg-slate-600 text-slate-300 px-2.5 md:px-4 py-1 md:py-2.5 rounded text-xs md:text-sm font-bold border border-slate-600" title="Marcar como pago pendiente">⏳</button>
-                        )}
-                        {onDelete && (
-                          <button onClick={() => setDeleteConfirm(acc)}
-                            className="bg-red-800/60 hover:bg-red-700 text-red-300 hover:text-white px-2 md:px-3 py-1 md:py-2.5 rounded text-xs md:text-sm font-bold border border-red-700/50">🗑️</button>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          );
-        })()}
-
         {/* ── Cuentas Abiertas ── */}
         {(() => {
           const normales = accounts.filter(a => a.type !== 'direct' && a.status !== 'pending_payment');
@@ -172,6 +102,76 @@ export function CajaScreen({
                   </div>
                 )
               }
+            </div>
+          );
+        })()}
+
+        {/* ── Cobros Directos ── */}
+        {(() => {
+          const directas = accounts.filter(a => a.type === 'direct');
+          if (directas.length === 0) return null;
+          return (
+            <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-slate-600/50 p-5 shadow-2xl">
+              <h3 className="text-slate-300 font-bold text-lg mb-4">Cobros Directos ({directas.length})</h3>
+              <div className="space-y-3">
+                {directas.map(acc => (
+                  <div key={acc._id || acc.id} className="bg-slate-700/40 rounded-xl p-4 md:p-5 flex flex-wrap justify-between items-center gap-3 border border-slate-600/50">
+                    <div>
+                      <div className="text-white font-bold text-base md:text-xl">{acc.locationLabel || acc.barra || 'Barra'}{acc.clientName && acc.clientName !== 'Cliente General' ? ` — ${acc.clientName}` : ''}</div>
+                      <div className="text-slate-400 text-sm md:text-base">{acc.mesera} · {(acc.items||[]).length} items</div>
+                    </div>
+                    <div className="flex flex-col gap-1.5 items-end">
+                      <span className="text-[#94cb47] font-bold text-base md:text-xl">₡{(acc.total||0).toLocaleString()}</span>
+                      <div className="flex items-center gap-1.5">
+                        <button onClick={() => setViewItemsOrder(acc)} className="bg-slate-600 hover:bg-slate-500 text-white px-2.5 md:px-4 py-1 md:py-2.5 rounded text-xs md:text-sm font-bold">Items</button>
+                        <button onClick={() => setBillOrder(acc)} className="bg-[#94cb47] hover:bg-[#7ab035] text-black px-2.5 md:px-4 py-1 md:py-2.5 rounded text-xs md:text-sm font-bold">Cobrar</button>
+                        {onMarkPending && (
+                          <button onClick={() => onMarkPending(acc)} className="bg-slate-700 hover:bg-slate-600 text-slate-300 px-2.5 md:px-4 py-1 md:py-2.5 rounded text-xs md:text-sm font-bold border border-slate-600" title="Marcar como pago pendiente">⏳</button>
+                        )}
+                        {onDelete && (
+                          <button onClick={() => setDeleteConfirm(acc)}
+                            className="bg-red-800/60 hover:bg-red-700 text-red-300 hover:text-white px-2 md:px-3 py-1 md:py-2.5 rounded text-xs md:text-sm font-bold border border-red-700/50">🗑️</button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })()}
+
+        {/* ── Cuentas Pago Pendiente ── */}
+        {(() => {
+          const pendientes = accounts.filter(a => a.status === 'pending_payment');
+          if (pendientes.length === 0) return null;
+          return (
+            <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border-2 border-[#94cb47]/60 p-5 shadow-2xl">
+              <div className="flex items-center gap-3 mb-4">
+                <h3 className="text-[#94cb47] font-bold text-lg">Pago Pendiente ({pendientes.length})</h3>
+                <span className="text-slate-400 text-xs">No se borran al limpiar el día</span>
+              </div>
+              <div className="space-y-3">
+                {pendientes.map(acc => (
+                  <div key={acc._id || acc.id} className="bg-[#94cb47]/10 rounded-xl p-4 md:p-5 flex flex-wrap justify-between items-center gap-3 border border-[#94cb47]/30">
+                    <div>
+                      <div className="text-white font-bold text-base md:text-xl">{acc.locationLabel || acc.barra || ((acc.table && acc.table > 0) ? `Mesa ${acc.table}` : 'Sin ubicación')}{acc.clientName ? ` — ${acc.clientName}` : ''}</div>
+                      <div className="text-slate-400 text-sm md:text-base">{acc.mesera} · {(acc.items||[]).length} items</div>
+                      {acc.pendingNote && <div className="text-[#94cb47]/70 text-xs mt-0.5">{acc.pendingNote}</div>}
+                    </div>
+                    <div className="flex flex-col gap-1.5 items-end">
+                      <span className="text-[#94cb47] font-bold text-base md:text-xl">₡{(acc.total||0).toLocaleString()}</span>
+                      <div className="flex items-center gap-1.5">
+                        <button onClick={() => setViewItemsOrder(acc)} className="bg-slate-600 hover:bg-slate-500 text-white px-2.5 md:px-4 py-1 md:py-2.5 rounded text-xs md:text-sm font-bold">Items</button>
+                        <button onClick={() => setBillOrder(acc)} className="bg-[#94cb47] hover:bg-[#7ab035] text-black px-2.5 md:px-4 py-1 md:py-2.5 rounded text-xs md:text-sm font-bold">Cobrar</button>
+                        {onMarkPending && (
+                          <button onClick={() => onMarkPending(acc)} className="bg-slate-700 hover:bg-slate-600 text-slate-300 px-2.5 md:px-4 py-1 md:py-2.5 rounded text-xs md:text-sm font-bold border border-slate-600">Reabrir</button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           );
         })()}
