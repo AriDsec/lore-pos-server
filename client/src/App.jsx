@@ -338,7 +338,7 @@ export default function RestaurantePOS() {
   const handleSelectAccount = (accountId) => {
     if (!accountId) {
       setSelectedAccount(null);
-      setCartItems([]); setSelectedTable(null); setSelectedBarra(null); setClientName(''); setOrderType(null);
+      setCartItems([]); setSelectedTable(null); setSelectedBarra(null); setClientName(''); setModoRestaurante(false); setOrderType(null);
       return;
     }
     const acc = openAccounts.find(a => (a._id === accountId || a.id === accountId));
@@ -352,7 +352,7 @@ export default function RestaurantePOS() {
   };
 
   // Servicio 10% solo aplica en mesas (no en barras — ahí el cliente se sirve solo)
-  const aplicaServicio = servicioActivoGlobal && currentZone === 'bar' && !!selectedTable && !selectedBarra;
+  const aplicaServicio = servicioActivoGlobal && currentZone === 'bar' && !modoRestaurante && !!selectedTable && !selectedBarra;
   const conServicio = (precio) => aplicaServicio ? Math.round(precio * 1.10) : precio;
 
   const addToCart = (item, withPotatoes = false) => {
@@ -389,7 +389,8 @@ export default function RestaurantePOS() {
       showToast('El 10% de servicio aplica en mesas — selecciona una mesa o confirma que es barra', 'warning');
     }
     if (!orderType) { showToast('Selecciona el tipo de pedido', 'warning'); return; }
-    if (orderType === 'dine-in' && (currentZone === 'restaurante' ? !selectedTable : (!selectedTable && !selectedBarra))) { showToast('Selecciona una mesa o barra', 'warning'); return; }
+    const validZone = (currentZone === 'bar' && modoRestaurante) ? 'restaurante' : currentZone;
+    if (orderType === 'dine-in' && (validZone === 'restaurante' ? !selectedTable : (!selectedTable && !selectedBarra))) { showToast('Selecciona una mesa o barra', 'warning'); return; }
     if (!clientName.trim()) { showToast('Ingresa un nombre o seña', 'warning'); return; }
     if (clientName.trim().toLowerCase() === 'cliente general') { showToast('Usa un nombre real, no "Cliente General"', 'warning'); return; }
     const total = cartItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
@@ -451,13 +452,13 @@ export default function RestaurantePOS() {
               // Si eligió crear nueva, continuar normalmente
               setLoading(true);
               try {
-                await api.createAccount({ id: `acc-${currentZone}-${currentUser}-${Date.now()}`, zone: effectiveZone, mesera: currentUser, items: [...cartItems], total, type: orderType, table: (selectedTable && Number(selectedTable) > 0) ? Number(selectedTable) : null, barra: currentZone === 'bar' ? selectedBarra : null, clientName, foodItems, drinkItems: cartItems.filter(i => ['alcoholic','beverage','soda','batido'].includes(i.category)), locationLabel: selectedBarra ? selectedBarra : ((selectedTable && Number(selectedTable) > 0) ? `Mesa ${selectedTable}` : orderType === 'takeout' ? 'Para llevar' : 'Sin mesa'), status: 'open', createdAt: new Date() });
+                await api.createAccount({ id: `acc-${currentZone}-${currentUser}-${Date.now()}`, zone: effectiveZone, mesera: currentUser, items: [...cartItems], total, type: orderType, table: (selectedTable && Number(selectedTable) > 0) ? Number(selectedTable) : null, barra: (currentZone === 'bar' && !modoRestaurante) ? selectedBarra : null, clientName, foodItems, drinkItems: cartItems.filter(i => ['alcoholic','beverage','soda','batido'].includes(i.category)), locationLabel: selectedBarra ? selectedBarra : ((selectedTable && Number(selectedTable) > 0) ? `Mesa ${selectedTable}` : orderType === 'takeout' ? 'Para llevar' : 'Sin mesa'), status: 'open', createdAt: new Date() });
                 if (foodItems.length > 0) {
                   await api.createKitchenOrder({ id: `k-${Date.now()}`, zone: effectiveZone, mesera: currentUser, items: foodItems, table: (selectedTable && Number(selectedTable) > 0) ? Number(selectedTable) : null, barra: currentZone === 'bar' ? (selectedBarra || null) : null, clientName: clientName || '', locationLabel: selectedBarra ? selectedBarra : ((selectedTable && Number(selectedTable) > 0) ? `Mesa ${selectedTable}` : orderType === 'takeout' ? 'Para llevar' : 'Sin mesa'), status: 'pending', createdAt: new Date() });
                 }
                 const fresh = await api.getOpenAccounts(currentZone);
                 setOpenAccounts(fresh);
-                setCartItems([]); setSelectedTable(null); setSelectedBarra(null); setClientName(''); setOrderType(null); setSelectedAccount(null);
+                setCartItems([]); setSelectedTable(null); setSelectedBarra(null); setClientName(''); setModoRestaurante(false); setOrderType(null); setSelectedAccount(null);
                 showToast('Cuenta registrada');
               } catch(err) {
                 showToast('Error al guardar: ' + err.message, 'error');
@@ -469,7 +470,7 @@ export default function RestaurantePOS() {
           return;
         }
 
-        await api.createAccount({ id: `acc-${currentZone}-${currentUser}-${Date.now()}`, zone: effectiveZone, mesera: currentUser, items: [...cartItems], total, type: orderType, table: (selectedTable && Number(selectedTable) > 0) ? Number(selectedTable) : null, barra: currentZone === 'bar' ? selectedBarra : null, clientName, foodItems, drinkItems: cartItems.filter(i => ['alcoholic','beverage','soda','batido'].includes(i.category)), locationLabel: selectedBarra ? selectedBarra : ((selectedTable && Number(selectedTable) > 0) ? `Mesa ${selectedTable}` : orderType === 'takeout' ? 'Para llevar' : 'Sin mesa'), status: 'open', createdAt: new Date() });
+        await api.createAccount({ id: `acc-${currentZone}-${currentUser}-${Date.now()}`, zone: effectiveZone, mesera: currentUser, items: [...cartItems], total, type: orderType, table: (selectedTable && Number(selectedTable) > 0) ? Number(selectedTable) : null, barra: (currentZone === 'bar' && !modoRestaurante) ? selectedBarra : null, clientName, foodItems, drinkItems: cartItems.filter(i => ['alcoholic','beverage','soda','batido'].includes(i.category)), locationLabel: selectedBarra ? selectedBarra : ((selectedTable && Number(selectedTable) > 0) ? `Mesa ${selectedTable}` : orderType === 'takeout' ? 'Para llevar' : 'Sin mesa'), status: 'open', createdAt: new Date() });
         if (foodItems.length > 0) {
           await api.createKitchenOrder({ id: `k-${Date.now()}`, zone: effectiveZone, mesera: currentUser, items: foodItems, table: (selectedTable && Number(selectedTable) > 0) ? Number(selectedTable) : null, barra: currentZone === 'bar' ? (selectedBarra || null) : null, clientName: clientName || '', locationLabel: selectedBarra ? selectedBarra : ((selectedTable && Number(selectedTable) > 0) ? `Mesa ${selectedTable}` : orderType === 'takeout' ? 'Para llevar' : 'Sin mesa'), status: 'pending', createdAt: new Date() });
         }
@@ -711,7 +712,16 @@ export default function RestaurantePOS() {
           licores={LICORES}
           maxTables={modoRestaurante ? 5 : (currentZone === 'bar' ? 12 : 5)}
           tables={modoRestaurante ? null : (currentZone === 'bar' ? [0,1,2,3,4,5,6,7,8,9,10,11,12] : null)}
-          modoRestaurante={modoRestaurante} setModoRestaurante={setModoRestaurante}
+          modoRestaurante={modoRestaurante}
+          onToggleModoRestaurante={() => {
+            setModoRestaurante(v => !v);
+            setSelectedTable(null);
+            setSelectedBarra(null);
+            setCartItems([]);
+            setClientName('');
+            setOrderType(null);
+            setSelectedAccount(null);
+          }}
           onLogout={handleLogout} addToCart={addToCart}
           cartItems={cartItems} updateQuantity={updateQuantity}
           removeFromCart={removeFromCart} updateNotes={updateNotes}
