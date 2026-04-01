@@ -45,6 +45,7 @@ export function MeseraScreen({
     openAccounts, selectedAccount,
     onSelectAccount,
     isBar,
+    modoRestaurante,
     onDirectPay,
     tables,
     onSplit: (acc) => setSplitOrder(acc),
