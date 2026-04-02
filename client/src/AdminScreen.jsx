@@ -104,6 +104,14 @@ export function AdminScreen({ barPaid, restPaid, loading, onLogout, setPaidOrder
   const countMethod = (arr, m) => arr.filter(o => (o.paymentMethod || 'efectivo') === m).length;
   const sumMethod   = (arr, m) => arr.filter(o => (o.paymentMethod || 'efectivo') === m).reduce((s, o) => s + o.total, 0);
 
+  const methodLabel = (m) =>
+      m === 'sinpe'          ? 'Sinpe' :
+      m === 'tarjeta'        ? 'Tarjeta' :
+      m === 'mixto'          ? 'Efectivo + Tarjeta' :
+      m === 'efectivo_sinpe' ? 'Efectivo + Sinpe' :
+      m === 'tarjeta_sinpe'  ? 'Tarjeta + Sinpe' :
+      'Efectivo';
+
   const imprimirHTML = (html) => {
     const printDiv = document.createElement('div');
     printDiv.id = 'lore-admin-print';
@@ -217,15 +225,7 @@ ${countMethod(paid,'tarjeta_sinpe')>0?`<span style="background:#1e1b4b;color:#a5
     const restFoodTotal  = restPaid.reduce((s,o) => s+(o.items||[]).filter(i=>isFood(i)).reduce((a,i)=>a+i.price*i.quantity,0),0);
     const restDrinkTotal = restPaid.reduce((s,o) => s+(o.items||[]).filter(i=>isDrink(i)).reduce((a,i)=>a+i.price*i.quantity,0),0);
 
-    const methodLabel = (m) =>
-      m === 'sinpe'          ? 'Sinpe' :
-      m === 'tarjeta'        ? 'Tarjeta' :
-      m === 'mixto'          ? 'Efectivo + Tarjeta' :
-      m === 'efectivo_sinpe' ? 'Efectivo + Sinpe' :
-      m === 'tarjeta_sinpe'  ? 'Tarjeta + Sinpe' :
-      'Efectivo';
-
-    const sortedBar  = [...barPaid].sort((a,b) => new Date(a.closedAt) - new Date(b.closedAt));
+      const sortedBar  = [...barPaid].sort((a,b) => new Date(a.closedAt) - new Date(b.closedAt));
     const sortedRest = [...restPaid].sort((a,b) => new Date(a.closedAt) - new Date(b.closedAt));
     const cuentasBarHTML  = sortedBar.map(o => {
       const hora = o.closedAt ? new Date(o.closedAt).toLocaleTimeString('es-CR',{hour:'2-digit',minute:'2-digit'}) : '';
