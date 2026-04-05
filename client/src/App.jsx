@@ -372,12 +372,13 @@ export default function RestaurantePOS() {
   const conServicio = (precio) => aplicaServicio ? Math.round(precio * 1.10) : precio;
 
   const addToCart = (item, withPotatoes = false) => {
-    const itemId = `${item.id}${withPotatoes ? '_cp' : ''}`;
+    const itemId = `${item.id}${withPotatoes ? '_cp' : ''}_${currentUser}`;
     const basePrice = item.price + (withPotatoes && item.canHavePapas ? 500 : 0);
     const price = conServicio(basePrice);
     const displayName = withPotatoes && item.canHavePapas ? `${item.name} + Papas` : item.name;
     setCartItems(prev => {
-      const idx = prev.findIndex(i => i.id === itemId);
+      // Agrupar solo si el item fue agregado por el mismo usuario — si es otro, nueva línea
+      const idx = prev.findIndex(i => i.id === itemId && i.addedBy === currentUser);
       if (idx >= 0) {
         const updated = [...prev];
         updated[idx] = { ...updated[idx], quantity: updated[idx].quantity + 1 };
@@ -421,12 +422,13 @@ export default function RestaurantePOS() {
           setLoading(false); return;
         }
         const accId = acc?.id || selectedAccount;
-        await api.updateAccount(accId, { items: cartItems, total });
+        await api.updateAccount(accId, { items: cartItems, total, editedBy: currentUser });
 
         // Detectar items nuevos o con cantidad aumentada vs lo que ya estaba en la cuenta
         const prevItems = acc?.items || [];
         const itemsParaCocina = foodItems.reduce((nuevos, item) => {
-          const prev = prevItems.find(p => p.id === item.id);
+          const baseId = item.id.replace(/_[^_]+$/, ''); // quitar sufijo _usuario
+          const prev = prevItems.find(p => p.id === item.id || p.id === baseId || p.id.replace(/_[^_]+$/, '') === baseId);
           if (!prev) {
             // Item completamente nuevo
             nuevos.push({ ...item, esNuevo: true });
@@ -618,7 +620,7 @@ export default function RestaurantePOS() {
       const remainTotal = remaining.reduce((s, i) => s + i.price * i.quantity, 0);
       const newTotal    = newItems.reduce((s, i) => s + i.price * i.quantity, 0);
       // Actualizar cuenta original con los items restantes
-      await api.updateAccount(accId, { items: remaining, total: remainTotal });
+      await api.updateAccount(accId, { items: remaining, total: remainTotal, editedBy: currentUser });
       // Crear cuenta nueva con los items separados (mismos datos de ubicación y nombre)
       await api.createAccount({
         id: `acc-split-${Date.now()}`,
