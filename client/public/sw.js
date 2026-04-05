@@ -1,5 +1,5 @@
 // Service Worker — LORE POS
-const CACHE = 'lore-pos-v2';
+const CACHE = 'lore-pos-v3';
 
 self.addEventListener('install', e => {
   self.skipWaiting();
