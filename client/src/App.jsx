@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+mimport { useState, useEffect, useCallback, useRef } from "react";
 import { sonidoPedidoNuevo, sonidoPedidoListo, sonidoCobro } from "./sounds.js";
 import * as api from "./api.js";
 import { MENU, LICORES, PINES, meseras, barras } from './constants.js';
@@ -228,7 +228,7 @@ export default function RestaurantePOS() {
     const wasAdmin = adminUser !== null;
     setCurrentUser(null); setUserRole(null); setCurrentZone(null);
     if (wasAdmin) localStorage.setItem('lore_admin', adminUser);
-    setCartItems([]); setSelectedTable(null); setSelectedBarra(null);
+    sessionStorage.removeItem('lore_cart'); setCartItems([]); setSelectedTable(null); setSelectedBarra(null);
     setClientName(''); setOrderType(null); setSelectedAccount(null);
     setOpenAccounts([]); setPaidOrders([]); setKitchenOrders([]);
     setSyncError(null);
@@ -354,7 +354,7 @@ export default function RestaurantePOS() {
   const handleSelectAccount = (accountId) => {
     if (!accountId) {
       setSelectedAccount(null);
-      setCartItems([]); setSelectedTable(null); setSelectedBarra(null); setClientName(''); setModoRestaurante(false); setOrderType(null);
+      sessionStorage.removeItem('lore_cart'); setCartItems([]); setSelectedTable(null); setSelectedBarra(null); setClientName(''); setModoRestaurante(false); setOrderType(null);
       return;
     }
     const acc = openAccounts.find(a => (a._id === accountId || a.id === accountId));
@@ -418,7 +418,7 @@ export default function RestaurantePOS() {
         const acc = openAccounts.find(a => (a._id === selectedAccount || a.id === selectedAccount));
         if (!acc || !['open', 'pending_approval'].includes(acc.status)) {
           showToast('Esta cuenta ya fue cobrada o no existe', 'warning');
-          setSelectedAccount(null); setCartItems([]); setClientName(''); setOrderType(null);
+          setSelectedAccount(null); sessionStorage.removeItem('lore_cart'); setCartItems([]); setClientName(''); setOrderType(null);
           setLoading(false); return;
         }
         const accId = acc?.id || selectedAccount;
@@ -431,12 +431,19 @@ export default function RestaurantePOS() {
         // Merge inteligente: los items del carrito son NUEVOS — no reemplazar los existentes
         // Agrupar por id base + addedBy para no duplicar
         const mergedMap = new Map();
-        // Primero poner los existentes
+        // Normalizar ids existentes (pueden tener :: de ediciones anteriores)
         existingItems.forEach(item => {
-          const key = `${item.id}||${item.addedBy || ''}`;
-          mergedMap.set(key, { ...item });
+          const baseId = item.id.includes('::') ? item.id.split('::')[0] : item.id;
+          const key = `${baseId}||${item.addedBy || ''}`;
+          if (mergedMap.has(key)) {
+            // Mismo item mismo usuario — sumar (no debería pasar pero por seguridad)
+            const prev = mergedMap.get(key);
+            mergedMap.set(key, { ...prev, id: baseId, quantity: prev.quantity + item.quantity });
+          } else {
+            mergedMap.set(key, { ...item, id: baseId });
+          }
         });
-        // Luego agregar los del carrito — si ya existe mismo id base + mismo usuario, sumar cantidad
+        // Agregar los del carrito — si ya existe mismo id base + mismo usuario, sumar cantidad
         cartItems.forEach(item => {
           const baseId = item.id.includes('::') ? item.id.split('::')[0] : item.id;
           const key = `${baseId}||${item.addedBy || currentUser}`;
@@ -505,7 +512,7 @@ export default function RestaurantePOS() {
                 }
                 const fresh = await api.getOpenAccounts(currentZone);
                 setOpenAccounts(fresh);
-                setCartItems([]); setSelectedTable(null); setSelectedBarra(null); setClientName(''); setModoRestaurante(false); setOrderType(null); setSelectedAccount(null);
+                sessionStorage.removeItem('lore_cart'); setCartItems([]); setSelectedTable(null); setSelectedBarra(null); setClientName(''); setModoRestaurante(false); setOrderType(null); setSelectedAccount(null);
                 showToast(accountStatus2 === 'pending_approval' ? 'Cuenta enviada — esperando aprobación de caja' : 'Cuenta registrada');
               } catch(err) {
                 showToast('Error al guardar: ' + err.message, 'error');
@@ -527,7 +534,7 @@ export default function RestaurantePOS() {
       }
       const fresh = await api.getOpenAccounts(currentZone);
       setOpenAccounts(fresh);
-      setCartItems([]); setSelectedTable(null); setSelectedBarra(null); setClientName(''); setOrderType(null); setSelectedAccount(null); setModoRestaurante(false);
+      sessionStorage.removeItem('lore_cart'); setCartItems([]); setSelectedTable(null); setSelectedBarra(null); setClientName(''); setOrderType(null); setSelectedAccount(null); setModoRestaurante(false);
     } catch (err) {
       showToast('Error al guardar: ' + err.message, 'error');
     } finally {
@@ -560,7 +567,7 @@ export default function RestaurantePOS() {
           clientName: 'Cliente General', status: 'pending', createdAt: new Date(),
         });
       }
-      setCartItems([]); setSelectedTable(null); setSelectedBarra(null); setClientName(''); setOrderType(null); setSelectedAccount(null);
+      sessionStorage.removeItem('lore_cart'); setCartItems([]); setSelectedTable(null); setSelectedBarra(null); setClientName(''); setOrderType(null); setSelectedAccount(null);
       showToast('Pedido enviado a caja');
     } catch (err) {
       showToast('Error: ' + err.message, 'error');
@@ -839,7 +846,7 @@ export default function RestaurantePOS() {
             setModoRestaurante(v => !v);
             setSelectedTable(null);
             setSelectedBarra(null);
-            setCartItems([]);
+            sessionStorage.removeItem('lore_cart'); setCartItems([]);
             setClientName('');
             setOrderType(null);
             setSelectedAccount(null);
