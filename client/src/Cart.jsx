@@ -7,6 +7,7 @@ export function ShoppingCart({
   barras, maxTables, tables, modoRestaurante,
   openAccounts, selectedAccount, onSelectAccount,
   mobileVisible, onDirectPay, isBar, onSplit,
+  onPayRejected, onDeleteRejected,
   currentUser, aplicaServicio, loading,
 }) {
   // Si la cuenta seleccionada pertenece a otra mesera, solo se pueden agregar items (no borrar/editar los existentes)
@@ -59,8 +60,18 @@ export function ShoppingCart({
           ))}
           {openAccounts.filter(a => a.status === 'rejected' && a.mesera === currentUser).map(acc => (
             <div key={acc.id || acc._id} className="mt-1 text-xs text-red-400 bg-red-900/20 border border-red-500/30 rounded-lg px-3 py-2">
-              <div>❌ {acc.clientName || acc.locationLabel} — rechazada</div>
-              {acc.rejectedReason && <div className="text-red-300 mt-0.5">Motivo: {acc.rejectedReason}</div>}
+              <div className="mb-1">❌ {acc.clientName || acc.locationLabel} — rechazada</div>
+              {acc.rejectedReason && <div className="text-red-300 mb-1.5">Motivo: {acc.rejectedReason}</div>}
+              <div className="flex gap-2">
+                <button onClick={() => onPayRejected && onPayRejected(acc)}
+                  className="flex-1 bg-[#94cb47] hover:bg-[#7ab035] text-black font-bold py-1 rounded text-xs transition">
+                  Cobrar directo
+                </button>
+                <button onClick={() => onDeleteRejected && onDeleteRejected(acc)}
+                  className="flex-1 bg-red-900/60 hover:bg-red-900 text-red-300 font-bold py-1 rounded text-xs transition">
+                  Borrar
+                </button>
+              </div>
             </div>
           ))}
         </div>
