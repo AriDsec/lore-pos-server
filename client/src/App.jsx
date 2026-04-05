@@ -1,4 +1,4 @@
-mimport { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { sonidoPedidoNuevo, sonidoPedidoListo, sonidoCobro } from "./sounds.js";
 import * as api from "./api.js";
 import { MENU, LICORES, PINES, meseras, barras } from './constants.js';
@@ -456,7 +456,12 @@ export default function RestaurantePOS() {
         });
         const mergedItems = Array.from(mergedMap.values());
         const mergedTotal = mergedItems.reduce((s, i) => s + i.price * i.quantity, 0);
-        await api.updateAccount(accId, { items: mergedItems, total: mergedTotal, editedBy: currentUser });
+        const updatedAcc = await api.updateAccount(accId, { items: mergedItems, total: mergedTotal, editedBy: currentUser });
+        // Actualizar openAccounts en memoria inmediatamente con la cuenta ya mergeada
+        // Evita que una segunda edición rápida lea items viejos
+        if (updatedAcc) {
+          setOpenAccounts(prev => prev.map(a => (a.id === accId || a._id === accId) ? { ...a, ...updatedAcc } : a));
+        }
 
         // Detectar items nuevos vs lo que ya estaba en la cuenta
         const prevItems = existingItems;
