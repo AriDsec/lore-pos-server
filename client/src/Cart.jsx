@@ -51,6 +51,18 @@ export function ShoppingCart({
               </option>
             ))}
           </select>
+          {/* Cuentas pendientes de aprobación y rechazadas — siempre visibles */}
+          {openAccounts.filter(a => a.status === 'pending_approval' && a.mesera === currentUser).map(acc => (
+            <div key={acc.id || acc._id} className="mt-1 text-xs text-amber-400 bg-amber-900/20 border border-amber-500/30 rounded-lg px-3 py-1.5">
+              ⏳ {acc.clientName || acc.locationLabel} — esperando aprobación de caja
+            </div>
+          ))}
+          {openAccounts.filter(a => a.status === 'rejected' && a.mesera === currentUser).map(acc => (
+            <div key={acc.id || acc._id} className="mt-1 text-xs text-red-400 bg-red-900/20 border border-red-500/30 rounded-lg px-3 py-2">
+              <div>❌ {acc.clientName || acc.locationLabel} — rechazada</div>
+              {acc.rejectedReason && <div className="text-red-300 mt-0.5">Motivo: {acc.rejectedReason}</div>}
+            </div>
+          ))}
         </div>
 
         {/* Lista de items */}
@@ -120,17 +132,7 @@ export function ShoppingCart({
                 <option value="dine-in">Local</option>
                 <option value="takeout">Llevar</option>
               </select>
-            {openAccounts.filter(a => a.status === 'pending_approval').map(acc => (
-              <div key={acc.id} className="mt-1 text-xs text-amber-400 bg-amber-900/20 border border-amber-500/30 rounded-lg px-3 py-1.5">
-                ⏳ {acc.clientName || acc.locationLabel} — esperando aprobación de caja
-              </div>
-            ))}
-            {openAccounts.filter(a => a.status === 'rejected').map(acc => (
-              <div key={acc.id} className="mt-1 text-xs text-red-400 bg-red-900/20 border border-red-500/30 rounded-lg px-3 py-2">
-                <div>❌ {acc.clientName || acc.locationLabel} — rechazada</div>
-                {acc.rejectedReason && <div className="text-red-300 mt-0.5">Motivo: {acc.rejectedReason}</div>}
-              </div>
-            ))}
+
             </div>
 
             {/* Mesa + Barra — Barra solo en bar */}
