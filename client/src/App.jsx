@@ -750,14 +750,8 @@ export default function RestaurantePOS() {
   };
 
   const handleDeleteRejected = async (account) => {
-    setLoading(true);
-    try {
-      await api.deleteAccount(account.id || account._id);
-      const fresh = await api.getOpenAccounts(currentZone);
-      setOpenAccounts(fresh);
-      showToast('Cuenta eliminada');
-    } catch (err) { showToast('Error: ' + err.message, 'error'); }
-    finally { setLoading(false); }
+    // Reuse handleDeleteAccount which already handles kitchen orders cross-zone
+    await handleDeleteAccount(account);
   };
 
   const handleApproveAccount = async (account) => {
