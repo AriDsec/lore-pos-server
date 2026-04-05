@@ -288,6 +288,7 @@ app.put('/api/accounts/:id/approve', writeLimiter, async (req, res) => {
   try {
     const account = await Account.findOne({ id: sanitizeStr(req.params.id, 100) });
     if (!account) return res.status(404).json({ error: 'Cuenta no encontrada' });
+    if (account.status !== 'pending_approval') return res.json(account); // ya procesada
     account.status = 'open';
     account.approvedAt = new Date();
     await account.save();
@@ -300,6 +301,7 @@ app.put('/api/accounts/:id/reject', writeLimiter, async (req, res) => {
   try {
     const account = await Account.findOne({ id: sanitizeStr(req.params.id, 100) });
     if (!account) return res.status(404).json({ error: 'Cuenta no encontrada' });
+    if (account.status !== 'pending_approval') return res.status(400).json({ error: 'Solo se pueden rechazar cuentas pendientes' });
     account.status = 'rejected';
     account.rejectedReason = sanitizeStr(req.body.reason || 'Sin motivo', 200);
     account.rejectedAt = new Date();
