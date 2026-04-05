@@ -78,6 +78,7 @@ const accountSchema = new mongoose.Schema({
   id: String,
   zone: String,
   mesera: String,
+  lastEditedBy: String,
   clientName: String,
   table: Number,
   barra: String,
@@ -194,6 +195,7 @@ app.put('/api/accounts/:id', writeLimiter, async (req, res) => {
     account.foodItems = items.filter(i => i.category === 'food');
     account.drinkItems = items.filter(i => i.category !== 'food');
     account.lastUpdated = new Date();
+    if (req.body.editedBy) account.lastEditedBy = sanitizeStr(req.body.editedBy, 50);
     await account.save();
     res.json(account);
   } catch (error) { res.status(500).json({ error: error.message }); }
