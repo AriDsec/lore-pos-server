@@ -77,7 +77,7 @@ export function CajaScreen({
                         <div className="flex justify-between items-start mb-3">
                           <div className="flex-1 min-w-0 pr-3">
                             <div className="text-white font-bold text-sm leading-snug">{acc.locationLabel || acc.barra || ((acc.table && acc.table > 0) ? `Mesa ${acc.table}` : 'Sin ubicación')}{acc.clientName ? ` — ${acc.clientName}` : ''}</div>
-                            <div className="text-slate-400 text-xs md:text-sm mt-0.5">{acc.mesera} · {(acc.items||[]).length} items</div>
+                            <div className="text-slate-400 text-xs md:text-sm mt-0.5">{acc.mesera}{acc.lastEditedBy && acc.lastEditedBy !== acc.mesera ? ` (editada por ${acc.lastEditedBy})` : ''} · {(acc.items||[]).length} items</div>
                           </div>
                           <div className="flex items-center gap-2 flex-shrink-0">
                             <span className="text-[#94cb47] font-bold text-sm">₡{(acc.total||0).toLocaleString()}</span>
@@ -118,7 +118,7 @@ export function CajaScreen({
                   <div key={acc._id || acc.id} className="bg-slate-700/40 rounded-xl p-4 md:p-5 flex flex-wrap justify-between items-center gap-3 border border-slate-600/50">
                     <div>
                       <div className="text-white font-bold text-base md:text-xl">{acc.locationLabel || acc.barra || 'Barra'}{acc.clientName && acc.clientName !== 'Cliente General' ? ` — ${acc.clientName}` : ''}</div>
-                      <div className="text-slate-400 text-sm md:text-base">{acc.mesera} · {(acc.items||[]).length} items</div>
+                      <div className="text-slate-400 text-sm md:text-base">{acc.mesera}{acc.lastEditedBy && acc.lastEditedBy !== acc.mesera ? ` (editada por ${acc.lastEditedBy})` : ''} · {(acc.items||[]).length} items</div>
                     </div>
                     <div className="flex flex-col gap-1.5 items-end">
                       <span className="text-[#94cb47] font-bold text-base md:text-xl">₡{(acc.total||0).toLocaleString()}</span>
@@ -156,7 +156,7 @@ export function CajaScreen({
                   <div key={acc._id || acc.id} className="bg-[#94cb47]/10 rounded-xl p-4 md:p-5 flex flex-wrap justify-between items-center gap-3 border border-[#94cb47]/30">
                     <div>
                       <div className="text-white font-bold text-base md:text-xl">{acc.locationLabel || acc.barra || ((acc.table && acc.table > 0) ? `Mesa ${acc.table}` : 'Sin ubicación')}{acc.clientName ? ` — ${acc.clientName}` : ''}</div>
-                      <div className="text-slate-400 text-sm md:text-base">{acc.mesera} · {(acc.items||[]).length} items</div>
+                      <div className="text-slate-400 text-sm md:text-base">{acc.mesera}{acc.lastEditedBy && acc.lastEditedBy !== acc.mesera ? ` (editada por ${acc.lastEditedBy})` : ''} · {(acc.items||[]).length} items</div>
                       {acc.pendingNote && <div className="text-[#94cb47]/70 text-xs mt-0.5">{acc.pendingNote}</div>}
                     </div>
                     <div className="flex flex-col gap-1.5 items-end">
