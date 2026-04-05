@@ -49,7 +49,6 @@ function MenuCenter({ menuTab, setMenuTab, menu, licores, addToCart, onModalChan
       )}
     </div>
   );
-  );
 }
 
 export function MeseraScreen({
