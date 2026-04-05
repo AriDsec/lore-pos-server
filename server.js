@@ -20,8 +20,6 @@ const sanitizeStatus = (val, allowed, fallback) =>
   allowed.includes(val) ? val : fallback;
 
 const app = express();
-app.set('trust proxy', 1); // Railway usa proxy — necesario para express-rate-limit
-
 // ── Seguridad ──
 app.disable('x-powered-by');
 app.use(helmet({
@@ -36,7 +34,6 @@ const generalLimiter = rateLimit({
   limit: 200,
   standardHeaders: 'draft-8',
   legacyHeaders: false,
-  validate: { xForwardedForHeader: false },
   message: { error: 'Demasiadas solicitudes, intenta más tarde.' },
 });
 
@@ -46,7 +43,6 @@ const writeLimiter = rateLimit({
   limit: 60,
   standardHeaders: 'draft-8',
   legacyHeaders: false,
-  validate: { xForwardedForHeader: false },
   message: { error: 'Demasiadas solicitudes de escritura, intenta más tarde.' },
 });
 
@@ -56,7 +52,6 @@ const adminLimiter = rateLimit({
   limit: 30,
   standardHeaders: 'draft-8',
   legacyHeaders: false,
-  validate: { xForwardedForHeader: false },
   message: { error: 'Demasiadas solicitudes administrativas, intenta más tarde.' },
 });
 
@@ -92,15 +87,15 @@ const accountSchema = new mongoose.Schema({
   type: String,
   items: [{
     id: String, name: String, price: Number, quantity: Number,
-    category: String, notes: String, addedBy: String, breakdown: {}, kitchen: Boolean, conServicio: Boolean,
+    category: String, notes: String, addedBy: String, kitchen: Boolean, conServicio: Boolean,
   }],
   foodItems: [{
     id: String, name: String, price: Number, quantity: Number,
-    category: String, notes: String, addedBy: String, breakdown: {}, kitchen: Boolean, conServicio: Boolean,
+    category: String, notes: String, addedBy: String, kitchen: Boolean, conServicio: Boolean,
   }],
   drinkItems: [{
     id: String, name: String, price: Number, quantity: Number,
-    category: String, notes: String, addedBy: String, breakdown: {}, kitchen: Boolean, conServicio: Boolean,
+    category: String, notes: String, addedBy: String, kitchen: Boolean, conServicio: Boolean,
   }],
   total: Number,
   totalOriginal: Number,
@@ -397,6 +392,14 @@ const publicPath = path.join(__dirname, 'public');
 console.log('📁 Public path:', publicPath);
 console.log('📁 Public exists:', fs.existsSync(publicPath));
 console.log('📁 index.html exists:', fs.existsSync(path.join(publicPath, 'index.html')));
+
+app.get('/api/reports/:zone', async (req, res) => {
+  try {
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    const accounts = await Account.find({ zone: req.params.zone, status: 'paid', closedAt: { $gte: today } });
+    res.json(accounts);
+  } catch (error) { res.status(500).json({ error: error.message }); }
+});
 
 app.use(express.static(publicPath));
 
