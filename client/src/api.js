@@ -81,6 +81,9 @@ export const markPendingPayment = (id, note = '') =>
 export const approveAccount = (id) => fetch(`${BASE}/accounts/${id}/approve`, { method: 'PUT' }).then(handleResponse);
 export const rejectAccount  = (id, reason) => fetch(`${BASE}/accounts/${id}/reject`, { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ reason }) }).then(handleResponse);
 
+export const getReport = (zone) =>
+  fetch(`${BASE}/reports/${zone}`).then(r => r.json());
+
 export const clearBar        = () => fetch(`${BASE}/admin/clear-bar`, { method: 'DELETE' }).then(handleResponse);
 export const clearRestaurante = () => fetch(`${BASE}/admin/clear-restaurante`, { method: 'DELETE' }).then(handleResponse);
 
