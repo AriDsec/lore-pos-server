@@ -21,7 +21,12 @@ export function ItemsModal({ order, onClose }) {
                 <span className="text-[#94cb47] font-bold">₡{(item.price * item.quantity).toLocaleString()}</span>
               </div>
               {item.notes && <div className="text-xs text-yellow-300 mt-1">📝 {item.notes}</div>}
-              {item.addedBy && <div className="text-xs text-slate-400 mt-1">👤 {item.addedBy}</div>}
+              {item.breakdown && Object.keys(item.breakdown).length > 1
+                ? <div className="text-xs text-slate-400 mt-1">
+                    {Object.entries(item.breakdown).map(([user, qty]) => `${user} x${qty}`).join(' · ')}
+                  </div>
+                : item.addedBy && <div className="text-xs text-slate-400 mt-1">👤 {item.addedBy}</div>
+              }
             </div>
           ))}
         </div>
