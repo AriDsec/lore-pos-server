@@ -372,19 +372,27 @@ export default function RestaurantePOS() {
   const conServicio = (precio) => aplicaServicio ? Math.round(precio * 1.10) : precio;
 
   const addToCart = (item, withPotatoes = false) => {
-    const itemId = `${item.id}${withPotatoes ? '_cp' : ''}::${currentUser}`;
+    const baseId = `${item.id}${withPotatoes ? '_cp' : ''}`;
     const basePrice = item.price + (withPotatoes && item.canHavePapas ? 500 : 0);
     const price = conServicio(basePrice);
     const displayName = withPotatoes && item.canHavePapas ? `${item.name} + Papas` : item.name;
     setCartItems(prev => {
-      // Agrupar solo si el item fue agregado por el mismo usuario — si es otro, nueva línea
-      const idx = prev.findIndex(i => i.id === itemId);
+      // Agrupar por baseId — un solo item en carrito con breakdown por usuario
+      const idx = prev.findIndex(i => {
+        const iBase = i.id.includes('::') ? i.id.split('::')[0] : i.id;
+        return iBase === baseId;
+      });
       if (idx >= 0) {
         const updated = [...prev];
-        updated[idx] = { ...updated[idx], quantity: updated[idx].quantity + 1 };
+        const existing = updated[idx];
+        const bd = { ...(existing.breakdown || { [existing.addedBy || currentUser]: existing.quantity }) };
+        bd[currentUser] = (bd[currentUser] || 0) + 1;
+        const newQty = existing.quantity + 1;
+        updated[idx] = { ...existing, quantity: newQty, breakdown: bd, addedBy: Object.keys(bd).join(', ') };
         return updated;
       }
-      return [...prev, { ...item, id: itemId, price, name: displayName, quantity: 1, notes: '', addedBy: currentUser, conServicio: aplicaServicio }];
+      const bd = { [currentUser]: 1 };
+      return [...prev, { ...item, id: baseId, price, name: displayName, quantity: 1, notes: '', addedBy: currentUser, breakdown: bd, conServicio: aplicaServicio }];
     });
   };
 
@@ -457,7 +465,15 @@ export default function RestaurantePOS() {
           }
         });
         cartItems.forEach(item => {
-          addToMap(item, item.addedBy || currentUser);
+          // Si el item del carrito ya tiene breakdown (múltiples usuarios), expandir
+          if (item.breakdown && Object.keys(item.breakdown).length > 1) {
+            const baseId = item.id.includes('::') ? item.id.split('::')[0] : item.id;
+            Object.entries(item.breakdown).forEach(([user, qty]) => {
+              addToMap({ ...item, id: baseId, quantity: qty }, user);
+            });
+          } else {
+            addToMap(item, item.addedBy || currentUser);
+          }
         });
         const mergedItems = Array.from(mergedMap.values());
         const mergedTotal = mergedItems.reduce((s, i) => s + i.price * i.quantity, 0);
