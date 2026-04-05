@@ -337,11 +337,9 @@ export function MenuDropdown({ menu, onSelectItem }) {
 // MENU PANEL UNIFICADO — Comida / Bebidas / Licores + Buscador Global
 // ─────────────────────────────────────────────
 
-export function MenuPanel({ menu, licores, onSelectItem, onModalChange }) {
+export function MenuPanel({ menu, licores, onSelectItem, onModalChange, expandedCat, setExpandedCat, expandedLicorCat, setExpandedLicorCat }) {
   const [seccion, setSeccion] = useState('comida');
   const [busqueda, setBusqueda] = useState('');
-  const [expandedCat, setExpandedCat] = useState(null);
-  const [expandedLicorCat, setExpandedLicorCat] = useState(null);
   const [selectedLicor, setSelectedLicor] = useState(null);
 
   // Separar menú en comida y bebidas
