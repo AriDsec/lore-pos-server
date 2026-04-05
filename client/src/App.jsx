@@ -416,7 +416,7 @@ export default function RestaurantePOS() {
     try {
       if (selectedAccount) {
         const acc = openAccounts.find(a => (a._id === selectedAccount || a.id === selectedAccount));
-        if (!acc || acc.status !== 'open') {
+        if (!acc || !['open', 'pending_approval'].includes(acc.status)) {
           showToast('Esta cuenta ya fue cobrada o no existe', 'warning');
           setSelectedAccount(null); setCartItems([]); setClientName(''); setOrderType(null);
           setLoading(false); return;
@@ -478,14 +478,15 @@ export default function RestaurantePOS() {
               // Si eligió crear nueva, continuar normalmente
               setLoading(true);
               try {
-                await api.createAccount({ id: `acc-${currentZone}-${currentUser}-${Date.now()}`, zone: effectiveZone, mesera: currentUser, items: [...cartItems], total, type: orderType, table: (selectedTable && Number(selectedTable) > 0) ? Number(selectedTable) : null, barra: (currentZone === 'bar' && !modoRestaurante) ? selectedBarra : null, clientName, foodItems, drinkItems: cartItems.filter(i => ['alcoholic','beverage','soda','batido'].includes(i.category)), locationLabel: selectedBarra ? selectedBarra : ((selectedTable && Number(selectedTable) > 0) ? `Mesa ${selectedTable}` : orderType === 'takeout' ? 'Para llevar' : 'Sin mesa'), status: 'open', createdAt: new Date() });
-                if (foodItems.length > 0) {
+                const accountStatus2 = (effectiveZone === 'bar' && userRole === 'mesera') ? 'pending_approval' : 'open';
+                await api.createAccount({ id: `acc-${currentZone}-${currentUser}-${Date.now()}`, zone: effectiveZone, mesera: currentUser, items: [...cartItems], total, type: orderType, table: (selectedTable && Number(selectedTable) > 0) ? Number(selectedTable) : null, barra: (currentZone === 'bar' && !modoRestaurante) ? selectedBarra : null, clientName, foodItems, drinkItems: cartItems.filter(i => ['alcoholic','beverage','soda','batido'].includes(i.category)), locationLabel: selectedBarra ? selectedBarra : ((selectedTable && Number(selectedTable) > 0) ? `Mesa ${selectedTable}` : orderType === 'takeout' ? 'Para llevar' : 'Sin mesa'), status: accountStatus2, createdAt: new Date() });
+                if (foodItems.length > 0 && accountStatus2 === 'open') {
                   await api.createKitchenOrder({ id: `k-${Date.now()}`, zone: effectiveZone, mesera: currentUser, items: foodItems, table: (selectedTable && Number(selectedTable) > 0) ? Number(selectedTable) : null, barra: currentZone === 'bar' ? (selectedBarra || null) : null, clientName: clientName || '', locationLabel: selectedBarra ? selectedBarra : ((selectedTable && Number(selectedTable) > 0) ? `Mesa ${selectedTable}` : orderType === 'takeout' ? 'Para llevar' : 'Sin mesa'), status: 'pending', createdAt: new Date() });
                 }
                 const fresh = await api.getOpenAccounts(currentZone);
                 setOpenAccounts(fresh);
                 setCartItems([]); setSelectedTable(null); setSelectedBarra(null); setClientName(''); setModoRestaurante(false); setOrderType(null); setSelectedAccount(null);
-                showToast('Cuenta registrada');
+                showToast(accountStatus2 === 'pending_approval' ? 'Cuenta enviada — esperando aprobación de caja' : 'Cuenta registrada');
               } catch(err) {
                 showToast('Error al guardar: ' + err.message, 'error');
               } finally {
@@ -496,11 +497,12 @@ export default function RestaurantePOS() {
           return;
         }
 
-        await api.createAccount({ id: `acc-${currentZone}-${currentUser}-${Date.now()}`, zone: effectiveZone, mesera: currentUser, items: [...cartItems], total, type: orderType, table: (selectedTable && Number(selectedTable) > 0) ? Number(selectedTable) : null, barra: (currentZone === 'bar' && !modoRestaurante) ? selectedBarra : null, clientName, foodItems, drinkItems: cartItems.filter(i => ['alcoholic','beverage','soda','batido'].includes(i.category)), locationLabel: selectedBarra ? selectedBarra : ((selectedTable && Number(selectedTable) > 0) ? `Mesa ${selectedTable}` : orderType === 'takeout' ? 'Para llevar' : 'Sin mesa'), status: 'open', createdAt: new Date() });
-        if (foodItems.length > 0) {
+        const accountStatus = (effectiveZone === 'bar' && userRole === 'mesera') ? 'pending_approval' : 'open';
+        await api.createAccount({ id: `acc-${currentZone}-${currentUser}-${Date.now()}`, zone: effectiveZone, mesera: currentUser, items: [...cartItems], total, type: orderType, table: (selectedTable && Number(selectedTable) > 0) ? Number(selectedTable) : null, barra: (currentZone === 'bar' && !modoRestaurante) ? selectedBarra : null, clientName, foodItems, drinkItems: cartItems.filter(i => ['alcoholic','beverage','soda','batido'].includes(i.category)), locationLabel: selectedBarra ? selectedBarra : ((selectedTable && Number(selectedTable) > 0) ? `Mesa ${selectedTable}` : orderType === 'takeout' ? 'Para llevar' : 'Sin mesa'), status: accountStatus, createdAt: new Date() });
+        if (foodItems.length > 0 && accountStatus === 'open') {
           await api.createKitchenOrder({ id: `k-${Date.now()}`, zone: effectiveZone, mesera: currentUser, items: foodItems, table: (selectedTable && Number(selectedTable) > 0) ? Number(selectedTable) : null, barra: currentZone === 'bar' ? (selectedBarra || null) : null, clientName: clientName || '', locationLabel: selectedBarra ? selectedBarra : ((selectedTable && Number(selectedTable) > 0) ? `Mesa ${selectedTable}` : orderType === 'takeout' ? 'Para llevar' : 'Sin mesa'), status: 'pending', createdAt: new Date() });
         }
-        showToast('Cuenta registrada');
+        showToast(accountStatus === 'pending_approval' ? 'Cuenta enviada — esperando aprobación de caja' : 'Cuenta registrada');
       }
       const fresh = await api.getOpenAccounts(currentZone);
       setOpenAccounts(fresh);
@@ -685,6 +687,40 @@ export default function RestaurantePOS() {
   const zoneOpenAccounts = (currentZone === 'bar' ? barAccounts : restAccounts)
     .filter(a => a.type !== 'direct');
 
+  const handleApproveAccount = async (account) => {
+    setLoading(true);
+    try {
+      await api.approveAccount(account.id || account._id);
+      const foodItems = (account.items || []).filter(i => i.category === 'food' || i.category === 'batido' || (i.category === 'otro' && i.kitchen));
+      if (foodItems.length > 0) {
+        await api.createKitchenOrder({
+          id: `k-${Date.now()}`, zone: account.zone, mesera: account.mesera,
+          items: foodItems,
+          table: (account.table && account.table > 0) ? Number(account.table) : null,
+          barra: account.barra || null,
+          clientName: account.clientName || '',
+          locationLabel: account.locationLabel || '',
+          status: 'pending', createdAt: new Date()
+        });
+      }
+      const [open, paid] = await Promise.all([api.getOpenAccounts(currentZone), api.getPaidAccounts(currentZone)]);
+      setOpenAccounts(open); setPaidOrders(paid);
+      showToast('Cuenta aprobada');
+    } catch (err) { showToast('Error: ' + err.message, 'error'); }
+    finally { setLoading(false); }
+  };
+
+  const handleRejectAccount = async (account, reason) => {
+    setLoading(true);
+    try {
+      await api.rejectAccount(account.id || account._id, reason);
+      const [open, paid] = await Promise.all([api.getOpenAccounts(currentZone), api.getPaidAccounts(currentZone)]);
+      setOpenAccounts(open); setPaidOrders(paid);
+      showToast('Cuenta rechazada');
+    } catch (err) { showToast('Error: ' + err.message, 'error'); }
+    finally { setLoading(false); }
+  };
+
   // ── LOGIN ─────────────────────────────────────
   if (!currentUser) {
     if (showSelector) {
@@ -787,7 +823,7 @@ export default function RestaurantePOS() {
   }
 
   if (userRole === 'caja' && currentZone === 'bar') {
-    return <><Toast toasts={toasts} offline={!!syncError} /><CajaScreen zona="bar" zonaNombre="Bar" accounts={barAccounts} paid={barPaid} loading={loading} billOrder={billOrder} setBillOrder={setBillOrder} viewItemsOrder={viewItemsOrder} setViewItemsOrder={setViewItemsOrder} splitOrder={splitOrder} setSplitOrder={setSplitOrder} onSplit={handleSplitAccount} onLogout={handleLogout} onPay={payAccount} onDelete={handleDeleteAccount} onMarkPending={handleMarkPending} /></>;
+    return <><Toast toasts={toasts} offline={!!syncError} /><CajaScreen zona="bar" zonaNombre="Bar" accounts={barAccounts} paid={barPaid} loading={loading} billOrder={billOrder} setBillOrder={setBillOrder} viewItemsOrder={viewItemsOrder} setViewItemsOrder={setViewItemsOrder} splitOrder={splitOrder} setSplitOrder={setSplitOrder} onSplit={handleSplitAccount} onLogout={handleLogout} onPay={payAccount} onDelete={handleDeleteAccount} onMarkPending={handleMarkPending} onApprove={handleApproveAccount} onReject={handleRejectAccount} /></>;
   }
 
   if (userRole === 'caja' && currentZone === 'restaurante') {
