@@ -52,14 +52,16 @@ export function Toast({ toasts, offline }) {
 // ─────────────────────────────────────────────
 
 export function Header({ mesera, zona, onLogout }) {
+  const nombreLocal = zona === 'Bar' ? 'Centro Social El Higuerón' : 'Jale donde Lore';
   return (
     <div className="bg-gradient-to-r from-slate-800 to-slate-900 border-b border-[#94cb47]/20 p-4 shadow-xl">
       <div className="max-w-7xl mx-auto flex justify-between items-center">
         <div className="flex items-center gap-3">
-          <img src="/logo.png" alt="LORE" className="w-9 h-9 object-contain drop-shadow" />
+          <img src="/logo.png" alt="LORE" className="w-10 h-10 object-contain drop-shadow" />
           <div>
-            <div className="text-[#94cb47] font-bold text-base leading-tight">{zona}</div>
-            <div className="text-[#94cb47]/60 text-xs">{mesera}</div>
+            <div className="text-[#94cb47] font-bold text-lg md:text-xl leading-tight">{zona}</div>
+            <div className="text-white/70 text-sm md:text-base font-medium leading-tight">{nombreLocal}</div>
+            <div className="text-[#94cb47]/60 text-xs md:text-sm">{mesera}</div>
           </div>
         </div>
         <button onClick={onLogout} className="flex items-center gap-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-5 py-2.5 rounded-lg font-bold transition shadow-lg">
