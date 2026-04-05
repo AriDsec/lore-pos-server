@@ -5,6 +5,53 @@ import { MenuPanel, OtrosPanel } from './menu.jsx';
 import { SplitModal } from './modals.jsx';
 import { ShoppingCart } from './Cart.jsx';
 
+function MenuCenter({ menuTab, setMenuTab, menu, licores, addToCart, onModalChange, isBar, modoRestaurante, onToggleModoRestaurante }) {
+  return (
+
+    <div className="space-y-3">
+      <div className="flex gap-1.5">
+        {[
+          { id: 'productos', label: 'Productos' },
+          { id: 'otros',     label: 'Otros' },
+        ].map(t => (
+          <button
+            key={t.id}
+            onClick={() => setMenuTab(t.id)}
+            className={`flex-1 py-2 rounded-lg font-bold text-sm transition ${
+              menuTab === t.id
+                ? 'bg-[#94cb47] text-black'
+                : 'bg-slate-800 text-slate-400 hover:bg-slate-700 border border-slate-700'
+            }`}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+      {menuTab === 'productos' && <MenuPanel menu={menu} licores={licores} onSelectItem={addToCart} onModalChange={onModalChange} />}
+      {menuTab === 'otros'     && <OtrosPanel onAddToCart={addToCart} onModalChange={onModalChange} />}
+      {/* Toggle modo restaurante — solo visible para meseras de bar */}
+      {isBar && onToggleModoRestaurante && (
+        <button
+          onClick={onToggleModoRestaurante}
+          className={`w-full flex items-center justify-between px-4 py-3 rounded-xl border transition ${
+            modoRestaurante
+              ? 'bg-[#94cb47]/15 border-[#94cb47]/50'
+              : 'bg-slate-800/60 border-slate-700'
+          }`}
+        >
+          <span className={`text-sm font-semibold ${modoRestaurante ? 'text-[#94cb47]' : 'text-slate-500'}`}>
+            {modoRestaurante ? 'Modo Restaurante activo' : 'Atender mesa de restaurante'}
+          </span>
+          <div className={`w-10 h-5 rounded-full transition-colors relative flex-shrink-0 ${modoRestaurante ? 'bg-[#94cb47]' : 'bg-slate-600'}`}>
+            <div className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-all ${modoRestaurante ? 'left-5' : 'left-0.5'}`} />
+          </div>
+        </button>
+      )}
+    </div>
+  );
+  );
+}
+
 export function MeseraScreen({
   currentUser, zona, menu, licores, maxTables, onLogout, addToCart,
   cartItems, updateQuantity, removeFromCart, updateNotes,
@@ -56,48 +103,6 @@ export function MeseraScreen({
   // Panel central con secciones y buscador global
   const [menuTab, setMenuTab] = useState('productos');
 
-  const MenuCenter = () => (
-    <div className="space-y-3">
-      <div className="flex gap-1.5">
-        {[
-          { id: 'productos', label: 'Productos' },
-          { id: 'otros',     label: 'Otros' },
-        ].map(t => (
-          <button
-            key={t.id}
-            onClick={() => setMenuTab(t.id)}
-            className={`flex-1 py-2 rounded-lg font-bold text-sm transition ${
-              menuTab === t.id
-                ? 'bg-[#94cb47] text-black'
-                : 'bg-slate-800 text-slate-400 hover:bg-slate-700 border border-slate-700'
-            }`}
-          >
-            {t.label}
-          </button>
-        ))}
-      </div>
-      {menuTab === 'productos' && <MenuPanel menu={menu} licores={licores} onSelectItem={addToCart} onModalChange={onModalChange} />}
-      {menuTab === 'otros'     && <OtrosPanel onAddToCart={addToCart} onModalChange={onModalChange} />}
-      {/* Toggle modo restaurante — solo visible para meseras de bar */}
-      {isBar && onToggleModoRestaurante && (
-        <button
-          onClick={onToggleModoRestaurante}
-          className={`w-full flex items-center justify-between px-4 py-3 rounded-xl border transition ${
-            modoRestaurante
-              ? 'bg-[#94cb47]/15 border-[#94cb47]/50'
-              : 'bg-slate-800/60 border-slate-700'
-          }`}
-        >
-          <span className={`text-sm font-semibold ${modoRestaurante ? 'text-[#94cb47]' : 'text-slate-500'}`}>
-            {modoRestaurante ? 'Modo Restaurante activo' : 'Atender mesa de restaurante'}
-          </span>
-          <div className={`w-10 h-5 rounded-full transition-colors relative flex-shrink-0 ${modoRestaurante ? 'bg-[#94cb47]' : 'bg-slate-600'}`}>
-            <div className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-all ${modoRestaurante ? 'left-5' : 'left-0.5'}`} />
-          </div>
-        </button>
-      )}
-    </div>
-  );
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-slate-900 to-black flex flex-col">
@@ -133,7 +138,7 @@ export function MeseraScreen({
       {/* ── Landscape: flex — menú flexible / carrito ancho fijo ── */}
       <div className={`${isLandscape ? "flex" : "hidden"} gap-4 p-4 w-full overflow-hidden`} style={{height: "calc(100vh - 64px)"}}>
         <div className="flex-1 overflow-y-auto">
-          <MenuCenter />
+          <MenuCenter menuTab={menuTab} setMenuTab={setMenuTab} menu={menu} licores={licores} addToCart={addToCart} onModalChange={onModalChange} isBar={isBar} modoRestaurante={modoRestaurante} onToggleModoRestaurante={onToggleModoRestaurante} />
         </div>
         <div style={{width: "min(520px, 40vw)", flexShrink: 0, height: "100%", display: "flex", flexDirection: "column", gap: "10px"}}>
           <div style={{flex: 1, overflowY: "auto", minHeight: 0}}>
