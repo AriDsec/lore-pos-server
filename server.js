@@ -181,7 +181,8 @@ app.post('/api/accounts', writeLimiter, async (req, res) => {
       table: sanitizeNum(data.table, null),
       barra: sanitizeStr(data.barra, 50),
       items: itemsWithBy,
-      createdAt: new Date(), lastUpdated: new Date(), status: 'open'
+      createdAt: new Date(), lastUpdated: new Date(),
+      status: sanitizeStatus(data.status, ['open', 'pending_approval'], 'open')
     });
     await newAccount.save();
     res.status(201).json(newAccount);
