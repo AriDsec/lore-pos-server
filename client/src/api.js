@@ -96,7 +96,6 @@ export const setMeserasActivas = (val) =>
     body: JSON.stringify({ value: val })
   }).then(handleResponse);
 
-export const getReport = (zone) =>
   fetch(`${BASE}/reports/${zone}`).then(handleResponse);
 
 // ── REGISTRO DE ACCESO ────────────────────────
