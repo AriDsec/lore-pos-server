@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Plus, Minus, ChevronDown, Search, Clock } from 'lucide-react';
+import { Plus, ChevronDown, Search, Clock } from 'lucide-react';
 import { LICORES, OTROS, ADICIONALES_COCINA } from './constants.js';
 
 // ─────────────────────────────────────────────
@@ -346,8 +346,6 @@ export function MenuPanel({ menu, licores, onSelectItem, onModalChange, expanded
   const allItems = Object.entries(menu).flatMap(([cat, items]) =>
     items.map(i => ({ ...i, cat }))
   );
-  const comidaItems = allItems.filter(i => i.category === 'food');
-  const bebidaItems = allItems.filter(i => ['beverage', 'soda', 'batido'].includes(i.category));
 
   // Agrupar por categoría para mostrar
   const comidaGroups = Object.fromEntries(
