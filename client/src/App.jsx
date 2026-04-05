@@ -422,7 +422,11 @@ export default function RestaurantePOS() {
           setLoading(false); return;
         }
         const accId = acc?.id || selectedAccount;
-        await api.updateAccount(accId, { items: cartItems, total, editedBy: currentUser });
+        // Mergear items existentes con items nuevos del carrito
+        const existingItems = acc?.items || [];
+        const mergedItems = [...existingItems, ...cartItems];
+        const mergedTotal = mergedItems.reduce((s, i) => s + i.price * i.quantity, 0);
+        await api.updateAccount(accId, { items: mergedItems, total: mergedTotal, editedBy: currentUser });
 
         // Detectar items nuevos o con cantidad aumentada vs lo que ya estaba en la cuenta
         const prevItems = acc?.items || [];
