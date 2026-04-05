@@ -805,6 +805,7 @@ export default function RestaurantePOS() {
       syncError={syncError}
       loading={loading}
       onLogin={loginWithPin}
+      onShowSelector={() => setShowSelector(true)}
     />;
   }
 
@@ -821,18 +822,7 @@ export default function RestaurantePOS() {
     );
   }
 
-  // Guard contra renders intermedios durante logout — debe estar ANTES de todos los renders por rol
-  if (!currentUser || !userRole || !currentZone) {
-    return (
-      <>
-        <Toast toasts={toasts} offline={!!syncError} />
-        {showSelector
-          ? <SelectorScreen isLandscape={isLandscape} syncError={syncError} loading={loading} adminUser={adminUser} onSelect={handleSelectorLogin} onBack={() => { setShowSelector(false); setAdminUser(null); localStorage.removeItem('lore_admin'); }} />
-          : <PinLoginScreen isLandscape={isLandscape} syncError={syncError} loading={loading} onLogin={loginWithPin} onShowSelector={() => setShowSelector(true)} />
-        }
-      </>
-    );
-  }
+
 
   if (userRole === 'mesera') {
     return (
