@@ -62,6 +62,7 @@ export function MeseraScreen({
   splitOrder, setSplitOrder, onSplit,
   onModalChange, aplicaServicio, loading,
   modoRestaurante, onToggleModoRestaurante,
+  onPayRejected, onDeleteRejected,
   mesaConflict, setMesaConflict, onAddToExisting,
 }) {
   const [mobileTab, setMobileTab] = useState('menu');
@@ -93,6 +94,8 @@ export function MeseraScreen({
     isBar,
     modoRestaurante,
     onDirectPay,
+    onPayRejected,
+    onDeleteRejected,
     tables,
     onSplit: (acc) => setSplitOrder(acc),
     currentUser,
