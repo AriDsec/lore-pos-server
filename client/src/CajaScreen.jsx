@@ -13,7 +13,7 @@ export function CajaScreen({
   zona, zonaNombre, accounts, paid,
   loading, billOrder, setBillOrder, viewItemsOrder, setViewItemsOrder,
   splitOrder, setSplitOrder, onSplit,
-  onLogout, onPay, onDelete, onMarkPending,
+  onLogout, onPay, onDelete, onMarkPending, onApprove, onReject,
 }) {
   const { totalCobrado, foodCobrado, drinkCobrado } = CajaStats({ paid });
   const [deleteConfirm, setDeleteConfirm] = useState(null);
@@ -61,9 +61,44 @@ export function CajaScreen({
           </>
         )}
 
+        {/* ── Por Aprobar ── */}
+        {zona === 'bar' && onApprove && (() => {
+          const pendingApproval = accounts.filter(a => a.status === 'pending_approval');
+          if (pendingApproval.length === 0) return null;
+          return (
+            <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-amber-500/40 p-5 shadow-2xl mb-4">
+              <h3 className="text-amber-400 font-bold text-base md:text-lg mb-4">Por Aprobar ({pendingApproval.length})</h3>
+              <div className="space-y-3">
+                {pendingApproval.map(acc => (
+                  <div key={acc._id || acc.id} className="bg-slate-700/50 rounded-xl p-3 border border-amber-500/20">
+                    <div className="flex justify-between items-start mb-2">
+                      <div>
+                        <div className="text-white font-bold text-sm md:text-base">{acc.locationLabel || acc.barra || ((acc.table && acc.table > 0) ? `Mesa ${acc.table}` : '—')}{acc.clientName ? ` — ${acc.clientName}` : ''}</div>
+                        <div className="text-slate-400 text-xs md:text-sm">{acc.mesera} · {(acc.items||[]).length} items</div>
+                      </div>
+                      <div className="text-amber-400 font-bold text-sm md:text-base">₡{(acc.total||0).toLocaleString()}</div>
+                    </div>
+                    <div className="text-xs text-slate-400 mb-2">{(acc.items||[]).map(i => `${i.quantity}x ${i.name}`).join(', ')}</div>
+                    <div className="flex gap-2">
+                      <button onClick={() => onApprove(acc)}
+                        className="flex-1 bg-[#94cb47] hover:bg-[#7ab035] text-black font-bold py-1.5 rounded-lg text-xs md:text-sm transition">
+                        Aprobar
+                      </button>
+                      <button onClick={() => { setRejectTarget(acc); setRejectReason(''); }}
+                        className="flex-1 bg-red-900/50 hover:bg-red-900 text-red-300 font-bold py-1.5 rounded-lg text-xs md:text-sm transition">
+                        Rechazar
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })()}
+
         {/* ── Cuentas Abiertas ── */}
         {(() => {
-          const normales = accounts.filter(a => a.type !== 'direct' && a.status !== 'pending_payment');
+          const normales = accounts.filter(a => a.type !== 'direct' && a.status !== 'pending_payment' && a.status !== 'pending_approval' && a.status !== 'rejected');
           return (
             <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-5 shadow-2xl">
               <h3 className="text-[#94cb47] font-bold text-lg mb-4">Cuentas Abiertas ({normales.length})</h3>
@@ -102,6 +137,25 @@ export function CajaScreen({
                   </div>
                 )
               }
+            </div>
+          );
+        })()}
+
+        {/* ── Cuentas Rechazadas — info para caja ── */}
+        {(() => {
+          const rechazadas = accounts.filter(a => a.status === 'rejected');
+          if (rechazadas.length === 0) return null;
+          return (
+            <div className="bg-slate-800/40 rounded-2xl border border-red-500/20 p-4 mb-4">
+              <h3 className="text-red-400 font-bold text-sm mb-3">Rechazadas ({rechazadas.length})</h3>
+              <div className="space-y-2">
+                {rechazadas.map(acc => (
+                  <div key={acc._id || acc.id} className="flex justify-between items-center text-xs text-slate-400 bg-slate-800 rounded-lg px-3 py-2">
+                    <span>{acc.mesera} — {acc.clientName || acc.locationLabel}</span>
+                    <button onClick={() => onDelete(acc)} className="text-red-400 hover:text-red-300 ml-3">✕</button>
+                  </div>
+                ))}
+              </div>
             </div>
           );
         })()}
@@ -253,6 +307,30 @@ export function CajaScreen({
           </div>
         </div>
       )}
+      {/* Modal rechazo */}
+      {rejectTarget && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+          <div className="bg-slate-900 border border-red-500/40 rounded-2xl p-6 max-w-sm w-full space-y-4">
+            <h2 className="text-red-300 font-bold text-lg">Rechazar cuenta</h2>
+            <p className="text-slate-400 text-sm">{rejectTarget.clientName} — {rejectTarget.mesera}</p>
+            <input value={rejectReason} onChange={e => setRejectReason(e.target.value)}
+              placeholder="Motivo del rechazo..."
+              className="w-full bg-slate-800 border border-slate-600 text-white rounded-xl px-4 py-2.5 focus:outline-none focus:border-red-500 text-sm"
+              autoFocus />
+            <div className="flex gap-3">
+              <button onClick={() => setRejectTarget(null)}
+                className="flex-1 bg-slate-700 hover:bg-slate-600 text-white font-bold py-2.5 rounded-xl transition text-sm">
+                Cancelar
+              </button>
+              <button onClick={() => { onReject(rejectTarget, rejectReason || 'Sin motivo'); setRejectTarget(null); }}
+                className="flex-1 bg-red-700 hover:bg-red-600 text-white font-bold py-2.5 rounded-xl transition text-sm">
+                Confirmar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {viewItemsOrder && <ItemsModal order={viewItemsOrder} onClose={() => setViewItemsOrder(null)} />}
       {splitOrder && <SplitModal account={splitOrder} onConfirm={onSplit} onClose={() => setSplitOrder(null)} />}
     </div>
