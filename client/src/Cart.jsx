@@ -45,7 +45,7 @@ export function ShoppingCart({
             className="w-full bg-slate-700 border border-[#94cb47]/30 text-white rounded-lg p-2 text-xs focus:outline-none"
           >
             <option value="">➕ Nueva Cuenta</option>
-            {openAccounts.filter(a => a.status !== 'pending_payment').map(acc => (
+            {openAccounts.filter(a => a.status !== 'pending_payment' && a.status !== 'pending_approval' && a.status !== 'rejected').map(acc => (
               <option key={acc.id} value={acc.id}>
                 {acc.barra ? acc.barra : (acc.table && acc.table > 0) ? `Mesa ${acc.table}` : 'Sin mesa'}{acc.clientName ? ` — ${acc.clientName}` : ''}
               </option>
@@ -120,6 +120,17 @@ export function ShoppingCart({
                 <option value="dine-in">Local</option>
                 <option value="takeout">Llevar</option>
               </select>
+            {openAccounts.filter(a => a.status === 'pending_approval').map(acc => (
+              <div key={acc.id} className="mt-1 text-xs text-amber-400 bg-amber-900/20 border border-amber-500/30 rounded-lg px-3 py-1.5">
+                ⏳ {acc.clientName || acc.locationLabel} — esperando aprobación de caja
+              </div>
+            ))}
+            {openAccounts.filter(a => a.status === 'rejected').map(acc => (
+              <div key={acc.id} className="mt-1 text-xs text-red-400 bg-red-900/20 border border-red-500/30 rounded-lg px-3 py-2">
+                <div>❌ {acc.clientName || acc.locationLabel} — rechazada</div>
+                {acc.rejectedReason && <div className="text-red-300 mt-0.5">Motivo: {acc.rejectedReason}</div>}
+              </div>
+            ))}
             </div>
 
             {/* Mesa + Barra — Barra solo en bar */}
