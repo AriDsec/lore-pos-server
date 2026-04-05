@@ -372,13 +372,13 @@ export default function RestaurantePOS() {
   const conServicio = (precio) => aplicaServicio ? Math.round(precio * 1.10) : precio;
 
   const addToCart = (item, withPotatoes = false) => {
-    const itemId = `${item.id}${withPotatoes ? '_cp' : ''}_${currentUser}`;
+    const itemId = `${item.id}${withPotatoes ? '_cp' : ''}::${currentUser}`;
     const basePrice = item.price + (withPotatoes && item.canHavePapas ? 500 : 0);
     const price = conServicio(basePrice);
     const displayName = withPotatoes && item.canHavePapas ? `${item.name} + Papas` : item.name;
     setCartItems(prev => {
       // Agrupar solo si el item fue agregado por el mismo usuario — si es otro, nueva línea
-      const idx = prev.findIndex(i => i.id === itemId && i.addedBy === currentUser);
+      const idx = prev.findIndex(i => i.id === itemId);
       if (idx >= 0) {
         const updated = [...prev];
         updated[idx] = { ...updated[idx], quantity: updated[idx].quantity + 1 };
@@ -432,11 +432,11 @@ export default function RestaurantePOS() {
         const mergedTotal = mergedItems.reduce((s, i) => s + i.price * i.quantity, 0);
         await api.updateAccount(accId, { items: mergedItems, total: mergedTotal, editedBy: currentUser });
 
-        // Detectar items nuevos o con cantidad aumentada vs lo que ya estaba en la cuenta
-        const prevItems = acc?.items || [];
+        // Detectar items nuevos vs lo que ya estaba en la cuenta
+        const prevItems = existingItems;
         const itemsParaCocina = foodItems.reduce((nuevos, item) => {
-          const baseId = item.id.replace(/_[^_]+$/, ''); // quitar sufijo _usuario
-          const prev = prevItems.find(p => p.id === item.id || p.id === baseId || p.id.replace(/_[^_]+$/, '') === baseId);
+          const baseId = item.id.includes('::') ? item.id.split('::')[0] : item.id;
+          const prev = prevItems.find(p => (p.id.includes('::') ? p.id.split('::')[0] : p.id) === baseId);
           if (!prev) {
             // Item completamente nuevo
             nuevos.push({ ...item, esNuevo: true });
