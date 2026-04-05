@@ -36,6 +36,7 @@ const generalLimiter = rateLimit({
   limit: 200,
   standardHeaders: 'draft-8',
   legacyHeaders: false,
+  validate: { xForwardedForHeader: false },
   message: { error: 'Demasiadas solicitudes, intenta más tarde.' },
 });
 
@@ -45,6 +46,7 @@ const writeLimiter = rateLimit({
   limit: 60,
   standardHeaders: 'draft-8',
   legacyHeaders: false,
+  validate: { xForwardedForHeader: false },
   message: { error: 'Demasiadas solicitudes de escritura, intenta más tarde.' },
 });
 
@@ -54,6 +56,7 @@ const adminLimiter = rateLimit({
   limit: 30,
   standardHeaders: 'draft-8',
   legacyHeaders: false,
+  validate: { xForwardedForHeader: false },
   message: { error: 'Demasiadas solicitudes administrativas, intenta más tarde.' },
 });
 
