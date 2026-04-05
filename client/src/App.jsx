@@ -428,7 +428,26 @@ export default function RestaurantePOS() {
           setLoading(false); return;
         }
         const existingItems = acc?.items || [];
-        const mergedItems = [...existingItems, ...cartItems];
+        // Merge inteligente: los items del carrito son NUEVOS — no reemplazar los existentes
+        // Agrupar por id base + addedBy para no duplicar
+        const mergedMap = new Map();
+        // Primero poner los existentes
+        existingItems.forEach(item => {
+          const key = `${item.id}||${item.addedBy || ''}`;
+          mergedMap.set(key, { ...item });
+        });
+        // Luego agregar los del carrito — si ya existe mismo id base + mismo usuario, sumar cantidad
+        cartItems.forEach(item => {
+          const baseId = item.id.includes('::') ? item.id.split('::')[0] : item.id;
+          const key = `${baseId}||${item.addedBy || currentUser}`;
+          if (mergedMap.has(key)) {
+            const existing = mergedMap.get(key);
+            mergedMap.set(key, { ...existing, quantity: existing.quantity + item.quantity });
+          } else {
+            mergedMap.set(key, { ...item, id: baseId, addedBy: item.addedBy || currentUser });
+          }
+        });
+        const mergedItems = Array.from(mergedMap.values());
         const mergedTotal = mergedItems.reduce((s, i) => s + i.price * i.quantity, 0);
         await api.updateAccount(accId, { items: mergedItems, total: mergedTotal, editedBy: currentUser });
 
