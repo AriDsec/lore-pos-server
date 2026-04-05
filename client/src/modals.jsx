@@ -684,9 +684,9 @@ export function SelectorScreen({ isLandscape, syncError, loading, onSelect, onBa
   const meseras = ['Mari', 'Mile', 'Lin', 'Temp Bar', 'Guido Bar'];
 
   // Determine which menu to show based on who logged in
-  const isSuperAdmin = adminUser === 'Ariel';
   const isBarAdmin = adminUser === 'Guido' || adminUser === 'Lindsey';
   const isRestAdmin = adminUser === 'Aaron';
+  const nombreLocal = isRestAdmin ? 'Donde Lore' : 'Centro Social El Higuerón';
 
   const Header = () => (
     <div className="flex items-center justify-between w-full mb-8">
@@ -695,7 +695,7 @@ export function SelectorScreen({ isLandscape, syncError, loading, onSelect, onBa
         <div>
           <div style={{ fontFamily: "'Cinzel', serif", letterSpacing: '0.12em' }}
             className="text-white text-2xl md:text-4xl font-normal">Sistema de Pedidos</div>
-          <div className="text-slate-300 text-sm md:text-base mt-0.5">Donde Lore</div>
+          <div className="text-slate-300 text-sm md:text-base mt-0.5">{nombreLocal}</div>
         </div>
       </div>
       <button onClick={onBack}
