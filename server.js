@@ -79,6 +79,9 @@ const accountSchema = new mongoose.Schema({
   zone: String,
   mesera: String,
   lastEditedBy: String,
+  approvedAt: Date,
+  rejectedReason: String,
+  rejectedAt: Date,
   clientName: String,
   table: Number,
   barra: String,
@@ -141,7 +144,7 @@ const Config = mongoose.model('Config', configSchema);
 
 app.get('/api/accounts/:zone/open', async (req, res) => {
   try {
-    const accounts = await Account.find({ zone: req.params.zone, status: { $in: ['open', 'pending_payment'] } });
+    const accounts = await Account.find({ zone: req.params.zone, status: { $in: ['open', 'pending_payment', 'pending_approval', 'rejected'] } });
     res.json(accounts);
   } catch (error) { res.status(500).json({ error: error.message }); }
 });
@@ -279,10 +282,36 @@ app.get('/api/reports/:zone', async (req, res) => {
 });
 
 // ============ ADMIN — LIMPIAR DÍA ============
+// Aprobar cuenta pending_approval
+app.put('/api/accounts/:id/approve', writeLimiter, async (req, res) => {
+  try {
+    const account = await Account.findOne({ id: sanitizeStr(req.params.id, 100) });
+    if (!account) return res.status(404).json({ error: 'Cuenta no encontrada' });
+    account.status = 'open';
+    account.approvedAt = new Date();
+    await account.save();
+    res.json(account);
+  } catch (error) { res.status(500).json({ error: error.message }); }
+});
+
+// Rechazar cuenta pending_approval
+app.put('/api/accounts/:id/reject', writeLimiter, async (req, res) => {
+  try {
+    const account = await Account.findOne({ id: sanitizeStr(req.params.id, 100) });
+    if (!account) return res.status(404).json({ error: 'Cuenta no encontrada' });
+    account.status = 'rejected';
+    account.rejectedReason = sanitizeStr(req.body.reason || 'Sin motivo', 200);
+    account.rejectedAt = new Date();
+    await account.save();
+    res.json(account);
+  } catch (error) { res.status(500).json({ error: error.message }); }
+});
+
 app.put('/api/accounts/:id/pending', async (req, res) => {
   try {
     const account = await Account.findOne({ id: sanitizeStr(req.params.id, 100) });
     if (!account) return res.status(404).json({ error: 'Cuenta no encontrada' });
+    if (!['open', 'pending_payment'].includes(account.status)) return res.status(400).json({ error: 'No se puede cambiar estado de esta cuenta' });
     account.status = account.status === 'pending_payment' ? 'open' : 'pending_payment';
     account.pendingNote = sanitizeStr(req.body.note || '', 100);
     await account.save();
@@ -294,7 +323,7 @@ app.put('/api/accounts/:id/pending', async (req, res) => {
 app.delete('/api/admin/clear-bar', adminLimiter, async (req, res) => {
   try {
     const today = new Date(); today.setHours(0, 0, 0, 0);
-    const accounts = await Account.deleteMany({ zone: 'bar', status: 'paid', closedAt: { $gte: today } });
+    const accounts = await Account.deleteMany({ zone: 'bar', status: { $in: ['paid', 'rejected'] }, createdAt: { $gte: today } });
     const kitchen = await KitchenOrder.deleteMany({ zone: 'bar', createdAt: { $gte: today } });
     res.json({ deleted: accounts.deletedCount, kitchen: kitchen.deletedCount });
   } catch (error) { res.status(500).json({ error: error.message }); }
@@ -304,7 +333,7 @@ app.delete('/api/admin/clear-bar', adminLimiter, async (req, res) => {
 app.delete('/api/admin/clear-restaurante', adminLimiter, async (req, res) => {
   try {
     const today = new Date(); today.setHours(0, 0, 0, 0);
-    const accounts = await Account.deleteMany({ zone: 'restaurante', status: 'paid', closedAt: { $gte: today } });
+    const accounts = await Account.deleteMany({ zone: 'restaurante', status: { $in: ['paid', 'rejected'] }, createdAt: { $gte: today } });
     const kitchen = await KitchenOrder.deleteMany({ zone: 'restaurante', createdAt: { $gte: today } });
     res.json({ deleted: accounts.deletedCount, kitchen: kitchen.deletedCount });
   } catch (error) { res.status(500).json({ error: error.message }); }
@@ -314,7 +343,7 @@ app.delete('/api/admin/clear-day', adminLimiter, async (req, res) => {
   try {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    const result = await Account.deleteMany({ status: 'paid', closedAt: { $gte: today } });
+    const result = await Account.deleteMany({ status: { $in: ['paid', 'rejected'] }, $or: [{ closedAt: { $gte: today } }, { status: 'rejected', createdAt: { $gte: today } }] });
     const kitchenResult = await KitchenOrder.deleteMany({ createdAt: { $gte: today } });
     res.json({ deleted: result.deletedCount, kitchen: kitchenResult.deletedCount });
   } catch (error) { res.status(500).json({ error: error.message }); }
