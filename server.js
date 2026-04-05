@@ -88,15 +88,15 @@ const accountSchema = new mongoose.Schema({
   type: String,
   items: [{
     id: String, name: String, price: Number, quantity: Number,
-    category: String, notes: String, addedBy: String, kitchen: Boolean, conServicio: Boolean,
+    category: String, notes: String, addedBy: String, breakdown: Object, kitchen: Boolean, conServicio: Boolean,
   }],
   foodItems: [{
     id: String, name: String, price: Number, quantity: Number,
-    category: String, notes: String, addedBy: String, kitchen: Boolean, conServicio: Boolean,
+    category: String, notes: String, addedBy: String, breakdown: Object, kitchen: Boolean, conServicio: Boolean,
   }],
   drinkItems: [{
     id: String, name: String, price: Number, quantity: Number,
-    category: String, notes: String, addedBy: String, kitchen: Boolean, conServicio: Boolean,
+    category: String, notes: String, addedBy: String, breakdown: Object, kitchen: Boolean, conServicio: Boolean,
   }],
   total: Number,
   totalOriginal: Number,
@@ -271,16 +271,6 @@ app.delete('/api/kitchen/:id', async (req, res) => {
   } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
-app.get('/api/reports/:zone', async (req, res) => {
-  try {
-    const today = new Date(); today.setHours(0, 0, 0, 0);
-    const closedAccounts = await Account.find({ zone: req.params.zone, status: 'paid', closedAt: { $gte: today } });
-    const totalSales = closedAccounts.reduce((sum, acc) => sum + acc.total, 0);
-    const foodTotal = closedAccounts.reduce((sum, acc) =>
-      sum + (acc.items||[]).filter(i => i.category === 'food').reduce((s, i) => s + i.price * i.quantity, 0), 0);
-    res.json({ zone: req.params.zone, totalSales, foodTotal, drinksTotal: totalSales - foodTotal, accountsPaid: closedAccounts.length, accounts: closedAccounts });
-  } catch (error) { res.status(500).json({ error: error.message }); }
-});
 
 // ============ ADMIN — LIMPIAR DÍA ============
 // Aprobar cuenta pending_approval
