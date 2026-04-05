@@ -422,7 +422,11 @@ export default function RestaurantePOS() {
           setLoading(false); return;
         }
         const accId = acc?.id || selectedAccount;
-        // Mergear items existentes con items nuevos del carrito
+        // Solo guardar si hay items nuevos en el carrito
+        if (cartItems.length === 0) {
+          showToast('Agrega algo al carrito primero', 'warning');
+          setLoading(false); return;
+        }
         const existingItems = acc?.items || [];
         const mergedItems = [...existingItems, ...cartItems];
         const mergedTotal = mergedItems.reduce((s, i) => s + i.price * i.quantity, 0);
