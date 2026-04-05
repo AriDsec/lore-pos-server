@@ -20,6 +20,7 @@ const sanitizeStatus = (val, allowed, fallback) =>
   allowed.includes(val) ? val : fallback;
 
 const app = express();
+app.set('trust proxy', 1); // Railway usa proxy — necesario para express-rate-limit
 
 // ── Seguridad ──
 app.disable('x-powered-by');
@@ -88,15 +89,15 @@ const accountSchema = new mongoose.Schema({
   type: String,
   items: [{
     id: String, name: String, price: Number, quantity: Number,
-    category: String, notes: String, addedBy: String, breakdown: Object, kitchen: Boolean, conServicio: Boolean,
+    category: String, notes: String, addedBy: String, breakdown: mongoose.Schema.Types.Mixed, kitchen: Boolean, conServicio: Boolean,
   }],
   foodItems: [{
     id: String, name: String, price: Number, quantity: Number,
-    category: String, notes: String, addedBy: String, breakdown: Object, kitchen: Boolean, conServicio: Boolean,
+    category: String, notes: String, addedBy: String, breakdown: mongoose.Schema.Types.Mixed, kitchen: Boolean, conServicio: Boolean,
   }],
   drinkItems: [{
     id: String, name: String, price: Number, quantity: Number,
-    category: String, notes: String, addedBy: String, breakdown: Object, kitchen: Boolean, conServicio: Boolean,
+    category: String, notes: String, addedBy: String, breakdown: mongoose.Schema.Types.Mixed, kitchen: Boolean, conServicio: Boolean,
   }],
   total: Number,
   totalOriginal: Number,
