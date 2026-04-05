@@ -51,8 +51,11 @@ export function Toast({ toasts, offline }) {
 // HEADER
 // ─────────────────────────────────────────────
 
-export function Header({ mesera, zona, onLogout }) {
-  const nombreLocal = zona === 'Bar' ? 'Centro Social El Higuerón' : 'Jale donde Lore';
+export function Header({ mesera, zona, onLogout, esBar }) {
+  // esBar prop para distinguir zona cuando zona='Caja' no alcanza
+  const nombreLocal = esBar !== undefined
+    ? (esBar ? 'Centro Social El Higuerón' : 'Jale donde Lore')
+    : (zona === 'Bar' ? 'Centro Social El Higuerón' : 'Jale donde Lore');
   return (
     <div className="bg-gradient-to-r from-slate-800 to-slate-900 border-b border-[#94cb47]/20 p-4 shadow-xl">
       <div className="max-w-7xl mx-auto flex justify-between items-center">
