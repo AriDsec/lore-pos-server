@@ -116,9 +116,7 @@ export function imprimirTiquete(order, zona) {
   const ubicacion = order.locationLabel || order.barra
     || ((order.table && order.table > 0) ? `Mesa ${order.table}` : '');
 
-  const linea = (texto = '', ancho = 40) => texto.padEnd(ancho, ' ');
   const separador = '-'.repeat(40);
-  const separadorDoble = '='.repeat(40);
 
   let itemsText = '';
   (order.items || []).forEach(item => {
