@@ -90,7 +90,10 @@ export function ShoppingCart({
                   <div className="flex-1 pr-1 min-w-0">
                     <div className="font-bold text-white text-xs md:text-lg leading-tight">{item.name}</div>
                     <div className="text-[#94cb47] font-bold text-xs md:text-lg">₡{(item.price * item.quantity).toLocaleString()}</div>
-                    {item.addedBy && <div className="text-slate-500 text-xs">👤 {item.addedBy}</div>}
+                    {item.breakdown && Object.keys(item.breakdown).length > 1
+                      ? <div className="text-slate-500 text-xs">{Object.entries(item.breakdown).map(([u,q]) => `${u} x${q}`).join(' · ')}</div>
+                      : item.addedBy && <div className="text-slate-500 text-xs">👤 {item.addedBy}</div>
+                    }
                   </div>
                   {!isOthersMesera && (
                     <button onClick={() => removeFromCart(item.id)} className="text-red-400 hover:text-red-300 p-0.5 flex-shrink-0">
