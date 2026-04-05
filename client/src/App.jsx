@@ -431,28 +431,33 @@ export default function RestaurantePOS() {
         // Merge inteligente: los items del carrito son NUEVOS — no reemplazar los existentes
         // Agrupar por id base + addedBy para no duplicar
         const mergedMap = new Map();
-        // Normalizar ids existentes (pueden tener :: de ediciones anteriores)
-        existingItems.forEach(item => {
+        // Agrupar por producto (baseId) — guardar desglose por mesera en breakdown
+        const addToMap = (item, who) => {
           const baseId = item.id.includes('::') ? item.id.split('::')[0] : item.id;
-          const key = `${baseId}||${item.addedBy || ''}`;
-          if (mergedMap.has(key)) {
-            // Mismo item mismo usuario — sumar (no debería pasar pero por seguridad)
-            const prev = mergedMap.get(key);
-            mergedMap.set(key, { ...prev, id: baseId, quantity: prev.quantity + item.quantity });
+          if (mergedMap.has(baseId)) {
+            const prev = mergedMap.get(baseId);
+            const bd = { ...(prev.breakdown || {}) };
+            bd[who] = (bd[who] || 0) + item.quantity;
+            mergedMap.set(baseId, { ...prev, id: baseId, quantity: prev.quantity + item.quantity, breakdown: bd, addedBy: Object.keys(bd).join(', ') });
           } else {
-            mergedMap.set(key, { ...item, id: baseId });
+            const bd = { [who]: item.quantity };
+            mergedMap.set(baseId, { ...item, id: baseId, quantity: item.quantity, breakdown: bd, addedBy: who });
+          }
+        };
+        existingItems.forEach(item => {
+          const who = item.addedBy || '';
+          const baseId = item.id.includes('::') ? item.id.split('::')[0] : item.id;
+          // Reconstruir desde breakdown si existe, o usar addedBy directo
+          if (item.breakdown && Object.keys(item.breakdown).length > 0) {
+            Object.entries(item.breakdown).forEach(([user, qty]) => {
+              addToMap({ ...item, id: baseId, quantity: qty }, user);
+            });
+          } else {
+            addToMap({ ...item, id: baseId }, who);
           }
         });
-        // Agregar los del carrito — si ya existe mismo id base + mismo usuario, sumar cantidad
         cartItems.forEach(item => {
-          const baseId = item.id.includes('::') ? item.id.split('::')[0] : item.id;
-          const key = `${baseId}||${item.addedBy || currentUser}`;
-          if (mergedMap.has(key)) {
-            const existing = mergedMap.get(key);
-            mergedMap.set(key, { ...existing, quantity: existing.quantity + item.quantity });
-          } else {
-            mergedMap.set(key, { ...item, id: baseId, addedBy: item.addedBy || currentUser });
-          }
+          addToMap(item, item.addedBy || currentUser);
         });
         const mergedItems = Array.from(mergedMap.values());
         const mergedTotal = mergedItems.reduce((s, i) => s + i.price * i.quantity, 0);
