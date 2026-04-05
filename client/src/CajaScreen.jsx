@@ -18,6 +18,8 @@ export function CajaScreen({
   const { totalCobrado, foodCobrado, drinkCobrado } = CajaStats({ paid });
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [showStats, setShowStats] = useState(false);
+  const [rejectTarget, setRejectTarget] = useState(null);
+  const [rejectReason, setRejectReason] = useState('');
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-slate-900 to-black">
