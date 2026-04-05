@@ -689,6 +689,41 @@ export default function RestaurantePOS() {
   const zoneOpenAccounts = (currentZone === 'bar' ? barAccounts : restAccounts)
     .filter(a => a.type !== 'direct');
 
+  const handlePayRejected = async (account) => {
+    // Cobrar directo una cuenta rechazada — borrar la rejected y crear cobro directo
+    setLoading(true);
+    try {
+      await api.deleteAccount(account.id || account._id);
+      // Crear cuenta tipo direct con los mismos items
+      const total = (account.items || []).reduce((s, i) => s + i.price * i.quantity, 0);
+      await api.createAccount({
+        id: `acc-direct-${Date.now()}`, zone: account.zone, mesera: account.mesera,
+        items: account.items || [], total, type: 'direct',
+        table: account.table || null, barra: account.barra || null,
+        clientName: account.clientName || 'Cliente General',
+        foodItems: (account.items || []).filter(i => i.category === 'food' || i.category === 'batido'),
+        drinkItems: (account.items || []).filter(i => ['alcoholic','beverage','soda'].includes(i.category)),
+        locationLabel: account.locationLabel || '',
+        status: 'open', createdAt: new Date(),
+      });
+      const fresh = await api.getOpenAccounts(currentZone);
+      setOpenAccounts(fresh);
+      showToast('Cuenta lista para cobrar en caja');
+    } catch (err) { showToast('Error: ' + err.message, 'error'); }
+    finally { setLoading(false); }
+  };
+
+  const handleDeleteRejected = async (account) => {
+    setLoading(true);
+    try {
+      await api.deleteAccount(account.id || account._id);
+      const fresh = await api.getOpenAccounts(currentZone);
+      setOpenAccounts(fresh);
+      showToast('Cuenta eliminada');
+    } catch (err) { showToast('Error: ' + err.message, 'error'); }
+    finally { setLoading(false); }
+  };
+
   const handleApproveAccount = async (account) => {
     setLoading(true);
     try {
@@ -801,6 +836,7 @@ export default function RestaurantePOS() {
           openAccounts={zoneOpenAccounts} selectedAccount={selectedAccount}
           onSelectAccount={handleSelectAccount}
           isBar={currentZone === 'bar'} onDirectPay={handleDirectPay}
+          onPayRejected={handlePayRejected} onDeleteRejected={handleDeleteRejected}
           splitOrder={splitOrder} setSplitOrder={setSplitOrder} onSplit={handleSplitAccount}
           onModalChange={(open) => { modalOpenRef.current = open; }}
           aplicaServicio={aplicaServicio} loading={loading}
