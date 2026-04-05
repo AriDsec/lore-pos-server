@@ -691,11 +691,11 @@ export function SelectorScreen({ isLandscape, syncError, loading, onSelect, onBa
   const Header = () => (
     <div className="flex items-center justify-between w-full mb-8">
       <div className="flex items-center gap-4">
-        <img src="/logo.png" alt="LORE" className="w-16 h-16 md:w-20 md:h-20 object-contain drop-shadow-2xl flex-shrink-0" />
+        <img src="/logo.png" alt="LORE" className="w-20 h-20 md:w-28 md:h-28 object-contain drop-shadow-2xl flex-shrink-0" />
         <div>
           <div style={{ fontFamily: "'Cinzel', serif", letterSpacing: '0.12em' }}
-            className="text-white text-xl md:text-3xl font-normal">Sistema de Pedidos</div>
-          <div className="text-slate-500 text-xs md:text-sm mt-0.5">Centro Social El Higuerón</div>
+            className="text-white text-2xl md:text-4xl font-normal">Sistema de Pedidos</div>
+          <div className="text-slate-300 text-sm md:text-base mt-0.5">Donde Lore</div>
         </div>
       </div>
       <button onClick={onBack}
@@ -706,7 +706,7 @@ export function SelectorScreen({ isLandscape, syncError, loading, onSelect, onBa
   );
 
   const SectionLabel = ({ children }) => (
-    <div className="text-slate-500 text-xs font-semibold uppercase tracking-widest mb-3">{children}</div>
+    <div className="text-slate-300 text-xs font-semibold uppercase tracking-widest mb-3">{children}</div>
   );
 
   const PrimaryBtn = ({ onClick, children }) => (
