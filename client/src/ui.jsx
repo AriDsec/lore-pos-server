@@ -114,7 +114,7 @@ export function imprimirTiquete(order, zona) {
     'Efectivo';
 
   const ubicacion = order.locationLabel || order.barra
-    || ((order.table && order.table > 0) ? `Mesa ${order.table}` : '');
+    || ((order.table !== null && order.table !== undefined) ? `Mesa ${order.table}` : '');
 
   const separador = '-'.repeat(40);
 
