@@ -685,7 +685,7 @@ export function PinLoginScreen({ isLandscape, syncError, loading, onLogin }) {
 // SELECTOR SCREEN (Admin)
 // ─────────────────────────────────────────────
 
-export function SelectorScreen({ isLandscape, syncError, loading, onSelect, onBack, adminUser }) {
+export function SelectorScreen({ isLandscape, syncError, loading, onSelect, onBack, adminUser, kitchenPendingCount = 0 }) {
   const meseras = ['Mari', 'Mile', 'Lin', 'Temp Bar', 'Guido Bar'];
 
   // Determine which menu to show based on who logged in
@@ -764,7 +764,15 @@ export function SelectorScreen({ isLandscape, syncError, loading, onSelect, onBa
             <SectionLabel>Restaurante</SectionLabel>
             <PrimaryBtn onClick={() => onSelect('Caja Restaurante')}>Caja</PrimaryBtn>
             <PrimaryBtn onClick={() => onSelect('Tablet Restaurante')}>Tomar Pedidos</PrimaryBtn>
-            <PrimaryBtn onClick={() => onSelect('Cocina')}>Cocina</PrimaryBtn>
+            <button onClick={() => onSelect('Cocina')}
+              className="relative w-full bg-[#94cb47] hover:bg-[#7ab035] active:bg-[#6a9c2e] text-black font-bold py-5 md:py-6 rounded-2xl transition shadow-lg text-base md:text-xl">
+              Cocina
+              {kitchenPendingCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold min-w-[22px] h-[22px] rounded-full flex items-center justify-center px-1 shadow-lg">
+                  {kitchenPendingCount}
+                </span>
+              )}
+            </button>
             <div className="pt-2">
               <PrimaryBtn onClick={() => onSelect('__admin__')}>Panel Admin</PrimaryBtn>
             </div>
@@ -802,7 +810,15 @@ export function SelectorScreen({ isLandscape, syncError, loading, onSelect, onBa
             <SectionLabel>Zona Restaurante</SectionLabel>
             <PrimaryBtn onClick={() => onSelect('Caja Restaurante')}>Caja</PrimaryBtn>
             <PrimaryBtn onClick={() => onSelect('Tablet Restaurante')}>Tomar Pedidos</PrimaryBtn>
-            <PrimaryBtn onClick={() => onSelect('Cocina')}>Cocina</PrimaryBtn>
+            <button onClick={() => onSelect('Cocina')}
+              className="relative w-full bg-[#94cb47] hover:bg-[#7ab035] active:bg-[#6a9c2e] text-black font-bold py-5 md:py-6 rounded-2xl transition shadow-lg text-base md:text-xl">
+              Cocina
+              {kitchenPendingCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold min-w-[22px] h-[22px] rounded-full flex items-center justify-center px-1 shadow-lg">
+                  {kitchenPendingCount}
+                </span>
+              )}
+            </button>
           </div>
           {/* Admin */}
           <div className={`bg-slate-800/80 backdrop-blur border border-[#94cb47]/30 rounded-2xl p-5 md:p-8 space-y-3 ${!isLandscape ? 'sm:col-span-2' : ''}`}>
