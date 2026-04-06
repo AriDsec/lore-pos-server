@@ -298,3 +298,37 @@ export const MENU = {
       { id: 'f_filet_pescado', name: 'Filet de pescado', price: 3300, category: 'food', canHavePapas: true },
       { id: 'f_costilla_bbq', name: 'Costilla BBQ', price: 4500, category: 'food', canHavePapas: true },
       { id: 'f_salchipapas', name: 'Salchipapas', price: 2800, category: 'food' },
+
+    ],
+    'Menú de niños': [
+      { id: 'f_deditos_pollo', name: 'Deditos de pollo', price: 2300, category: 'food' },
+      { id: 'f_deditos_pescado', name: 'Deditos de pescado', price: 2300, category: 'food' },
+      { id: 'f_papas_pequenas', name: 'Papas pequeñas', price: 1000, category: 'food' },
+      { id: 'f_nino_nachos', name: 'Niño nachos', price: 2300, category: 'food' },
+    ],
+  },
+};
+
+// ─────────────────────────────────────────────
+// PINES Y USUARIOS
+// ─────────────────────────────────────────────
+export const PINES = {
+  // ── Caja ──
+  'Caja Bar':           { pin: '1970', role: 'caja',   zone: 'bar' },
+  'Caja Restaurante':   { pin: '1969', role: 'caja',   zone: 'restaurante' },
+  // ── Meseras Bar ──
+  'Mari':               { pin: '5456', role: 'mesera', zone: 'bar' },
+  'Mile':               { pin: '8995', role: 'mesera', zone: 'bar' },
+  'Lin':                { pin: '7777', role: 'mesera', zone: 'bar' },
+  'Temp Bar':           { pin: '1221', role: 'mesera', zone: 'bar' },
+  // ── Admins (selector completo + registro de acceso) ──
+  // Guido, Lindsey, Ariel: admin general
+  // Aaron: también usa Tablet Restaurante y Cocina desde su selector
+  'Guido':              { pin: '0000', role: 'admin',  zone: 'admin' },
+  'Lindsey':            { pin: '1324', role: 'admin',  zone: 'admin' },
+  'Ariel':              { pin: '3306', role: 'admin',  zone: 'admin' },
+  'Aaron':              { pin: '7878', role: 'admin',  zone: 'admin' },
+};
+
+export const meseras = ['Mari', 'Mile', 'Lin', 'Temp Bar', 'Guido Bar'];
+export const barras  = ['Barra 1', 'Barra 2', 'Barra 3', 'Barra Grande'];
