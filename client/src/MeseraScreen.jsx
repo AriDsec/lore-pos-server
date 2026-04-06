@@ -100,6 +100,7 @@ export function MeseraScreen({
     onSplit: (acc) => setSplitOrder(acc),
     currentUser,
     aplicaServicio,
+    onToggleModoRestaurante,
   };
 
   // Panel central con secciones y buscador global
