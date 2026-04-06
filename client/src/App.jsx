@@ -474,20 +474,9 @@ export default function RestaurantePOS() {
           setOpenAccounts(prev => prev.map(a => (a.id === accId || a._id === accId) ? { ...a, ...updatedAcc } : a));
         }
 
-        // Detectar items nuevos vs lo que ya estaba en la cuenta
-        const prevItems = existingItems;
-        const itemsParaCocina = foodItems.reduce((nuevos, item) => {
-          const baseId = item.id.includes('::') ? item.id.split('::')[0] : item.id;
-          const prev = prevItems.find(p => (p.id.includes('::') ? p.id.split('::')[0] : p.id) === baseId);
-          if (!prev) {
-            // Item completamente nuevo
-            nuevos.push({ ...item, esNuevo: true });
-          } else if (item.quantity > prev.quantity) {
-            // Cantidad aumentada — mandar solo la diferencia
-            nuevos.push({ ...item, quantity: item.quantity - prev.quantity, esNuevo: true });
-          }
-          return nuevos;
-        }, []);
+        // Todo lo que está en el carrito al editar es NUEVO para cocina
+        // El carrito ya solo tiene items nuevos (no los existentes de la cuenta)
+        const itemsParaCocina = foodItems.map(item => ({ ...item, esNuevo: true }));
 
         if (itemsParaCocina.length > 0) {
           await api.createKitchenOrder({
