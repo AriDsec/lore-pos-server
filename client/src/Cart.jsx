@@ -76,14 +76,38 @@ export function ShoppingCart({
           ))}
         </div>
 
-        {/* Lista de items */}
+        {/* Items existentes en la cuenta (solo lectura) */}
+        {selectedAcc && (selectedAcc.items || []).length > 0 && (
+          <div className="rounded-xl border border-slate-600/50 overflow-hidden">
+            <div className="bg-slate-700/40 px-3 py-1.5 text-slate-400 text-xs font-bold uppercase tracking-wide">
+              En la cuenta
+            </div>
+            <div className="divide-y divide-slate-700/40">
+              {(selectedAcc.items || []).map((item, i) => (
+                <div key={i} className="flex justify-between items-center px-3 py-2">
+                  <div>
+                    <span className="text-white text-xs md:text-sm">{item.quantity}x {item.name}</span>
+                    {item.breakdown && Object.keys(item.breakdown).length > 1
+                      ? <div className="text-slate-500 text-xs">{Object.entries(item.breakdown).map(([u,q]) => `${u} x${q}`).join(' · ')}</div>
+                      : item.addedBy && <div className="text-slate-500 text-xs">👤 {item.addedBy}</div>
+                    }
+                  </div>
+                  <span className="text-[#94cb47] text-xs font-bold">₡{(item.price * item.quantity).toLocaleString()}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Items nuevos a agregar */}
         {cartItems.length === 0 ? (
-          <div className="text-center py-8 text-slate-500">
-            <Utensils size={28} className="mx-auto mb-2 opacity-50" />
-            <p className="text-xs">Carrito vacío</p>
+          <div className="text-center py-6 text-slate-500">
+            <Utensils size={24} className="mx-auto mb-2 opacity-50" />
+            <p className="text-xs">{selectedAcc ? 'Agrega items nuevos' : 'Carrito vacío'}</p>
           </div>
         ) : (
           <div className="space-y-2">
+            {selectedAcc && <div className="text-slate-400 text-xs font-bold uppercase tracking-wide px-1">Agregando</div>}
             {cartItems.map(item => (
               <div key={item.id} className="bg-slate-700/60 rounded-lg p-2 border border-[#94cb47]/20">
                 <div className="flex justify-between items-center mb-1">
