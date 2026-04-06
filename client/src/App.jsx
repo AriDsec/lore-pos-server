@@ -436,54 +436,24 @@ export default function RestaurantePOS() {
           setLoading(false); return;
         }
         const existingItems = acc?.items || [];
-        // Merge inteligente: los items del carrito son NUEVOS — no reemplazar los existentes
-        // Agrupar por id base + addedBy para no duplicar
-        const mergedMap = new Map();
-        // Agrupar por producto (baseId) — guardar desglose por mesera en breakdown
-        const addToMap = (item, who) => {
-          const baseId = item.id.includes('::') ? item.id.split('::')[0] : item.id;
-          if (mergedMap.has(baseId)) {
-            const prev = mergedMap.get(baseId);
-            const bd = { ...(prev.breakdown || {}) };
-            bd[who] = (bd[who] || 0) + item.quantity;
-            mergedMap.set(baseId, { ...prev, id: baseId, quantity: prev.quantity + item.quantity, breakdown: bd, addedBy: Object.keys(bd).join(', ') });
+        // Merge simple: partir de existingItems, agregar/sumar los del carrito
+        const toBase = (id) => id.includes('::') ? id.split('::')[0] : id;
+        const merged = existingItems.map(e => ({ ...e, id: toBase(e.id) }));
+        cartItems.forEach(cartItem => {
+          const cBase = toBase(cartItem.id);
+          const existIdx = merged.findIndex(e => toBase(e.id) === cBase);
+          if (existIdx >= 0) {
+            const ex = merged[existIdx];
+            const bd = { ...(ex.breakdown || { [ex.addedBy || '']: ex.quantity }) };
+            const who = cartItem.addedBy || currentUser;
+            bd[who] = (bd[who] || 0) + cartItem.quantity;
+            merged[existIdx] = { ...ex, quantity: ex.quantity + cartItem.quantity, breakdown: bd, addedBy: Object.keys(bd).join(', ') };
           } else {
-            const bd = { [who]: item.quantity };
-            mergedMap.set(baseId, { ...item, id: baseId, quantity: item.quantity, breakdown: bd, addedBy: who });
-          }
-        };
-        existingItems.forEach(item => {
-          const who = item.addedBy || '';
-          const baseId = item.id.includes('::') ? item.id.split('::')[0] : item.id;
-          // Reconstruir desde breakdown si existe, o usar addedBy directo
-          if (item.breakdown && Object.keys(item.breakdown).length > 0) {
-            Object.entries(item.breakdown).forEach(([user, qty]) => {
-              addToMap({ ...item, id: baseId, quantity: qty }, user);
-            });
-          } else {
-            // Fallback para items sin breakdown (cuentas antiguas)
-            // Si addedBy tiene coma, es múltiples usuarios — repartir cantidad equitativamente
-            if (who.includes(', ')) {
-              const users = who.split(', ').filter(Boolean);
-              const qtyEach = Math.floor(item.quantity / users.length) || 1;
-              users.forEach(u => addToMap({ ...item, id: baseId, quantity: qtyEach }, u));
-            } else {
-              addToMap({ ...item, id: baseId }, who);
-            }
+            const who = cartItem.addedBy || currentUser;
+            merged.push({ ...cartItem, id: cBase, breakdown: { [who]: cartItem.quantity }, addedBy: who });
           }
         });
-        cartItems.forEach(item => {
-          // Si el item del carrito ya tiene breakdown (múltiples usuarios), expandir
-          if (item.breakdown && Object.keys(item.breakdown).length > 1) {
-            const baseId = item.id.includes('::') ? item.id.split('::')[0] : item.id;
-            Object.entries(item.breakdown).forEach(([user, qty]) => {
-              addToMap({ ...item, id: baseId, quantity: qty }, user);
-            });
-          } else {
-            addToMap(item, item.addedBy || currentUser);
-          }
-        });
-        const mergedItems = Array.from(mergedMap.values());
+        const mergedItems = merged;
         const mergedTotal = mergedItems.reduce((s, i) => s + i.price * i.quantity, 0);
         const updatedAcc = await api.updateAccount(accId, { items: mergedItems, total: mergedTotal, editedBy: currentUser });
         // Actualizar openAccounts en memoria inmediatamente con la cuenta ya mergeada
