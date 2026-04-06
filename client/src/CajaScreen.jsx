@@ -75,7 +75,7 @@ export function CajaScreen({
                   <div key={acc._id || acc.id} className="bg-slate-700/50 rounded-xl p-3 border border-amber-500/20">
                     <div className="flex justify-between items-start mb-2">
                       <div>
-                        <div className="text-white font-bold text-sm md:text-base">{acc.locationLabel || acc.barra || ((acc.table && acc.table > 0) ? `Mesa ${acc.table}` : '—')}{acc.clientName ? ` — ${acc.clientName}` : ''}</div>
+                        <div className="text-white font-bold text-sm md:text-base">{acc.locationLabel || acc.barra || ((acc.table !== null && acc.table !== undefined) ? `Mesa ${acc.table}` : '—')}{acc.clientName ? ` — ${acc.clientName}` : ''}</div>
                         <div className="text-slate-400 text-xs md:text-sm">{acc.mesera} · {(acc.items||[]).length} items</div>
                       </div>
                       <div className="text-amber-400 font-bold text-sm md:text-base">₡{(acc.total||0).toLocaleString()}</div>
@@ -113,7 +113,7 @@ export function CajaScreen({
                         {/* Fila superior: nombre + total + basurero */}
                         <div className="flex justify-between items-start mb-3">
                           <div className="flex-1 min-w-0 pr-3">
-                            <div className="text-white font-bold text-sm leading-snug">{acc.locationLabel || acc.barra || ((acc.table && acc.table > 0) ? `Mesa ${acc.table}` : 'Sin ubicación')}{acc.clientName ? ` — ${acc.clientName}` : ''}</div>
+                            <div className="text-white font-bold text-sm leading-snug">{acc.locationLabel || acc.barra || ((acc.table !== null && acc.table !== undefined) ? `Mesa ${acc.table}` : 'Sin ubicación')}{acc.clientName ? ` — ${acc.clientName}` : ''}</div>
                             <div className="text-slate-400 text-xs md:text-sm mt-0.5">{acc.mesera}{acc.lastEditedBy && acc.lastEditedBy !== acc.mesera ? ` (editada por ${acc.lastEditedBy})` : ''} · {(acc.items||[]).length} items</div>
                           </div>
                           <div className="flex items-center gap-2 flex-shrink-0">
@@ -211,7 +211,7 @@ export function CajaScreen({
                 {pendientes.map(acc => (
                   <div key={acc._id || acc.id} className="bg-[#94cb47]/10 rounded-xl p-4 md:p-5 flex flex-wrap justify-between items-center gap-3 border border-[#94cb47]/30">
                     <div>
-                      <div className="text-white font-bold text-base md:text-xl">{acc.locationLabel || acc.barra || ((acc.table && acc.table > 0) ? `Mesa ${acc.table}` : 'Sin ubicación')}{acc.clientName ? ` — ${acc.clientName}` : ''}</div>
+                      <div className="text-white font-bold text-base md:text-xl">{acc.locationLabel || acc.barra || ((acc.table !== null && acc.table !== undefined) ? `Mesa ${acc.table}` : 'Sin ubicación')}{acc.clientName ? ` — ${acc.clientName}` : ''}</div>
                       <div className="text-slate-400 text-sm md:text-base">{acc.mesera}{acc.lastEditedBy && acc.lastEditedBy !== acc.mesera ? ` (editada por ${acc.lastEditedBy})` : ''} · {(acc.items||[]).length} items</div>
                       {acc.pendingNote && <div className="text-[#94cb47]/70 text-xs mt-0.5">{acc.pendingNote}</div>}
                     </div>
@@ -242,7 +242,7 @@ export function CajaScreen({
                   <div className="flex justify-between items-start gap-2 mb-2">
                     <div className="min-w-0">
                       <div className="text-white font-bold text-sm md:text-base leading-tight">
-                        {o.locationLabel || o.barra || ((o.table && o.table > 0) ? `Mesa ${o.table}` : '—')}
+                        {o.locationLabel || o.barra || ((o.table !== null && o.table !== undefined) ? `Mesa ${o.table}` : '—')}
                         {o.clientName ? <span className="text-slate-300"> — {o.clientName}</span> : ''}
                       </div>
                       <div className="text-slate-400 text-xs md:text-sm mt-0.5">
@@ -285,7 +285,7 @@ export function CajaScreen({
               </p>
               <div className="bg-slate-700/60 rounded-xl p-3 mt-3 text-left">
                 <div className="text-white font-bold text-sm">
-                  {deleteConfirm.barra || ((deleteConfirm.table && deleteConfirm.table > 0) ? `Mesa ${deleteConfirm.table}` : '—')}
+                  {deleteConfirm.barra || ((deleteConfirm.table !== null && deleteConfirm.table !== undefined) ? `Mesa ${deleteConfirm.table}` : '—')}
                   {deleteConfirm.clientName ? ` — ${deleteConfirm.clientName}` : ''}
                 </div>
                 <div className="text-slate-400 text-xs md:text-sm mt-0.5">
