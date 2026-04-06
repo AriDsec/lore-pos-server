@@ -360,7 +360,7 @@ export default function RestaurantePOS() {
     const acc = openAccounts.find(a => (a._id === accountId || a.id === accountId));
     if (!acc) return;
     setSelectedAccount(accountId);
-    setCartItems(acc.items);
+    sessionStorage.removeItem('lore_cart'); setCartItems([]); // carrito vacío — solo se agregan items NUEVOS
     setSelectedTable((acc.table && Number(acc.table) > 0) ? Number(acc.table) : null);
     setSelectedBarra(acc.barra);
     setClientName(acc.clientName || '');
