@@ -172,7 +172,7 @@ export default function RestaurantePOS() {
   // Recalcular precios del carrito cuando cambia mesa/barra (servicio 10%)
   useEffect(() => {
     if (cartItems.length === 0 || currentZone !== 'bar' || !servicioActivoGlobal || modoRestaurante) return;
-    const esmesa = !!selectedTable && !selectedBarra;
+    const esmesa = (selectedTable !== null && selectedTable !== undefined) && !selectedBarra;
     setCartItems(prev => prev.map(item => {
       // Solo recalcular items con conServicio explícitamente definido (boolean)
       // Items sin conServicio (cuentas antiguas) NO se tocan para evitar doble 10%
@@ -368,7 +368,7 @@ export default function RestaurantePOS() {
   };
 
   // Servicio 10% solo aplica en mesas (no en barras — ahí el cliente se sirve solo)
-  const aplicaServicio = servicioActivoGlobal && currentZone === 'bar' && !modoRestaurante && !!selectedTable && !selectedBarra;
+  const aplicaServicio = servicioActivoGlobal && currentZone === 'bar' && !modoRestaurante && (selectedTable !== null && selectedTable !== undefined) && !selectedBarra;
   const conServicio = (precio) => aplicaServicio ? Math.round(precio * 1.10) : precio;
 
   const addToCart = (item, withPotatoes = false) => {
@@ -410,12 +410,12 @@ export default function RestaurantePOS() {
     // En restaurante nunca debe haber barra
     if (currentZone === 'restaurante' && selectedBarra) setSelectedBarra(null);
     // Avisar si el servicio debería aplicar pero no hay mesa seleccionada
-    if (servicioActivoGlobal && currentZone === 'bar' && !selectedTable && !selectedBarra) {
+    if (servicioActivoGlobal && currentZone === 'bar' && (selectedTable === null || selectedTable === undefined) && !selectedBarra) {
       showToast('El 10% de servicio aplica en mesas — selecciona una mesa o confirma que es barra', 'warning');
     }
     if (!orderType) { showToast('Selecciona el tipo de pedido', 'warning'); return; }
     const validZone = (currentZone === 'bar' && modoRestaurante) ? 'restaurante' : currentZone;
-    if (orderType === 'dine-in' && (validZone === 'restaurante' ? !selectedTable : (!selectedTable && !selectedBarra))) { showToast('Selecciona una mesa o barra', 'warning'); return; }
+    if (orderType === 'dine-in' && (validZone === 'restaurante' ? (selectedTable === null || selectedTable === undefined) : ((selectedTable === null || selectedTable === undefined) && !selectedBarra))) { showToast('Selecciona una mesa o barra', 'warning'); return; }
     if (!clientName.trim()) { showToast('Ingresa un nombre o seña', 'warning'); return; }
     if (clientName.trim().toLowerCase() === 'cliente general') { showToast('Usa un nombre real, no "Cliente General"', 'warning'); return; }
     const total = cartItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
@@ -647,6 +647,12 @@ export default function RestaurantePOS() {
       setKitchenOrders(prev => prev.filter(o => !kitchenToDelete.find(k => k.id === o.id)));
       const fresh = await api.getOpenAccounts(currentZone);
       setOpenAccounts(fresh);
+      // Si la cuenta borrada era la seleccionada, limpiar selección
+      if (selectedAccount === (account.id || account._id)) {
+        setSelectedAccount(null);
+        sessionStorage.removeItem('lore_cart'); setCartItems([]);
+        setSelectedTable(null); setSelectedBarra(null); setClientName(''); setOrderType(null);
+      }
       showToast('Cuenta eliminada');
     } catch (err) {
       showToast('Error al eliminar: ' + err.message, 'error');
