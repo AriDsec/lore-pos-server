@@ -461,7 +461,15 @@ export default function RestaurantePOS() {
               addToMap({ ...item, id: baseId, quantity: qty }, user);
             });
           } else {
-            addToMap({ ...item, id: baseId }, who);
+            // Fallback para items sin breakdown (cuentas antiguas)
+            // Si addedBy tiene coma, es múltiples usuarios — repartir cantidad equitativamente
+            if (who.includes(', ')) {
+              const users = who.split(', ').filter(Boolean);
+              const qtyEach = Math.floor(item.quantity / users.length) || 1;
+              users.forEach(u => addToMap({ ...item, id: baseId, quantity: qtyEach }, u));
+            } else {
+              addToMap({ ...item, id: baseId }, who);
+            }
           }
         });
         cartItems.forEach(item => {
