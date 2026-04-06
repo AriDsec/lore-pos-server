@@ -30,6 +30,17 @@ export default function RestaurantePOS() {
     return new Date().getDay() === 6; // true solo si es sábado
   });
 
+  // Contar pedidos pendientes en cocina cuando se muestra el selector
+  useEffect(() => {
+    if (!showSelector) return;
+    Promise.all([api.getKitchenOrders('restaurante'), api.getKitchenOrders('bar')])
+      .then(([kr, kb]) => {
+        const pending = [...kr, ...kb].filter(o => o.status === 'pending').length;
+        setKitchenPendingCount(pending);
+      })
+      .catch(() => {});
+  }, [showSelector]);
+
   // Al iniciar, sincronizar — sábado siempre activo, cualquier otro día siempre desactivo
   useEffect(() => {
     const esSabado = new Date().getDay() === 6;
@@ -65,6 +76,7 @@ export default function RestaurantePOS() {
   const [openAccounts, setOpenAccounts]   = useState([]);
   const [paidOrders, setPaidOrders]       = useState([]);
   const [kitchenOrders, setKitchenOrders] = useState([]);
+  const [kitchenPendingCount, setKitchenPendingCount] = useState(0);
   const [selectedAccount, setSelectedAccount] = useState(null);
 
   // Persistir carrito en sessionStorage — sobrevive recarga de página pero no cierre del browser
@@ -796,6 +808,7 @@ export default function RestaurantePOS() {
         syncError={syncError}
         loading={loading}
         adminUser={adminUser}
+        kitchenPendingCount={kitchenPendingCount}
         onSelect={handleSelectorLogin}
         onBack={() => { setShowSelector(false); setAdminUser(null); localStorage.removeItem('lore_admin'); }}
       />;
@@ -815,7 +828,7 @@ export default function RestaurantePOS() {
       <>
         <Toast toasts={toasts} offline={!!syncError} />
         {showSelector
-          ? <SelectorScreen isLandscape={isLandscape} syncError={syncError} loading={loading} onSelect={handleSelectorLogin} onBack={() => { setShowSelector(false); setAdminUser(null); localStorage.removeItem('lore_admin'); }} />
+          ? <SelectorScreen isLandscape={isLandscape} syncError={syncError} loading={loading} kitchenPendingCount={kitchenPendingCount} onSelect={handleSelectorLogin} onBack={() => { setShowSelector(false); setAdminUser(null); localStorage.removeItem('lore_admin'); }} />
           : <PinLoginScreen isLandscape={isLandscape} syncError={syncError} loading={loading} onLogin={loginWithPin} onShowSelector={() => setShowSelector(true)} />
         }
       </>
