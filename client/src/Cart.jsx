@@ -55,7 +55,7 @@ export function ShoppingCart({
             <option value="">➕ Nueva Cuenta</option>
             {openAccounts.filter(a => a.status !== 'pending_payment' && a.status !== 'pending_approval' && a.status !== 'rejected').map(acc => (
               <option key={acc.id} value={acc.id}>
-                {acc.barra ? acc.barra : (acc.table && acc.table > 0) ? `Mesa ${acc.table}` : 'Sin mesa'}{acc.clientName ? ` — ${acc.clientName}` : ''}
+                {acc.barra ? acc.barra : (acc.table !== null && acc.table !== undefined) ? `Mesa ${acc.table}` : 'Sin mesa'}{acc.clientName ? ` — ${acc.clientName}` : ''}
               </option>
             ))}
           </select>
@@ -187,7 +187,7 @@ export function ShoppingCart({
               <div className={(isBar && !modoRestaurante) ? "grid grid-cols-2 gap-2" : "grid grid-cols-1"}>
                 <div>
                   <label className="text-slate-400 text-xs md:text-lg mb-0.5 block">Mesa</label>
-                  <select value={selectedTable || ''} onChange={(e) => { setSelectedTable(e.target.value ? Number(e.target.value) : null); setSelectedBarra(null); }}
+                  <select value={selectedTable !== null && selectedTable !== undefined ? selectedTable : ''} onChange={(e) => { setSelectedTable(e.target.value !== '' ? Number(e.target.value) : null); setSelectedBarra(null); }}
                     className="w-full bg-slate-700 border border-[#94cb47]/30 text-white rounded-lg p-1.5 md:p-3 text-xs md:text-lg focus:outline-none">
                     <option value="">—</option>
                     {(tables || Array.from({ length: maxTables }, (_, i) => i + 1)).map(n => (
