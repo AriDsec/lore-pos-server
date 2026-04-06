@@ -87,15 +87,15 @@ const accountSchema = new mongoose.Schema({
   type: String,
   items: [{
     id: String, name: String, price: Number, quantity: Number,
-    category: String, notes: String, addedBy: String, kitchen: Boolean, conServicio: Boolean,
+    category: String, notes: String, addedBy: String, breakdown: mongoose.Schema.Types.Mixed, kitchen: Boolean, conServicio: Boolean,
   }],
   foodItems: [{
     id: String, name: String, price: Number, quantity: Number,
-    category: String, notes: String, addedBy: String, kitchen: Boolean, conServicio: Boolean,
+    category: String, notes: String, addedBy: String, breakdown: mongoose.Schema.Types.Mixed, kitchen: Boolean, conServicio: Boolean,
   }],
   drinkItems: [{
     id: String, name: String, price: Number, quantity: Number,
-    category: String, notes: String, addedBy: String, kitchen: Boolean, conServicio: Boolean,
+    category: String, notes: String, addedBy: String, breakdown: mongoose.Schema.Types.Mixed, kitchen: Boolean, conServicio: Boolean,
   }],
   total: Number,
   totalOriginal: Number,
