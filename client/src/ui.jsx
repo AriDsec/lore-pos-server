@@ -102,21 +102,24 @@ export async function imprimirTiquete(orden, config = {}) {
       fecha: new Date().toLocaleDateString('es-CR'),
       hora: new Date().toLocaleTimeString('es-CR'),
       zona: orden.zone === 'bar' ? 'Bar' : 'Restaurante',
-      ubicacion: orden.table ? `Mesa ${orden.table}` : orden.barra ? `Barra ${orden.barra}` : '',
-      paraLlevar: orden.orderType === 'llevar',
+      ubicacion: orden.locationLabel || (orden.table !== null && orden.table !== undefined ? `Mesa ${orden.table}` : orden.barra ? orden.barra : ''),
+      paraLlevar: orden.type === 'takeout',
       cliente: orden.clientName || '',
-      mesera: orden.meseraName || '',
+      mesera: orden.mesera || '',
       items: (orden.items || []).map(i => ({
         nombre: i.name,
         cantidad: i.quantity,
         precio: i.price,
-        nota: i.note || '',
+        nota: i.notes || '',
       })),
-      descuento: orden.discount || 0,
-      servicio: orden.serviceCharge || 0,
+      descuento: orden.descuento || 0,
+      servicio: 0,
       total: orden.total || 0,
       metodoPago: orden.paymentMethod || '',
-      desgloseMixto: orden.mixedPayment || null,
+      desgloseMixto: (orden.efectivoMixto || orden.tarjetaMixto) ? {
+        Efectivo: orden.efectivoMixto || 0,
+        [orden.paymentMethod === 'efectivo_sinpe' ? 'SINPE' : 'Tarjeta']: orden.tarjetaMixto || 0,
+      } : null,
     };
 
     const res = await fetch('http://localhost:3001/imprimir', {
