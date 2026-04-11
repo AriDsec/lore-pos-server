@@ -262,7 +262,7 @@ export function CajaScreen({
                     <div>{payBadge(o.paymentMethod)}</div>
                     <div className="flex gap-1.5">
                       <button onClick={() => setViewItemsOrder(o)} className="bg-slate-600 hover:bg-slate-500 text-white px-3 md:px-5 py-1.5 md:py-2.5 rounded-lg text-xs md:text-sm font-bold">📋 Ver</button>
-                      <button onClick={() => imprimirTiquete(o)} className="bg-blue-700 hover:bg-blue-800 text-white px-3 md:px-5 py-1.5 md:py-2.5 rounded-lg text-xs md:text-sm font-bold">🖨️</button>
+                      <button onClick={() => imprimirTiquete(o, zona)} className="bg-blue-700 hover:bg-blue-800 text-white px-3 md:px-5 py-1.5 md:py-2.5 rounded-lg text-xs md:text-sm font-bold">🖨️</button>
                     </div>
                   </div>
                 </div>
