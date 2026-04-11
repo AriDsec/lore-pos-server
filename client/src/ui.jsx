@@ -131,11 +131,11 @@ export function imprimirTiquete(order, zona) {
     html, body {
       font-family: 'Courier New', Courier, monospace;
       font-size: 12px;
-      width: 72mm;
+      width: 100%;
       color: #000;
       background: #fff;
     }
-    .wrap { padding: 4px 6px; }
+    .wrap { padding: 2px 4px; }
     .center { text-align: center; }
     .right  { text-align: right; }
     .bold   { font-weight: bold; }
@@ -145,9 +145,8 @@ export function imprimirTiquete(order, zona) {
     .sep2   { border-top: 2px solid #000;  margin: 3px 0; }
     pre     { font-family: inherit; font-size: inherit; white-space: pre-wrap; }
     @media print {
-      @page { margin: 0; size: 72mm auto; }
-      html, body { width: 72mm; height: auto; }
-      .wrap { padding-bottom: 0; }
+      @page { margin: 0; }
+      html, body { width: 100%; height: auto; }
     }
   </style>
 </head>
