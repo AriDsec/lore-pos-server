@@ -176,15 +176,14 @@ export function imprimirTiquete(order, zona) {
 </div>
 <script>
   window.onload = function() {
-    // Ajustar height al contenido real para evitar espacio en blanco
     var h = document.body.scrollHeight;
     var style = document.createElement('style');
-    style.innerHTML = '@page { size: 72mm ' + h + 'px; margin: 0; }';
+    style.innerHTML = '@page { size: 80mm ' + h + 'px; margin: 0; } html,body { width: 80mm; }';
     document.head.appendChild(style);
     setTimeout(function() {
       window.print();
       setTimeout(function() { window.close(); }, 500);
-    }, 100);
+    }, 150);
   };
 </script>
 </body>
