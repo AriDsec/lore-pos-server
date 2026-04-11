@@ -109,52 +109,49 @@ export function imprimirTiquete(order, zona) {
   const fecha = now.toLocaleDateString('es-CR', { day: '2-digit', month: '2-digit', year: 'numeric' });
   const hora  = now.toLocaleTimeString('es-CR', { hour: '2-digit', minute: '2-digit' });
 
-  const separador = '-'.repeat(40);
-
   let itemsText = '';
   (order.items || []).forEach(item => {
     const subtotal = `&#x20A1;${(item.price * item.quantity).toLocaleString()}`;
-    const nombreLocal = item.name.length > 22 ? item.name.substring(0, 22) : item.name;
-    const izq = `${item.quantity}x ${nombreLocal}`;
+    const nombre = item.name.length > 22 ? item.name.substring(0, 22) : item.name;
+    const izq = `${item.quantity}x ${nombre}`;
     itemsText += `${izq.padEnd(28)}${subtotal.padStart(12)}\n`;
     if (item.notes) itemsText += `   * ${item.notes}\n`;
   });
 
-  const totalOriginal = order.totalOriginal || order.total || 0;
-  const totalFinal    = order.total || 0;
-  const descuento     = order.descuento || 0;
-  const totalStr      = `&#x20A1;${totalFinal.toLocaleString()}`;
+  const totalFinal = order.total || 0;
+  const descuento  = order.descuento || 0;
 
   const html = `<!DOCTYPE html>
 <html>
 <head>
   <meta charset="UTF-8">
+  <title>Tiquete</title>
   <style>
-    @media print {
-      body { margin: 0; padding: 0; }
-      .no-print { display: none !important; }
-    }
-    * { box-sizing: border-box; }
-    body {
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
       font-family: 'Courier New', Courier, monospace;
       font-size: 12px;
       width: 72mm;
-      margin: 0 auto;
-      padding: 4px;
       color: #000;
       background: #fff;
     }
+    .wrap { padding: 4px 6px; }
     .center { text-align: center; }
     .right  { text-align: right; }
     .bold   { font-weight: bold; }
-    .large  { font-size: 15px; }
-    .xl     { font-size: 18px; }
-    .sep    { border-top: 1px dashed #000; margin: 4px 0; }
-    .sep2   { border-top: 2px solid #000; margin: 4px 0; }
-    pre     { font-family: inherit; font-size: inherit; margin: 0; white-space: pre-wrap; }
+    .xl     { font-size: 17px; }
+    .large  { font-size: 14px; }
+    .sep    { border-top: 1px dashed #000; margin: 3px 0; }
+    .sep2   { border-top: 2px solid #000;  margin: 3px 0; }
+    pre     { font-family: inherit; font-size: inherit; white-space: pre-wrap; }
+    @media print {
+      @page { margin: 0; size: 72mm auto; }
+      html, body { width: 72mm; }
+    }
   </style>
 </head>
 <body>
+<div class="wrap">
   <div class="center bold xl">Centro Social El Higueron</div>
   <div class="center">Donde Lore</div>
   <div class="center">Tel: 8888-8888</div>
@@ -171,32 +168,24 @@ export function imprimirTiquete(order, zona) {
   <div class="sep"></div>
   ${descuento > 0 ? `<div>Descuento: -&#x20A1;${descuento.toLocaleString()}</div>` : ''}
   <div class="sep2"></div>
-  <div class="bold large right">TOTAL: ${totalStr}</div>
+  <div class="bold large right">TOTAL: &#x20A1;${totalFinal.toLocaleString()}</div>
   <div class="sep2"></div>
   <div>Pago: ${metodoPago}</div>
   <div class="sep"></div>
   <div class="center">Gracias por su visita!</div>
-  <br><br><br>
+</div>
+<script>
+  window.onload = function() {
+    window.print();
+    setTimeout(function() { window.close(); }, 500);
+  };
+</script>
 </body>
 </html>`;
 
-  const printDiv = document.createElement('div');
-  printDiv.style.cssText = 'position:fixed;top:0;left:0;width:0;height:0;overflow:hidden;';
-  document.body.appendChild(printDiv);
-
-  const iframe = document.createElement('iframe');
-  iframe.style.cssText = 'width:0;height:0;border:none;';
-  printDiv.appendChild(iframe);
-
-  iframe.contentDocument.open();
-  iframe.contentDocument.write(html);
-  iframe.contentDocument.close();
-
-  setTimeout(() => {
-    iframe.contentWindow.focus();
-    iframe.contentWindow.print();
-    setTimeout(() => {
-      try { document.body.removeChild(printDiv); } catch(e) {}
-    }, 1000);
-  }, 300);
+  const win = window.open('', '_blank', 'width=300,height=600');
+  if (win) {
+    win.document.write(html);
+    win.document.close();
+  }
 }
