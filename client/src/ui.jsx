@@ -92,46 +92,111 @@ export const payBadge = (m) => {
 // ITEM BUTTON (menú regular)
 // ─────────────────────────────────────────────
 
-export async function imprimirTiquete(orden, config = {}) {
-  try {
-    const tiquete = {
-      local: config.local || 'Centro Social El Higuerón',
-      propietario: config.propietario || '',
-      cedula: config.cedula || '',
-      telefono: config.telefono || '',
-      fecha: new Date().toLocaleDateString('es-CR'),
-      hora: new Date().toLocaleTimeString('es-CR'),
-      zona: orden.zone === 'bar' ? 'Bar' : 'Restaurante',
-      ubicacion: orden.locationLabel || (orden.table !== null && orden.table !== undefined ? `Mesa ${orden.table}` : orden.barra ? orden.barra : ''),
-      paraLlevar: orden.type === 'takeout',
-      cliente: orden.clientName || '',
-      mesera: orden.mesera || '',
-      items: (orden.items || []).map(i => ({
-        nombre: i.name,
-        cantidad: i.quantity,
-        precio: i.price,
-        nota: i.notes || '',
-      })),
-      descuento: orden.descuento || 0,
-      servicio: 0,
-      total: orden.total || 0,
-      metodoPago: orden.paymentMethod || '',
-      desgloseMixto: (orden.efectivoMixto || orden.tarjetaMixto) ? {
-        Efectivo: orden.efectivoMixto || 0,
-        [orden.paymentMethod === 'efectivo_sinpe' ? 'SINPE' : 'Tarjeta']: orden.tarjetaMixto || 0,
-      } : null,
-    };
+export function imprimirTiquete(order, zona) {
+  const esBar = zona === 'bar';
+  const metodoPago =
+    order.paymentMethod === 'sinpe'          ? 'SINPE Movil' :
+    order.paymentMethod === 'tarjeta'        ? 'Tarjeta' :
+    order.paymentMethod === 'mixto'          ? `Efectivo &#x20A1;${(order.efectivoMixto||0).toLocaleString()} + Tarjeta &#x20A1;${(order.tarjetaMixto||0).toLocaleString()}` :
+    order.paymentMethod === 'efectivo_sinpe' ? `Efectivo &#x20A1;${(order.efectivoMixto||0).toLocaleString()} + SINPE &#x20A1;${(order.tarjetaMixto||0).toLocaleString()}` :
+    order.paymentMethod === 'tarjeta_sinpe'  ? `Tarjeta &#x20A1;${(order.efectivoMixto||0).toLocaleString()} + SINPE &#x20A1;${(order.tarjetaMixto||0).toLocaleString()}` :
+    'Efectivo';
 
-    const res = await fetch('http://localhost:3001/imprimir', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ tiquete }),
-    });
+  const ubicacion = order.locationLabel || order.barra
+    || ((order.table !== null && order.table !== undefined) ? `Mesa ${order.table}` : '');
 
-    if (!res.ok) throw new Error('Error del servidor de impresion');
-    return true;
-  } catch (err) {
-    console.error('imprimirTiquete error:', err);
-    return false;
-  }
+  const now = new Date();
+  const fecha = now.toLocaleDateString('es-CR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  const hora  = now.toLocaleTimeString('es-CR', { hour: '2-digit', minute: '2-digit' });
+
+  const separador = '-'.repeat(40);
+
+  let itemsText = '';
+  (order.items || []).forEach(item => {
+    const subtotal = `&#x20A1;${(item.price * item.quantity).toLocaleString()}`;
+    const nombreLocal = item.name.length > 22 ? item.name.substring(0, 22) : item.name;
+    const izq = `${item.quantity}x ${nombreLocal}`;
+    itemsText += `${izq.padEnd(28)}${subtotal.padStart(12)}\n`;
+    if (item.notes) itemsText += `   * ${item.notes}\n`;
+  });
+
+  const totalOriginal = order.totalOriginal || order.total || 0;
+  const totalFinal    = order.total || 0;
+  const descuento     = order.descuento || 0;
+  const totalStr      = `&#x20A1;${totalFinal.toLocaleString()}`;
+
+  const html = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    @media print {
+      body { margin: 0; padding: 0; }
+      .no-print { display: none !important; }
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 12px;
+      width: 72mm;
+      margin: 0 auto;
+      padding: 4px;
+      color: #000;
+      background: #fff;
+    }
+    .center { text-align: center; }
+    .right  { text-align: right; }
+    .bold   { font-weight: bold; }
+    .large  { font-size: 15px; }
+    .xl     { font-size: 18px; }
+    .sep    { border-top: 1px dashed #000; margin: 4px 0; }
+    .sep2   { border-top: 2px solid #000; margin: 4px 0; }
+    pre     { font-family: inherit; font-size: inherit; margin: 0; white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+  <div class="center bold xl">Centro Social El Higueron</div>
+  <div class="center">Donde Lore</div>
+  <div class="center">Tel: 8888-8888</div>
+  <div class="sep2"></div>
+  <div>Fecha: ${fecha}</div>
+  <div>Hora:  ${hora}</div>
+  <div>Zona:  ${esBar ? 'Bar' : 'Restaurante'}</div>
+  ${ubicacion ? `<div>Ubic:  ${ubicacion}</div>` : ''}
+  ${order.type === 'takeout' ? '<div class="center bold">*** PARA LLEVAR ***</div>' : ''}
+  ${order.clientName ? `<div>Cliente: ${order.clientName}</div>` : ''}
+  ${order.mesera ? `<div>Mesera:  ${order.mesera}</div>` : ''}
+  <div class="sep"></div>
+  <pre>${itemsText}</pre>
+  <div class="sep"></div>
+  ${descuento > 0 ? `<div>Descuento: -&#x20A1;${descuento.toLocaleString()}</div>` : ''}
+  <div class="sep2"></div>
+  <div class="bold large right">TOTAL: ${totalStr}</div>
+  <div class="sep2"></div>
+  <div>Pago: ${metodoPago}</div>
+  <div class="sep"></div>
+  <div class="center">Gracias por su visita!</div>
+  <br><br><br>
+</body>
+</html>`;
+
+  const printDiv = document.createElement('div');
+  printDiv.style.cssText = 'position:fixed;top:0;left:0;width:0;height:0;overflow:hidden;';
+  document.body.appendChild(printDiv);
+
+  const iframe = document.createElement('iframe');
+  iframe.style.cssText = 'width:0;height:0;border:none;';
+  printDiv.appendChild(iframe);
+
+  iframe.contentDocument.open();
+  iframe.contentDocument.write(html);
+  iframe.contentDocument.close();
+
+  setTimeout(() => {
+    iframe.contentWindow.focus();
+    iframe.contentWindow.print();
+    setTimeout(() => {
+      try { document.body.removeChild(printDiv); } catch(e) {}
+    }, 1000);
+  }, 300);
 }
