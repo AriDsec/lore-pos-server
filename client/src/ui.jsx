@@ -146,7 +146,8 @@ export function imprimirTiquete(order, zona) {
     pre     { font-family: inherit; font-size: inherit; white-space: pre-wrap; }
     @media print {
       @page { margin: 0; size: 72mm auto; }
-      html, body { width: 72mm; }
+      html, body { width: 72mm; height: auto; }
+      .wrap { padding-bottom: 0; }
     }
   </style>
 </head>
@@ -176,8 +177,15 @@ export function imprimirTiquete(order, zona) {
 </div>
 <script>
   window.onload = function() {
-    window.print();
-    setTimeout(function() { window.close(); }, 500);
+    // Ajustar height al contenido real para evitar espacio en blanco
+    var h = document.body.scrollHeight;
+    var style = document.createElement('style');
+    style.innerHTML = '@page { size: 72mm ' + h + 'px; margin: 0; }';
+    document.head.appendChild(style);
+    setTimeout(function() {
+      window.print();
+      setTimeout(function() { window.close(); }, 500);
+    }, 100);
   };
 </script>
 </body>
