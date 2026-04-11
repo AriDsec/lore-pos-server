@@ -455,8 +455,7 @@ export function BillModal({ order, onClose, onPay, zona }) {
             </button>
           )}
           <button onClick={() => imprimirTiquete(
-            hayDescuento ? { ...order, total: montoFinal, totalOriginal, descuento } : order,
-            zona
+            hayDescuento ? { ...order, total: montoFinal, totalOriginal, descuento } : order
           )} className="bg-blue-700 hover:bg-blue-800 text-white font-bold px-4 py-3 rounded-lg transition">🖨️</button>
           <button onClick={onClose} className="bg-slate-700 hover:bg-slate-600 text-white font-bold px-4 py-3 rounded-lg transition">✕</button>
         </div>
