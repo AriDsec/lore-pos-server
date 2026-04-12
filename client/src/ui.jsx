@@ -137,7 +137,7 @@ export function imprimirTiquete(order, zona) {
       color: #000;
       background: #fff;
       width: 72mm;
-      padding: 4px 6px;
+      padding: 4px 2px;
     }
 
     /* ── Encabezado ── */
