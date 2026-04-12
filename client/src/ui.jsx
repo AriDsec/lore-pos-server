@@ -129,17 +129,18 @@ export function imprimirTiquete(order, zona) {
   <title>Tiquete</title>
   <style>
     * { margin:0; padding:0; box-sizing:border-box; }
-    body { font-family:'Courier New',Courier,monospace; font-size:12px; color:#000; background:#fff; width:72mm; padding:4px 6px; }
+    body { font-family:'Courier New',Courier,monospace; font-size:14px; color:#000; background:#fff; width:72mm; padding:6px 8px; }
     .center { text-align:center; }
     .right  { text-align:right; }
     .bold   { font-weight:bold; }
-    .xl     { font-size:16px; }
-    .large  { font-size:13px; }
-    .sep    { border-top:1px dashed #000; margin:4px 0; }
-    .sep2   { border-top:2px solid #000; margin:4px 0; }
+    .xl     { font-size:20px; letter-spacing:1px; }
+    .large  { font-size:16px; }
+    .sep    { border-top:1px dashed #000; margin:6px 0; }
+    .sep2   { border-top:2px solid #000; margin:6px 0; }
+    div     { line-height:1.6; }
     table   { width:100%; border-collapse:collapse; }
-    td      { vertical-align:top; padding:1px 0; }
-    td:first-child { width:20px; }
+    td      { vertical-align:top; padding:2px 0; line-height:1.5; }
+    td:first-child { width:24px; }
     td:last-child  { white-space:nowrap; }
     @page   { size:72mm auto; margin:0; }
     @media print { html,body { width:72mm; } }
