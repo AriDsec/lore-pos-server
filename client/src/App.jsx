@@ -23,10 +23,6 @@ export default function RestaurantePOS() {
   const [toasts, setToasts]             = useState([]);
   const modalOpenRef = useRef(false); // pausa el sync cuando hay modal abierto
 
-  // Mantener modalOpenRef actualizado para que el interval del sync lo vea correctamente
-  useEffect(() => {
-    modalOpenRef.current = !!splitOrder || !!billOrder || !!viewItemsOrder;
-  }, [splitOrder, billOrder, viewItemsOrder]);
   const prevKitchenIds = useRef(new Set()); // para detectar pedidos nuevos en cocina
   const prevReadyIds   = useRef(new Set()); // para detectar pedidos listos para meseras
 
@@ -99,6 +95,11 @@ export default function RestaurantePOS() {
   const [billOrder, setBillOrder]           = useState(null);
   const [viewItemsOrder, setViewItemsOrder] = useState(null);
   const [splitOrder, setSplitOrder]         = useState(null);
+
+  // Mantener modalOpenRef actualizado para que el interval del sync lo vea correctamente
+  useEffect(() => {
+    modalOpenRef.current = !!splitOrder || !!billOrder || !!viewItemsOrder;
+  }, [splitOrder, billOrder, viewItemsOrder]);
   const [mesaConflict, setMesaConflict]     = useState(null); // {existingAcc, onConfirm}
 
   const [isLandscape, setIsLandscape] = useState(
