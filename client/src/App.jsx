@@ -389,10 +389,17 @@ export default function RestaurantePOS() {
   const conServicio = (precio) => aplicaServicio ? Math.round(precio * 1.10) : precio;
 
   const addToCart = (item, withPotatoes = false) => {
-    const baseId = `${item.id}${withPotatoes ? '_cp' : ''}`;
-    const basePrice = item.price + (withPotatoes && item.canHavePapas ? 500 : 0);
+    // withPotatoes: false = normal, true = con papas (+500), 'alt' = alternativa (yuca/pure)
+    const isAlt    = withPotatoes === 'alt';
+    const isPapas  = withPotatoes === true;
+    const baseId   = `${item.id}${isPapas ? '_cp' : isAlt ? '_alt' : ''}`;
+    const basePrice = item.price + (isPapas ? 500 : isAlt && !item.altFree ? 500 : 0);
     const price = conServicio(basePrice);
-    const displayName = withPotatoes && item.canHavePapas ? `${item.name} + Papas` : item.name;
+    const displayName = isPapas
+      ? `${item.name} + ${item.papasLabel || 'Papas'}`
+      : isAlt
+        ? `${item.name} + ${item.altLabel}`
+        : item.name;
     setCartItems(prev => {
       // Agrupar por baseId — un solo item en carrito con breakdown por usuario
       const idx = prev.findIndex(i => {
