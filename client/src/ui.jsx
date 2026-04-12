@@ -132,7 +132,7 @@ export function imprimirTiquete(order, zona) {
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: 'Courier New', Courier, monospace;
-      font-size: 13px;
+      font-size: 15px;
       color: #000;
       background: #fff;
       width: 72mm;
@@ -140,59 +140,59 @@ export function imprimirTiquete(order, zona) {
     }
 
     /* ── Encabezado ── */
-    .header { text-align: center; margin-bottom: 6px; }
+    .header { text-align: center; margin-bottom: 7px; }
     .header .local {
-      font-size: 17px;
+      font-size: 20px;
       font-weight: bold;
       letter-spacing: 1px;
       text-transform: uppercase;
       line-height: 1.3;
     }
     .header .sub {
-      font-size: 11px;
-      margin-top: 2px;
-      line-height: 1.5;
+      font-size: 13px;
+      margin-top: 3px;
+      line-height: 1.6;
     }
 
     /* ── Separadores ── */
-    .sep  { border-top: 1px dashed #000; margin: 5px 0; }
-    .sep2 { border-top: 2px solid  #000; margin: 5px 0; }
+    .sep  { border-top: 1px dashed #000; margin: 6px 0; }
+    .sep2 { border-top: 2px solid  #000; margin: 6px 0; }
 
     /* ── Info de la orden ── */
-    .info { font-size: 12px; line-height: 1.7; }
+    .info { font-size: 14px; line-height: 1.8; }
     .info .row { display: flex; }
-    .info .label { min-width: 58px; font-weight: bold; }
+    .info .label { min-width: 64px; font-weight: bold; }
     .info .llevar {
       text-align: center;
       font-weight: bold;
-      font-size: 13px;
-      margin: 3px 0;
+      font-size: 15px;
+      margin: 4px 0;
       border: 1px solid #000;
-      padding: 2px 0;
+      padding: 3px 0;
     }
 
     /* ── Items ── */
     table { width: 100%; border-collapse: collapse; margin: 2px 0; }
-    td { vertical-align: top; padding: 2px 0; font-size: 13px; line-height: 1.5; }
-    td.qty   { width: 22px; font-weight: bold; }
+    td { vertical-align: top; padding: 3px 0; font-size: 15px; line-height: 1.5; }
+    td.qty   { width: 26px; font-weight: bold; }
     td.name  { }
     td.price { text-align: right; white-space: nowrap; padding-left: 4px; }
-    .note    { font-size: 10px; color: #444; }
+    .note    { font-size: 12px; color: #444; }
 
     /* ── Totales ── */
-    .totales { font-size: 12px; line-height: 1.7; }
+    .totales { font-size: 14px; line-height: 1.8; }
     .totales .row { display: flex; justify-content: space-between; }
     .totales .total-row {
       display: flex;
       justify-content: space-between;
-      font-size: 16px;
+      font-size: 19px;
       font-weight: bold;
       margin: 3px 0;
     }
 
     /* ── Pie ── */
-    .pie { text-align: center; font-size: 11px; margin-top: 4px; line-height: 1.6; }
-    .pie .gracias { font-size: 12px; font-weight: bold; margin-bottom: 2px; }
+    .pie { text-align: center; font-size: 13px; margin-top: 5px; line-height: 1.7; }
+    .pie .gracias { font-size: 14px; font-weight: bold; margin-bottom: 2px; }
 
     @page   { size: 72mm auto; margin: 0; }
     @media print { html, body { width: 72mm; } }
