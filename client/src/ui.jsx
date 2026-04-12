@@ -178,7 +178,7 @@ export function imprimirTiquete(order, zona) {
   window.onload = function() {
     var h = document.body.scrollHeight;
     var style = document.createElement('style');
-    style.innerHTML = '@page { size: 80mm ' + h + 'px; margin: 0; } html,body { width: 80mm; }';
+    style.innerHTML = '@page { size: 80mm ' + h + 'px; margin: 0; orientation: portrait; } html,body { width: 80mm; }';
     document.head.appendChild(style);
     setTimeout(function() {
       window.print();
