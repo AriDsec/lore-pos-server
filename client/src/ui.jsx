@@ -112,11 +112,12 @@ export function imprimirTiquete(order, zona) {
   let itemsRows = '';
   (order.items || []).forEach(item => {
     const subtotal = (item.price * item.quantity).toLocaleString();
-    itemsRows += `<tr>
-      <td>${item.quantity}x</td>
-      <td>${item.name}${item.notes ? `<br><span style="color:#666;font-size:10px">* ${item.notes}</span>` : ''}</td>
-      <td style="text-align:right">&#x20A1;${subtotal}</td>
-    </tr>`;
+    itemsRows += `
+      <tr>
+        <td class="qty">${item.quantity}x</td>
+        <td class="name">${item.name}${item.notes ? `<br><span class="note">* ${item.notes}</span>` : ''}</td>
+        <td class="price">&#x20A1;${subtotal}</td>
+      </tr>`;
   });
 
   const totalFinal = order.total || 0;
@@ -128,55 +129,137 @@ export function imprimirTiquete(order, zona) {
   <meta charset="UTF-8">
   <title>Tiquete</title>
   <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body { font-family:'Courier New',Courier,monospace; font-size:14px; color:#000; background:#fff; width:72mm; padding:6px 8px; }
-    .center { text-align:center; }
-    .right  { text-align:right; }
-    .bold   { font-weight:bold; }
-    .xl     { font-size:20px; letter-spacing:1px; }
-    .large  { font-size:16px; }
-    .sep    { border-top:1px dashed #000; margin:6px 0; }
-    .sep2   { border-top:2px solid #000; margin:6px 0; }
-    div     { line-height:1.6; }
-    table   { width:100%; border-collapse:collapse; }
-    td      { vertical-align:top; padding:2px 0; line-height:1.5; }
-    td:first-child { width:24px; }
-    td:last-child  { white-space:nowrap; }
-    @page   { size:72mm auto; margin:0; }
-    @media print { html,body { width:72mm; } }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 13px;
+      color: #000;
+      background: #fff;
+      width: 72mm;
+      padding: 6px 8px 4px 8px;
+    }
+
+    /* ── Encabezado ── */
+    .header { text-align: center; margin-bottom: 6px; }
+    .header .local {
+      font-size: 17px;
+      font-weight: bold;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      line-height: 1.3;
+    }
+    .header .sub {
+      font-size: 11px;
+      margin-top: 2px;
+      line-height: 1.5;
+    }
+
+    /* ── Separadores ── */
+    .sep  { border-top: 1px dashed #000; margin: 5px 0; }
+    .sep2 { border-top: 2px solid  #000; margin: 5px 0; }
+
+    /* ── Info de la orden ── */
+    .info { font-size: 12px; line-height: 1.7; }
+    .info .row { display: flex; }
+    .info .label { min-width: 58px; font-weight: bold; }
+    .info .llevar {
+      text-align: center;
+      font-weight: bold;
+      font-size: 13px;
+      margin: 3px 0;
+      border: 1px solid #000;
+      padding: 2px 0;
+    }
+
+    /* ── Items ── */
+    table { width: 100%; border-collapse: collapse; margin: 2px 0; }
+    td { vertical-align: top; padding: 2px 0; font-size: 13px; line-height: 1.5; }
+    td.qty   { width: 22px; font-weight: bold; }
+    td.name  { }
+    td.price { text-align: right; white-space: nowrap; padding-left: 4px; }
+    .note    { font-size: 10px; color: #444; }
+
+    /* ── Totales ── */
+    .totales { font-size: 12px; line-height: 1.7; }
+    .totales .row { display: flex; justify-content: space-between; }
+    .totales .total-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 16px;
+      font-weight: bold;
+      margin: 3px 0;
+    }
+
+    /* ── Pie ── */
+    .pie { text-align: center; font-size: 11px; margin-top: 4px; line-height: 1.6; }
+    .pie .gracias { font-size: 12px; font-weight: bold; margin-bottom: 2px; }
+
+    @page   { size: 72mm auto; margin: 0; }
+    @media print { html, body { width: 72mm; } }
   </style>
 </head>
 <body>
-  <div class="center bold xl">Centro Social El Higueron</div>
-  <div class="center">Donde Lore</div>
-  <div class="center">Tel: 8888-8888</div>
+
+  <div class="header">
+    <div class="local">Centro Social<br>El Higuer&#243;n</div>
+    <div class="sub">
+      Guido Fern&#225;ndez Herrera<br>
+      C&#233;d: 1-0526-0613 &nbsp;|&nbsp; Tel: 2416-4453<br>
+      Cerbatana de Puriscal, San Jos&#233;
+    </div>
+  </div>
+
   <div class="sep2"></div>
-  <div>Fecha: ${fecha}</div>
-  <div>Hora:  ${hora}</div>
-  <div>Zona:  ${esBar ? 'Bar' : 'Restaurante'}</div>
-  ${ubicacion ? `<div>Ubic:  ${ubicacion}</div>` : ''}
-  ${order.type === 'takeout' ? '<div class="center bold">*** PARA LLEVAR ***</div>' : ''}
-  ${order.clientName ? `<div>Cliente: ${order.clientName}</div>` : ''}
-  ${order.mesera ? `<div>Mesera:  ${order.mesera}</div>` : ''}
+
+  <div class="info">
+    <div class="row"><span class="label">Fecha:</span><span>${fecha}</span></div>
+    <div class="row"><span class="label">Hora:</span><span>${hora}</span></div>
+    <div class="row"><span class="label">Zona:</span><span>${esBar ? 'Bar' : 'Restaurante'}</span></div>
+    ${ubicacion ? `<div class="row"><span class="label">Ubic:</span><span>${ubicacion}</span></div>` : ''}
+    ${order.type === 'takeout' ? '<div class="llevar">&#9733; PARA LLEVAR &#9733;</div>' : ''}
+    ${order.clientName ? `<div class="row"><span class="label">Cliente:</span><span>${order.clientName}</span></div>` : ''}
+    ${order.mesera ? `<div class="row"><span class="label">Mesera:</span><span>${order.mesera}</span></div>` : ''}
+  </div>
+
   <div class="sep"></div>
+
   <table>${itemsRows}</table>
+
   <div class="sep"></div>
-  ${descuento > 0 ? `<div>Descuento: -&#x20A1;${descuento.toLocaleString()}</div>` : ''}
+
+  <div class="totales">
+    ${descuento > 0 ? `<div class="row"><span>Descuento:</span><span>-&#x20A1;${descuento.toLocaleString()}</span></div>` : ''}
+    ${(() => { const svc = (order.items||[]).filter(i => i.conServicio).reduce((s,i) => s + Math.round(i.price * i.quantity / 11), 0); return svc > 0 ? `<div class="row"><span>Servicio 10%:</span><span>&#x20A1;${svc.toLocaleString()}</span></div>` : ''; })()}
+  </div>
+
   <div class="sep2"></div>
-  <div class="bold large right">TOTAL: &#x20A1;${totalFinal.toLocaleString()}</div>
+  <div class="totales">
+    <div class="total-row">
+      <span>TOTAL</span>
+      <span>&#x20A1;${totalFinal.toLocaleString()}</span>
+    </div>
+  </div>
   <div class="sep2"></div>
-  <div>Pago: ${metodoPago}</div>
+
+  <div class="totales">
+    <div class="row"><span>Pago:</span><span>${metodoPago}</span></div>
+  </div>
+
   <div class="sep"></div>
-  <div class="center">Gracias por su visita!</div>
+
+  <div class="pie">
+    <div class="gracias">&#9829; Gracias por su visita &#9829;</div>
+    <div>Vuelva pronto</div>
+  </div>
+
 </body>
 </html>`;
 
-  // Mismo método que usa el cierre — iframe oculto, no window.open
   const printDiv = document.createElement('div');
   printDiv.id = 'lore-tiquete-print';
   printDiv.style.cssText = 'display:none;';
   const iframe = document.createElement('iframe');
-  iframe.style.cssText = 'width:72mm;height:600px;border:none;';
+  iframe.style.cssText = 'width:72mm;height:800px;border:none;';
   printDiv.appendChild(iframe);
   document.body.appendChild(printDiv);
 
