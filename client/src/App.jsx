@@ -22,6 +22,11 @@ export default function RestaurantePOS() {
   const [adminUser, setAdminUser]       = useState(savedAdmin || null);
   const [toasts, setToasts]             = useState([]);
   const modalOpenRef = useRef(false); // pausa el sync cuando hay modal abierto
+
+  // Mantener modalOpenRef actualizado para que el interval del sync lo vea correctamente
+  useEffect(() => {
+    modalOpenRef.current = !!splitOrder || !!billOrder || !!viewItemsOrder;
+  }, [splitOrder, billOrder, viewItemsOrder]);
   const prevKitchenIds = useRef(new Set()); // para detectar pedidos nuevos en cocina
   const prevReadyIds   = useRef(new Set()); // para detectar pedidos listos para meseras
 
