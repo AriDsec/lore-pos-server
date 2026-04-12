@@ -109,49 +109,43 @@ export function imprimirTiquete(order, zona) {
   const fecha = now.toLocaleDateString('es-CR', { day: '2-digit', month: '2-digit', year: 'numeric' });
   const hora  = now.toLocaleTimeString('es-CR', { hour: '2-digit', minute: '2-digit' });
 
-  let itemsText = '';
+  let itemsRows = '';
   (order.items || []).forEach(item => {
-    const subtotal = `&#x20A1;${(item.price * item.quantity).toLocaleString()}`;
-    const nombre = item.name.length > 22 ? item.name.substring(0, 22) : item.name;
-    const izq = `${item.quantity}x ${nombre}`;
-    itemsText += `${izq.padEnd(28)}${subtotal.padStart(12)}\n`;
-    if (item.notes) itemsText += `   * ${item.notes}\n`;
+    const subtotal = (item.price * item.quantity).toLocaleString();
+    itemsRows += `<tr>
+      <td>${item.quantity}x</td>
+      <td>${item.name}${item.notes ? `<br><span style="color:#666;font-size:10px">* ${item.notes}</span>` : ''}</td>
+      <td style="text-align:right">&#x20A1;${subtotal}</td>
+    </tr>`;
   });
 
   const totalFinal = order.total || 0;
   const descuento  = order.descuento || 0;
 
   const html = `<!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
   <meta charset="UTF-8">
   <title>Tiquete</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body {
-      font-family: 'Courier New', Courier, monospace;
-      font-size: 12px;
-      width: 100%;
-      color: #000;
-      background: #fff;
-    }
-    .wrap { padding: 2px 4px; }
-    .center { text-align: center; }
-    .right  { text-align: right; }
-    .bold   { font-weight: bold; }
-    .xl     { font-size: 17px; }
-    .large  { font-size: 14px; }
-    .sep    { border-top: 1px dashed #000; margin: 3px 0; }
-    .sep2   { border-top: 2px solid #000;  margin: 3px 0; }
-    pre     { font-family: inherit; font-size: inherit; white-space: pre-wrap; }
-    @media print {
-      @page { margin: 0; }
-      html, body { width: 100%; height: auto; }
-    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Courier New',Courier,monospace; font-size:12px; color:#000; background:#fff; width:72mm; padding:4px 6px; }
+    .center { text-align:center; }
+    .right  { text-align:right; }
+    .bold   { font-weight:bold; }
+    .xl     { font-size:16px; }
+    .large  { font-size:13px; }
+    .sep    { border-top:1px dashed #000; margin:4px 0; }
+    .sep2   { border-top:2px solid #000; margin:4px 0; }
+    table   { width:100%; border-collapse:collapse; }
+    td      { vertical-align:top; padding:1px 0; }
+    td:first-child { width:20px; }
+    td:last-child  { white-space:nowrap; }
+    @page   { size:72mm auto; margin:0; }
+    @media print { html,body { width:72mm; } }
   </style>
 </head>
 <body>
-<div class="wrap">
   <div class="center bold xl">Centro Social El Higueron</div>
   <div class="center">Donde Lore</div>
   <div class="center">Tel: 8888-8888</div>
@@ -164,7 +158,7 @@ export function imprimirTiquete(order, zona) {
   ${order.clientName ? `<div>Cliente: ${order.clientName}</div>` : ''}
   ${order.mesera ? `<div>Mesera:  ${order.mesera}</div>` : ''}
   <div class="sep"></div>
-  <pre>${itemsText}</pre>
+  <table>${itemsRows}</table>
   <div class="sep"></div>
   ${descuento > 0 ? `<div>Descuento: -&#x20A1;${descuento.toLocaleString()}</div>` : ''}
   <div class="sep2"></div>
@@ -173,25 +167,31 @@ export function imprimirTiquete(order, zona) {
   <div>Pago: ${metodoPago}</div>
   <div class="sep"></div>
   <div class="center">Gracias por su visita!</div>
-</div>
-<script>
-  window.onload = function() {
-    var h = document.body.scrollHeight;
-    var style = document.createElement('style');
-    style.innerHTML = '@page { size: 80mm ' + h + 'px; margin: 0; orientation: portrait; } html,body { width: 80mm; }';
-    document.head.appendChild(style);
-    setTimeout(function() {
-      window.print();
-      setTimeout(function() { window.close(); }, 500);
-    }, 150);
-  };
-</script>
 </body>
 </html>`;
 
-  const win = window.open('', '_blank', 'width=300,height=600');
-  if (win) {
-    win.document.write(html);
-    win.document.close();
-  }
+  // Mismo método que usa el cierre — iframe oculto, no window.open
+  const printDiv = document.createElement('div');
+  printDiv.id = 'lore-tiquete-print';
+  printDiv.style.cssText = 'display:none;';
+  const iframe = document.createElement('iframe');
+  iframe.style.cssText = 'width:72mm;height:600px;border:none;';
+  printDiv.appendChild(iframe);
+  document.body.appendChild(printDiv);
+
+  const style = document.createElement('style');
+  style.id = 'lore-tiquete-print-style';
+  style.innerHTML = '@media print { body > *:not(#lore-tiquete-print) { display:none!important; } #lore-tiquete-print { display:block!important; } } @media screen { #lore-tiquete-print { display:none!important; } }';
+  document.head.appendChild(style);
+
+  const doc = iframe.contentDocument || iframe.contentWindow.document;
+  doc.open(); doc.write(html); doc.close();
+
+  setTimeout(() => {
+    try { iframe.contentWindow.print(); } catch(e) {}
+    setTimeout(() => {
+      try { document.body.removeChild(printDiv); } catch(e) {}
+      try { document.head.removeChild(style); } catch(e) {}
+    }, 1000);
+  }, 300);
 }
