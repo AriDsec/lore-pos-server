@@ -131,26 +131,27 @@ export function imprimirTiquete(order, zona) {
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      font-family: 'Courier New', Courier, monospace;
-      font-size: 15px;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 13px;
+      font-weight: bold;
       color: #000;
       background: #fff;
       width: 72mm;
-      padding: 6px 8px 4px 8px;
+      padding: 4px 6px;
     }
 
     /* ── Encabezado ── */
     .header { text-align: center; margin-bottom: 7px; }
     .header .local {
-      font-size: 20px;
+      font-size: 17px;
       font-weight: bold;
       letter-spacing: 1px;
       text-transform: uppercase;
       line-height: 1.3;
     }
     .header .sub {
-      font-size: 13px;
-      margin-top: 3px;
+      font-size: 11px;
+      margin-top: 2px;
       line-height: 1.6;
     }
 
@@ -159,40 +160,43 @@ export function imprimirTiquete(order, zona) {
     .sep2 { border-top: 2px solid  #000; margin: 6px 0; }
 
     /* ── Info de la orden ── */
-    .info { font-size: 14px; line-height: 1.8; }
+    .info { font-size: 12px; line-height: 1.7; }
     .info .row { display: flex; }
-    .info .label { min-width: 64px; font-weight: bold; }
+    .info .label { min-width: 58px; font-weight: bold; }
     .info .llevar {
       text-align: center;
       font-weight: bold;
-      font-size: 15px;
-      margin: 4px 0;
+      font-size: 13px;
+      margin: 3px 0;
       border: 1px solid #000;
-      padding: 3px 0;
+      padding: 2px 0;
     }
 
     /* ── Items ── */
     table { width: 100%; border-collapse: collapse; margin: 2px 0; }
-    td { vertical-align: top; padding: 3px 0; font-size: 15px; line-height: 1.5; }
-    td.qty   { width: 26px; font-weight: bold; }
-    td.name  { }
-    td.price { text-align: right; white-space: nowrap; padding-left: 4px; }
-    .note    { font-size: 12px; color: #444; }
+    td { vertical-align: top; padding: 2px 0; font-size: 13px; line-height: 1.5; }
+    td.qty   { width: 24px; font-weight: bold; white-space: nowrap; }
+    td.name  { word-break: break-word; }
+    td.price { text-align: right; white-space: nowrap; padding-left: 6px; width: 1%; }
+    .note    { font-size: 11px; color: #444; }
 
     /* ── Totales ── */
-    .totales { font-size: 14px; line-height: 1.8; }
-    .totales .row { display: flex; justify-content: space-between; }
+    .totales { font-size: 12px; line-height: 1.7; }
+    .totales .row { display: flex; justify-content: space-between; white-space: nowrap; }
+    .totales .row span:last-child { padding-left: 8px; }
     .totales .total-row {
       display: flex;
       justify-content: space-between;
-      font-size: 19px;
+      font-size: 16px;
       font-weight: bold;
       margin: 3px 0;
+      white-space: nowrap;
     }
+    .totales .total-row span:last-child { padding-left: 8px; }
 
     /* ── Pie ── */
-    .pie { text-align: center; font-size: 13px; margin-top: 5px; line-height: 1.7; }
-    .pie .gracias { font-size: 14px; font-weight: bold; margin-bottom: 2px; }
+    .pie { text-align: center; font-size: 11px; margin-top: 4px; line-height: 1.6; }
+    .pie .gracias { font-size: 12px; font-weight: bold; margin-bottom: 2px; }
 
     @page   { size: 72mm auto; margin: 0; }
     @media print { html, body { width: 72mm; } }
@@ -204,8 +208,9 @@ export function imprimirTiquete(order, zona) {
     <div class="local">Centro Social<br>El Higuer&#243;n</div>
     <div class="sub">
       Guido Fern&#225;ndez Herrera<br>
-      C&#233;d: 1-0526-0613 &nbsp;|&nbsp; Tel: 2416-4453<br>
-      Cerbatana de Puriscal, San Jos&#233;
+      C&#233;d: 1-0526-0613<br>
+      Tel: 2416-4453<br>
+      Cerbatana de Puriscal
     </div>
   </div>
 
