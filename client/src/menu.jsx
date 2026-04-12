@@ -7,6 +7,10 @@ import { LICORES, OTROS, ADICIONALES_COCINA } from './constants.js';
 // ─────────────────────────────────────────────
 
 export function ItemButton({ item, onSelectItem }) {
+  // altLabel: item tiene opcion alternativa (yuca, pure)
+  // altFree: la alternativa no cuesta extra (costilla frita: yuca = mismo precio)
+  const hasAlt = !!item.altLabel;
+
   return (
     <div className="space-y-1">
       <div className="flex items-center gap-2 bg-gradient-to-r from-slate-700 to-slate-800 border border-[#94cb47]/20 hover:border-[#94cb47]/40 rounded-lg p-3 transition-all">
@@ -19,7 +23,35 @@ export function ItemButton({ item, onSelectItem }) {
           <Plus size={14} />
         </button>
       </div>
-      {item.canHavePapas && (
+      {item.canHavePapas && hasAlt && (
+        <>
+          {/* Opcion alternativa (yuca o pure) */}
+          <div className="flex items-center gap-2 bg-slate-700/50 border border-[#94cb47]/20 hover:border-[#94cb47]/50 rounded-lg px-3 py-2 ml-3 transition-all">
+            <span className="flex-1 text-slate-400 text-xs">↳ {item.altLabel}</span>
+            <span className="text-[#94cb47] font-bold text-xs whitespace-nowrap">
+              {item.altFree ? `₡${item.price.toLocaleString()}` : `₡${(item.price + 500).toLocaleString()}`}
+            </span>
+            <button
+              onClick={() => onSelectItem(item, 'alt')}
+              className="bg-[#94cb47] hover:bg-[#7ab035] text-black rounded-md w-6 h-6 flex items-center justify-center flex-shrink-0 transition"
+            >
+              <Plus size={12} />
+            </button>
+          </div>
+          {/* Opcion con papas */}
+          <div className="flex items-center gap-2 bg-slate-700/50 border border-[#94cb47]/20 hover:border-[#94cb47]/50 rounded-lg px-3 py-2 ml-3 transition-all">
+            <span className="flex-1 text-slate-400 text-xs">↳ {item.papasLabel || 'con Papas'}</span>
+            <span className="text-[#94cb47] font-bold text-xs whitespace-nowrap">₡{(item.price + 500).toLocaleString()}</span>
+            <button
+              onClick={() => onSelectItem(item, true)}
+              className="bg-[#94cb47] hover:bg-[#7ab035] text-black rounded-md w-6 h-6 flex items-center justify-center flex-shrink-0 transition"
+            >
+              <Plus size={12} />
+            </button>
+          </div>
+        </>
+      )}
+      {item.canHavePapas && !hasAlt && (
         <div className="flex items-center gap-2 bg-slate-700/50 border border-[#94cb47]/20 hover:border-[#94cb47]/50 rounded-lg px-3 py-2 ml-3 transition-all">
           <span className="flex-1 text-slate-400 text-xs">↳ con Papas</span>
           <span className="text-[#94cb47] font-bold text-xs whitespace-nowrap">₡{(item.price + 500).toLocaleString()}</span>
