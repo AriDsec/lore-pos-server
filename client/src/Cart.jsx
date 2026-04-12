@@ -264,13 +264,6 @@ export function ShoppingCart({
           </div>
         )}
 
-        {/* Modo Restaurante toggle — solo para meseras de bar */}
-        {isBar && onToggleModoRestaurante && (
-          <button onClick={onToggleModoRestaurante}
-            className={`w-full py-2 rounded-xl border text-xs font-bold transition ${modoRestaurante ? 'bg-[#94cb47]/20 border-[#94cb47]/50 text-[#94cb47]' : 'bg-slate-700/40 border-slate-600 text-slate-400 hover:text-slate-300'}`}>
-            {modoRestaurante ? '🍽 Modo Restaurante activo' : '🍽 Modo Restaurante'}
-          </button>
-        )}
 
       </div>
     </div>
