@@ -401,13 +401,7 @@ export function MenuPanel({ menu, licores, onSelectItem, onModalChange, expanded
   ];
 
   const ItemBtn = ({ item }) => (
-    <button
-      onClick={() => onSelectItem(item)}
-      className="w-full flex justify-between items-center bg-slate-700/50 hover:bg-slate-600/60 border border-slate-600/50 hover:border-[#94cb47]/40 rounded-xl px-3 py-2.5 md:py-5 transition-all text-left group"
-    >
-      <span className="font-semibold text-white text-sm md:text-xl group-hover:text-[#94cb47] transition leading-tight">{item.name}</span>
-      <span className="text-[#94cb47] font-bold text-xs md:text-lg ml-2 whitespace-nowrap">₡{item.price.toLocaleString()}</span>
-    </button>
+    <ItemButton item={item} onSelectItem={onSelectItem} />
   );
 
   const CategoryGroup = ({ groups, category }) => (
