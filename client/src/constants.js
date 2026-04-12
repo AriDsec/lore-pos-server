@@ -163,7 +163,7 @@ export const MENU = {
     ],
     'Comida rápida': [
       { id: 'f_pechuga', name: 'Pechuga frita', price: 3900, category: 'food', canHavePapas: true },
-      { id: 'f_costilla_frita', name: 'Costilla frita', price: 3900, category: 'food', canHavePapas: true, papasLabel: 'Con papas', altLabel: 'Con yuca', altFree: true },
+      { id: 'f_costilla_frita', name: 'Costilla frita', price: 3900, category: 'food' },
       { id: 'f_alitas', name: 'Alitas (6)', price: 3900, category: 'food', canHavePapas: true },
       { id: 'f_nachos_carne', name: 'Nachos de carne', price: 4000, category: 'food' },
       { id: 'f_nachos_pollo', name: 'Nachos de pollo', price: 3900, category: 'food' },
@@ -195,8 +195,8 @@ export const MENU = {
       { id: 'f_quesadilla_carne', name: 'Quesadilla de carne', price: 4000, category: 'food' },
       { id: 'f_quesadilla_pollo', name: 'Quesadilla de pollo', price: 3900, category: 'food' },
       { id: 'f_quesadilla_mixta', name: 'Quesadilla mixta', price: 4300, category: 'food' },
-      { id: 'f_fajitas_res', name: 'Fajitas de res', price: 4000, category: 'food', canHavePapas: true, papasLabel: 'Con papas', altLabel: 'Con puré' },
-      { id: 'f_costilla_bbq', name: 'Costilla BBQ', price: 4500, category: 'food', canHavePapas: true, papasLabel: 'Con papas', altLabel: 'Con puré' },
+      { id: 'f_fajitas_res', name: 'Fajitas de res', price: 4000, category: 'food', canHavePapas: true },
+      { id: 'f_costilla_bbq', name: 'Costilla BBQ', price: 4500, category: 'food', canHavePapas: true },
     ],
     'Menú de niños': [
       { id: 'f_deditos_pollo', name: 'Deditos de pollo', price: 2300, category: 'food' },
@@ -264,7 +264,7 @@ export const MENU = {
     ],
     'Comida rápida': [
       { id: 'f_pechuga', name: 'Pechuga frita', price: 3900, category: 'food', canHavePapas: true },
-      { id: 'f_costilla_frita', name: 'Costilla frita', price: 3900, category: 'food', canHavePapas: true, papasLabel: 'Con papas', altLabel: 'Con yuca', altFree: true },
+      { id: 'f_costilla_frita', name: 'Costilla frita', price: 3900, category: 'food' },
       { id: 'f_alitas', name: 'Alitas (6)', price: 3900, category: 'food', canHavePapas: true },
       { id: 'f_nachos_carne', name: 'Nachos de carne', price: 4000, category: 'food' },
       { id: 'f_nachos_pollo', name: 'Nachos de pollo', price: 3900, category: 'food' },
@@ -296,8 +296,8 @@ export const MENU = {
       { id: 'f_quesadilla_carne', name: 'Quesadilla de carne', price: 4000, category: 'food' },
       { id: 'f_quesadilla_pollo', name: 'Quesadilla de pollo', price: 3900, category: 'food' },
       { id: 'f_quesadilla_mixta', name: 'Quesadilla mixta', price: 4300, category: 'food' },
-      { id: 'f_fajitas_res', name: 'Fajitas de res', price: 4000, category: 'food', canHavePapas: true, papasLabel: 'Con papas', altLabel: 'Con puré' },
-      { id: 'f_costilla_bbq', name: 'Costilla BBQ', price: 4500, category: 'food', canHavePapas: true, papasLabel: 'Con papas', altLabel: 'Con puré' },
+      { id: 'f_fajitas_res', name: 'Fajitas de res', price: 4000, category: 'food', canHavePapas: true },
+      { id: 'f_costilla_bbq', name: 'Costilla BBQ', price: 4500, category: 'food', canHavePapas: true },
     ],
     'Menú de niños': [
       { id: 'f_deditos_pollo', name: 'Deditos de pollo', price: 2300, category: 'food' },
