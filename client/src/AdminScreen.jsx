@@ -39,6 +39,18 @@ export function AdminScreen({ barPaid, restPaid, loading, onLogout, setPaidOrder
     return parseInt(localStorage.getItem('lore_num_meseras') || '3');
   });
 
+  // Modo Restaurante — activa/desactiva para meseras
+  const [modoRestActivo, setModoRestActivo] = useState(() => {
+    const saved = localStorage.getItem('lore_modo_rest');
+    if (saved !== null) return saved === 'true';
+    return false;
+  });
+  const toggleModoRest = (val) => {
+    setModoRestActivo(val);
+    localStorage.setItem('lore_modo_rest', String(val));
+    api.setConfig('modo_restaurante_activo', val).catch(() => {});
+  };
+
   const toggleServicio = (val) => {
     setServicioActivo(val);
     localStorage.setItem('lore_servicio', String(val));
@@ -433,6 +445,28 @@ ${countMethod(restPaid,'tarjeta_sinpe')>0?`<span style="background:#1e1b4b;color
             </div>
           </div>
         </div>
+
+        {/* ── Modo Restaurante Meseras ── */}
+        {(isSuperAdmin || isRestAdmin) && (
+          <div className={`rounded-2xl border-2 p-5 shadow-2xl ${modoRestActivo ? 'bg-gradient-to-br from-blue-900/30 to-slate-900 border-blue-500/60' : 'bg-slate-800/50 border-slate-600/40'}`}>
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <h3 className={`font-bold text-xl ${modoRestActivo ? 'text-blue-400' : 'text-slate-400'}`}>
+                  🍽 Modo Restaurante — Meseras
+                </h3>
+                <p className="text-slate-500 text-xs mt-0.5">
+                  Permite a las meseras del bar crear cuentas en zona restaurante
+                </p>
+              </div>
+              <button
+                onClick={() => toggleModoRest(!modoRestActivo)}
+                className={`px-4 py-2 rounded-xl font-bold text-sm transition border ${modoRestActivo ? 'bg-blue-600 hover:bg-blue-500 text-white border-blue-500' : 'bg-slate-700 hover:bg-slate-600 text-slate-300 border-slate-500'}`}
+              >
+                {modoRestActivo ? '✅ Activo' : '⭕ Inactivo'}
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* ── Servicio 10% Meseras (Sábados) ── */}
         <div className={`rounded-2xl border-2 p-5 shadow-2xl ${servicioActivo ? 'bg-gradient-to-br from-[#94cb47]/10 to-slate-900 border-[#94cb47]/40' : 'bg-slate-800/50 border-slate-600/40'}`}>
