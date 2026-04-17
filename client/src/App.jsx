@@ -260,6 +260,7 @@ export default function RestaurantePOS() {
     sessionStorage.removeItem('lore_cart'); setCartItems([]); setSelectedTable(null); setSelectedBarra(null);
     setClientName(''); setOrderType(null); setSelectedAccount(null);
     setOpenAccounts([]); setPaidOrders([]); setKitchenOrders([]);
+    setModoRestaurante(false);
     setSyncError(null);
     if (wasAdmin) {
       setShowSelector(true); // Admin vuelve al selector, no al PIN
