@@ -5,7 +5,7 @@ import { MenuPanel, OtrosPanel } from './menu.jsx';
 import { SplitModal } from './modals.jsx';
 import { ShoppingCart } from './Cart.jsx';
 
-function MenuCenter({ menuTab, setMenuTab, menu, licores, addToCart, onModalChange, isBar, modoRestaurante, onToggleModoRestaurante, expandedCat, setExpandedCat, expandedLicorCat, setExpandedLicorCat }) {
+function MenuCenter({ menuTab, setMenuTab, menu, licores, addToCart, onModalChange, isBar, modoRestaurante, onToggleModoRestaurante, modoRestHabilitado, expandedCat, setExpandedCat, expandedLicorCat, setExpandedLicorCat }) {
   return (
 
     <div className="space-y-3">
@@ -30,7 +30,7 @@ function MenuCenter({ menuTab, setMenuTab, menu, licores, addToCart, onModalChan
       {menuTab === 'productos' && <MenuPanel menu={menu} licores={licores} onSelectItem={addToCart} onModalChange={onModalChange} expandedCat={expandedCat} setExpandedCat={setExpandedCat} expandedLicorCat={expandedLicorCat} setExpandedLicorCat={setExpandedLicorCat} />}
       {menuTab === 'otros'     && <OtrosPanel onAddToCart={addToCart} onModalChange={onModalChange} />}
       {/* Toggle modo restaurante — solo visible para meseras de bar */}
-      {isBar && onToggleModoRestaurante && (
+      {isBar && onToggleModoRestaurante && modoRestHabilitado && (
         <button
           onClick={onToggleModoRestaurante}
           className={`w-full flex items-center justify-between px-4 py-3 rounded-xl border transition ${
@@ -61,7 +61,7 @@ export function MeseraScreen({
   onDirectPay, isBar, tables,
   splitOrder, setSplitOrder, onSplit,
   onModalChange, aplicaServicio, loading,
-  modoRestaurante, onToggleModoRestaurante,
+  modoRestaurante, onToggleModoRestaurante, modoRestHabilitado,
   onPayRejected, onDeleteRejected,
   mesaConflict, setMesaConflict, onAddToExisting,
 }) {
@@ -143,7 +143,7 @@ export function MeseraScreen({
       {/* ── Landscape: flex — menú flexible / carrito ancho fijo ── */}
       <div className={`${isLandscape ? "flex" : "hidden"} gap-4 p-4 w-full overflow-hidden`} style={{height: "calc(100vh - 64px)"}}>
         <div className="flex-1 overflow-y-auto">
-          <MenuCenter menuTab={menuTab} setMenuTab={setMenuTab} menu={menu} licores={licores} addToCart={addToCart} onModalChange={onModalChange} isBar={isBar} modoRestaurante={modoRestaurante} onToggleModoRestaurante={onToggleModoRestaurante} expandedCat={expandedCat} setExpandedCat={setExpandedCat} expandedLicorCat={expandedLicorCat} setExpandedLicorCat={setExpandedLicorCat} />
+          <MenuCenter menuTab={menuTab} setMenuTab={setMenuTab} menu={menu} licores={licores} addToCart={addToCart} onModalChange={onModalChange} isBar={isBar} modoRestaurante={modoRestaurante} onToggleModoRestaurante={onToggleModoRestaurante} modoRestHabilitado={modoRestHabilitado} expandedCat={expandedCat} setExpandedCat={setExpandedCat} expandedLicorCat={expandedLicorCat} setExpandedLicorCat={setExpandedLicorCat} />
         </div>
         <div style={{width: "min(520px, 40vw)", flexShrink: 0, height: "100%", display: "flex", flexDirection: "column", gap: "10px"}}>
           <div style={{flex: 1, overflowY: "auto", minHeight: 0}}>
@@ -205,7 +205,7 @@ export function MeseraScreen({
               </div>
               {menuTab === 'productos' && <MenuPanel menu={menu} licores={licores} onSelectItem={addToCart} onModalChange={onModalChange} expandedCat={expandedCat} setExpandedCat={setExpandedCat} expandedLicorCat={expandedLicorCat} setExpandedLicorCat={setExpandedLicorCat} />}
               {menuTab === 'otros'     && <OtrosPanel onAddToCart={addToCart} onModalChange={onModalChange} />}
-              {isBar && onToggleModoRestaurante && (
+              {isBar && onToggleModoRestaurante && modoRestHabilitado && (
         <button
           onClick={onToggleModoRestaurante}
           className={`w-full flex items-center justify-between px-4 py-3 rounded-xl border transition ${
