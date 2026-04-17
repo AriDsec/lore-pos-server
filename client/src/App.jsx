@@ -48,6 +48,13 @@ export default function RestaurantePOS() {
     setServicioActivoGlobal(esSabado);
     localStorage.setItem('lore_servicio', String(esSabado));
     // Si admin lo cambió manualmente hoy, respetar solo si el servidor lo dice Y es sábado
+    // Cargar modo restaurante siempre, independiente del día
+    api.getConfig('modo_restaurante_activo').then(({ value }) => {
+      const val = value === true || value === 'true';
+      setModoRestHabilitado(val);
+      localStorage.setItem('lore_modo_rest', String(val));
+    }).catch(() => {});
+
     if (!esSabado) {
       api.getConfig('servicio_activo').then(({ value }) => {
         // No sábado: solo activar si admin lo forzó manualmente (value===true guardado hoy)
@@ -91,6 +98,10 @@ export default function RestaurantePOS() {
     } catch {}
   }, [cartItems]);
   const [modoRestaurante, setModoRestaurante] = useState(false);
+  const [modoRestHabilitado, setModoRestHabilitado] = useState(() => {
+    const saved = localStorage.getItem('lore_modo_rest');
+    return saved === 'true';
+  });
 
   const [billOrder, setBillOrder]           = useState(null);
   const [viewItemsOrder, setViewItemsOrder] = useState(null);
@@ -847,6 +858,7 @@ export default function RestaurantePOS() {
           maxTables={modoRestaurante ? 5 : (currentZone === 'bar' ? 12 : 5)}
           tables={modoRestaurante ? null : (currentZone === 'bar' ? [0,1,2,3,4,5,6,7,8,9,10,11,12] : null)}
           modoRestaurante={modoRestaurante}
+          modoRestHabilitado={modoRestHabilitado}
           onToggleModoRestaurante={() => {
             setModoRestaurante(v => !v);
             setSelectedTable(null);
