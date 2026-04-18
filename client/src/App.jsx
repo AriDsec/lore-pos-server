@@ -11,7 +11,7 @@ import { AdminScreen } from './AdminScreen.jsx';
 
 // LORE POS v2.1
 export default function RestaurantePOS() {
-  const savedSession = (() => { try { return JSON.parse(localStorage.getItem('lore_session')); } catch { return null; } })();
+  const savedSession = (() => { try { return JSON.parse(sessionStorage.getItem('lore_session')); } catch { return null; } })();
   const savedAdmin   = (() => { try { return localStorage.getItem('lore_admin'); } catch { return null; } })();
   const [currentUser, setCurrentUser] = useState(savedSession?.user || null);
   const [userRole, setUserRole]       = useState(savedSession?.role || null);
@@ -255,12 +255,12 @@ export default function RestaurantePOS() {
 
   const handleLogin = async (name, role, zone) => {
     setCurrentUser(name); setUserRole(role); setCurrentZone(zone);
-    localStorage.setItem('lore_session', JSON.stringify({ user: name, role, zone }));
+    sessionStorage.setItem('lore_session', JSON.stringify({ user: name, role, zone }));
     await loadData(zone, role);
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('lore_session');
+    sessionStorage.removeItem('lore_session');
     setLoading(false); // resetear loading para evitar pantalla negra
     const wasAdmin = adminUser !== null;
     setCurrentUser(null); setUserRole(null); setCurrentZone(null);
