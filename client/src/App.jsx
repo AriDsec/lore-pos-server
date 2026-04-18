@@ -28,7 +28,12 @@ export default function RestaurantePOS() {
 
   // Servicio 10% — estado reactivo, persiste en servidor + localStorage como fallback
   const [servicioActivoGlobal, setServicioActivoGlobal] = useState(() => {
-    return new Date().getDay() === 6; // true solo si es sábado
+    const now = new Date();
+    const day = now.getDay();
+    const hour = now.getHours();
+    // Sábado activo desde las 4pm del sábado — no a medianoche
+    // También cubre el cierre: si es domingo antes de las 4am, aún cuenta como sábado
+    return (day === 6 && hour >= 16) || (day === 0 && hour < 4);
   });
 
   // Contar pedidos pendientes en cocina cuando se muestra el selector
@@ -44,7 +49,10 @@ export default function RestaurantePOS() {
 
   // Al iniciar, sincronizar — sábado siempre activo, cualquier otro día siempre desactivo
   useEffect(() => {
-    const esSabado = new Date().getDay() === 6;
+    const now = new Date();
+    const day = now.getDay();
+    const hour = now.getHours();
+    const esSabado = (day === 6 && hour >= 16) || (day === 0 && hour < 4);
     setServicioActivoGlobal(esSabado);
     localStorage.setItem('lore_servicio', String(esSabado));
     // Si admin lo cambió manualmente hoy, respetar solo si el servidor lo dice Y es sábado
