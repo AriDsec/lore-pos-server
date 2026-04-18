@@ -175,6 +175,7 @@ export function CajaScreen({
                     <div>
                       <div className="text-white font-bold text-base md:text-xl">{acc.locationLabel || acc.barra || 'Barra'}{acc.clientName && acc.clientName !== 'Cliente General' ? ` — ${acc.clientName}` : ''}</div>
                       <div className="text-slate-400 text-sm md:text-base">{acc.mesera}{acc.lastEditedBy && acc.lastEditedBy !== acc.mesera ? ` (editada por ${acc.lastEditedBy})` : ''} · {(acc.items||[]).length} items</div>
+                      {acc.createdAt && <div className="text-slate-500 text-xs mt-0.5">📅 {new Date(acc.createdAt).toLocaleDateString('es-CR', { day: '2-digit', month: '2-digit', year: 'numeric' })} {new Date(acc.createdAt).toLocaleTimeString('es-CR', { hour: '2-digit', minute: '2-digit' })}</div>}
                     </div>
                     <div className="flex flex-col gap-1.5 items-end">
                       <span className="text-[#94cb47] font-bold text-base md:text-xl">₡{(acc.total||0).toLocaleString()}</span>
@@ -213,6 +214,7 @@ export function CajaScreen({
                     <div>
                       <div className="text-white font-bold text-base md:text-xl">{acc.locationLabel || acc.barra || ((acc.table !== null && acc.table !== undefined) ? `Mesa ${acc.table}` : 'Sin ubicación')}{acc.clientName ? ` — ${acc.clientName}` : ''}</div>
                       <div className="text-slate-400 text-sm md:text-base">{acc.mesera}{acc.lastEditedBy && acc.lastEditedBy !== acc.mesera ? ` (editada por ${acc.lastEditedBy})` : ''} · {(acc.items||[]).length} items</div>
+                      {acc.createdAt && <div className="text-slate-500 text-xs mt-0.5">📅 {new Date(acc.createdAt).toLocaleDateString('es-CR', { day: '2-digit', month: '2-digit', year: 'numeric' })} {new Date(acc.createdAt).toLocaleTimeString('es-CR', { hour: '2-digit', minute: '2-digit' })}</div>}
                       {acc.pendingNote && <div className="text-[#94cb47]/70 text-xs mt-0.5">{acc.pendingNote}</div>}
                     </div>
                     <div className="flex flex-col gap-1.5 items-end">
