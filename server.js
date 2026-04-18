@@ -315,7 +315,7 @@ app.put('/api/accounts/:id/pending', async (req, res) => {
 app.delete('/api/admin/clear-bar', adminLimiter, async (req, res) => {
   try {
     const today = new Date(); today.setHours(0, 0, 0, 0);
-    const accounts = await Account.deleteMany({ zone: 'bar', status: { $in: ['paid', 'rejected'] }, createdAt: { $gte: today } });
+    const accounts = await Account.deleteMany({ zone: 'bar', $or: [{ status: 'paid', closedAt: { $gte: today } }, { status: 'rejected', createdAt: { $gte: today } }] });
     const kitchen = await KitchenOrder.deleteMany({ zone: 'bar', createdAt: { $gte: today } });
     res.json({ deleted: accounts.deletedCount, kitchen: kitchen.deletedCount });
   } catch (error) { res.status(500).json({ error: error.message }); }
@@ -325,7 +325,7 @@ app.delete('/api/admin/clear-bar', adminLimiter, async (req, res) => {
 app.delete('/api/admin/clear-restaurante', adminLimiter, async (req, res) => {
   try {
     const today = new Date(); today.setHours(0, 0, 0, 0);
-    const accounts = await Account.deleteMany({ zone: 'restaurante', status: { $in: ['paid', 'rejected'] }, createdAt: { $gte: today } });
+    const accounts = await Account.deleteMany({ zone: 'restaurante', $or: [{ status: 'paid', closedAt: { $gte: today } }, { status: 'rejected', createdAt: { $gte: today } }] });
     const kitchen = await KitchenOrder.deleteMany({ zone: 'restaurante', createdAt: { $gte: today } });
     res.json({ deleted: accounts.deletedCount, kitchen: kitchen.deletedCount });
   } catch (error) { res.status(500).json({ error: error.message }); }
