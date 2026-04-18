@@ -29,7 +29,8 @@ export function AdminScreen({ barPaid, restPaid, loading, onLogout, setPaidOrder
   const [confirmInput, setConfirmInput] = useState('');
 
   // Servicio 10% — automático los sábados, persiste en localStorage
-  const isSabado = new Date().getDay() === 6;
+  const now = new Date();
+  const isSabado = (now.getDay() === 6 && now.getHours() >= 16) || (now.getDay() === 0 && now.getHours() < 4);
   const [servicioActivo, setServicioActivo] = useState(() => {
     const saved = localStorage.getItem('lore_servicio');
     if (saved !== null) return saved === 'true';
