@@ -65,6 +65,9 @@ mongoose.set('strictQuery', true);
 mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
+  maxPoolSize: 5,        // limitar conexiones simultaneas — M0 tiene max 100 en total
+  serverSelectionTimeoutMS: 5000,
+  socketTimeoutMS: 10000,
 });
 
 const db = mongoose.connection;
