@@ -123,6 +123,11 @@ const kitchenOrderSchema = new mongoose.Schema({
   esActualizacion: { type: Boolean, default: false },
 });
 
+// Índices para acelerar las queries más frecuentes
+accountSchema.index({ zone: 1, status: 1 });        // getOpenAccounts, getPaidAccounts
+accountSchema.index({ zone: 1, status: 1, closedAt: 1 }); // clear-bar, clear-restaurante
+kitchenOrderSchema.index({ zone: 1, status: 1 });   // getKitchenOrders
+
 const Account = mongoose.model('Account', accountSchema);
 const KitchenOrder = mongoose.model('KitchenOrder', kitchenOrderSchema);
 
