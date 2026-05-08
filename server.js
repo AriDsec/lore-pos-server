@@ -151,7 +151,7 @@ const Config = mongoose.model('Config', configSchema);
 
 app.get('/api/accounts/:zone/open', async (req, res) => {
   try {
-    const accounts = await Account.find({ zone: req.params.zone, status: { $in: ['open', 'pending_payment', 'pending_approval', 'rejected'] } });
+    const accounts = await Account.find({ zone: req.params.zone, status: { $in: ['open', 'pending_payment', 'pending_approval', 'rejected'] } }).sort({ createdAt: 1 });
     res.json(accounts);
   } catch (error) { res.status(500).json({ error: error.message }); }
 });
