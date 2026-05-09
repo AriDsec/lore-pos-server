@@ -18,6 +18,7 @@ export default function RestaurantePOS() {
   const [currentZone, setCurrentZone] = useState(savedSession?.zone || null);
   const [loading, setLoading]         = useState(false);
   const [syncError, setSyncError]     = useState(null);
+  const syncFailCount = useRef(0); // solo mostrar error tras 2 fallos consecutivos
   const [showSelector, setShowSelector] = useState(!!savedAdmin && !savedSession?.user);
   const [adminUser, setAdminUser]       = useState(savedAdmin || null);
   const [toasts, setToasts]             = useState([]);
@@ -56,6 +57,11 @@ export default function RestaurantePOS() {
     setServicioActivoGlobal(esSabado);
     localStorage.setItem('lore_servicio', String(esSabado));
     // Si admin lo cambió manualmente hoy, respetar solo si el servidor lo dice Y es sábado
+    // Cargar perfiles editables de meseras
+    api.getMeserasPerfiles().then(res => {
+      if (res && res.value) setMeserasPerfiles(res.value);
+    }).catch(() => {});
+
     // Cargar modo restaurante siempre, independiente del día
     api.getConfig('modo_restaurante_activo').then(({ value }) => {
       const val = value === true || value === 'true';
@@ -106,6 +112,13 @@ export default function RestaurantePOS() {
     } catch {}
   }, [cartItems]);
   const [modoRestaurante, setModoRestaurante] = useState(false);
+  // Perfiles editables de meseras — { slot: { nombre, pin } }
+  const [meserasPerfiles, setMeserasPerfiles] = useState({
+    'Mari':     { nombre: 'Mari',     pin: '5456' },
+    'Mile':     { nombre: 'Mile',     pin: '8995' },
+    'Lin':      { nombre: 'Lin',      pin: '7777' },
+    'Temp Bar': { nombre: 'Temp Bar', pin: '1221' },
+  });
   const [modoRestHabilitado, setModoRestHabilitado] = useState(() => {
     const saved = localStorage.getItem('lore_modo_rest');
     return saved === 'true';
@@ -134,7 +147,7 @@ export default function RestaurantePOS() {
 
   const loadData = useCallback(async (zone, role, silent = false) => {
     if (!silent) setLoading(true);
-    setSyncError(null);
+    setSyncError(null); syncFailCount.current = 0;
     try {
       if (role === 'mesera' || role === 'caja') {
         const [open, paid] = await Promise.all([api.getOpenAccounts(zone), api.getPaidAccounts(zone)]);
@@ -181,7 +194,8 @@ export default function RestaurantePOS() {
         setPaidOrders([...bp, ...rp]);
       }
     } catch (err) {
-      setSyncError('Sin conexión al servidor.');
+      syncFailCount.current += 1;
+      if (syncFailCount.current >= 2) setSyncError('Sin conexión al servidor.');
       console.error(err);
     } finally {
       setLoading(false);
@@ -309,10 +323,13 @@ export default function RestaurantePOS() {
   const clearLockout = () => localStorage.removeItem('lore_lockout');
 
   const loginWithPin = async (pin) => {
-    const entry = Object.entries(PINES).find(([, v]) => v.pin === pin);
+    // Buscar PIN en perfiles editables primero, luego en PINES fijos
+    const perfilSlot = Object.entries(meserasPerfiles).find(([, p]) => p.pin === pin);
+    const entry = perfilSlot
+      ? Object.entries(PINES).find(([k]) => k === perfilSlot[0])
+      : Object.entries(PINES).find(([, v]) => v.pin === pin);
     // Verificar PIN primero — si es correcto, limpiar lockout y continuar sin importar intentos
     if (!entry) {
-      // PIN incorrecto — verificar lockout y registrar intento
       if (checkLockout()) return 'bloqueado';
       const locked = registerFailedAttempt();
       if (locked) {
@@ -322,7 +339,9 @@ export default function RestaurantePOS() {
       }
       return false;
     }
-    const [name, { role }] = entry;
+    const [slot, { role }] = entry;
+    // Usar nombre editable si existe, si no el slot original
+    const name = (meserasPerfiles[slot]?.nombre) || slot;
     if (role === 'admin') {
       setAdminUser(name);
       setShowSelector(true);
@@ -336,7 +355,7 @@ export default function RestaurantePOS() {
       const config = await api.getMeserasActivas();
       if (config && config.value) {
         const activas = config.value;
-        if (activas[name] === false) {
+        if (activas[slot] === false || activas[name] === false) {
           return 'desactivada';
         }
       }
@@ -920,5 +939,5 @@ export default function RestaurantePOS() {
     return <><Toast toasts={toasts} offline={!!syncError} /><CajaScreen zona="restaurante" zonaNombre="Restaurante" accounts={restAccounts} paid={restPaid} loading={loading} billOrder={billOrder} setBillOrder={setBillOrder} viewItemsOrder={viewItemsOrder} setViewItemsOrder={setViewItemsOrder} splitOrder={splitOrder} setSplitOrder={setSplitOrder} onSplit={handleSplitAccount} onLogout={handleLogout} onPay={payAccount} onDelete={handleDeleteAccount} onMarkPending={handleMarkPending} /></>;
   }
 
-  return <><Toast toasts={toasts} offline={!!syncError} /><AdminScreen barPaid={barPaid} restPaid={restPaid} loading={loading} onLogout={handleLogout} setPaidOrders={setPaidOrders} showToast={showToast} adminUser={adminUser} /></>;
+  return <><Toast toasts={toasts} offline={!!syncError} /><AdminScreen barPaid={barPaid} restPaid={restPaid} loading={loading} onLogout={handleLogout} setPaidOrders={setPaidOrders} showToast={showToast} adminUser={adminUser} meserasPerfiles={meserasPerfiles} onSavePerfiles={(p) => { setMeserasPerfiles(p); api.setConfig('meseras_perfiles', p).catch(() => {}); }} /></>;
 }
