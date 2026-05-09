@@ -18,7 +18,6 @@ export default function RestaurantePOS() {
   const [currentZone, setCurrentZone] = useState(savedSession?.zone || null);
   const [loading, setLoading]         = useState(false);
   const [syncError, setSyncError]     = useState(null);
-  const syncFailCount = useRef(0); // solo mostrar error tras 2 fallos consecutivos
   const [showSelector, setShowSelector] = useState(!!savedAdmin && !savedSession?.user);
   const [adminUser, setAdminUser]       = useState(savedAdmin || null);
   const [toasts, setToasts]             = useState([]);
@@ -148,7 +147,7 @@ export default function RestaurantePOS() {
 
   const loadData = useCallback(async (zone, role, silent = false) => {
     if (!silent) setLoading(true);
-    setSyncError(null); syncFailCount.current = 0;
+    setSyncError(null);
     try {
       if (role === 'mesera' || role === 'caja') {
         const [open, paid] = await Promise.all([api.getOpenAccounts(zone), api.getPaidAccounts(zone)]);
@@ -195,8 +194,7 @@ export default function RestaurantePOS() {
         setPaidOrders([...bp, ...rp]);
       }
     } catch (err) {
-      syncFailCount.current += 1;
-      if (syncFailCount.current >= 2) setSyncError('Sin conexión al servidor.');
+      setSyncError('Sin conexión al servidor.');
       console.error(err);
     } finally {
       setLoading(false);
@@ -326,10 +324,9 @@ export default function RestaurantePOS() {
   const loginWithPin = async (pin) => {
     // Buscar PIN en perfiles editables primero, luego en PINES fijos
     const perfilSlot = Object.entries(meserasPerfiles).find(([, p]) => p.pin === pin);
-    // Buscar en PINES por PIN original o por slot del perfil editable
-    const entry = Object.entries(PINES).find(([k, v]) =>
-      v.pin === pin || (perfilSlot && k === perfilSlot[0] && perfilSlot[1].pin === pin)
-    );
+    const entry = perfilSlot
+      ? Object.entries(PINES).find(([k]) => k === perfilSlot[0])
+      : Object.entries(PINES).find(([, v]) => v.pin === pin);
     // Verificar PIN primero — si es correcto, limpiar lockout y continuar sin importar intentos
     if (!entry) {
       if (checkLockout()) return 'bloqueado';
