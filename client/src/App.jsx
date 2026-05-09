@@ -325,9 +325,10 @@ export default function RestaurantePOS() {
   const loginWithPin = async (pin) => {
     // Buscar PIN en perfiles editables primero, luego en PINES fijos
     const perfilSlot = Object.entries(meserasPerfiles).find(([, p]) => p.pin === pin);
-    const entry = perfilSlot
-      ? Object.entries(PINES).find(([k]) => k === perfilSlot[0])
-      : Object.entries(PINES).find(([, v]) => v.pin === pin);
+    // Buscar en PINES por PIN original o por slot del perfil editable
+    const entry = Object.entries(PINES).find(([k, v]) =>
+      v.pin === pin || (perfilSlot && k === perfilSlot[0] && perfilSlot[1].pin === pin)
+    );
     // Verificar PIN primero — si es correcto, limpiar lockout y continuar sin importar intentos
     if (!entry) {
       if (checkLockout()) return 'bloqueado';
