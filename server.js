@@ -57,6 +57,7 @@ const adminLimiter = rateLimit({
 
 app.use('/api', generalLimiter);
 
+app.set('trust proxy', 1); // Railway usa proxy — necesario para express-rate-limit
 app.use(cors());
 app.use(express.json());
 
