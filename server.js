@@ -27,27 +27,26 @@ app.use(helmet({
 
 const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  limit: 2000, // 6 dispositivos * sync 5s = ~1080/15min, 2000 da margen
-  standardHeaders: true,
+  limit: 200,
+  standardHeaders: 'draft-8',
   legacyHeaders: false,
   message: { error: 'Demasiadas solicitudes, intenta más tarde.' },
 });
 const writeLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   limit: 60,
-  standardHeaders: true,
+  standardHeaders: 'draft-8',
   legacyHeaders: false,
   message: { error: 'Demasiadas solicitudes de escritura, intenta más tarde.' },
 });
 const adminLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   limit: 30,
-  standardHeaders: true,
+  standardHeaders: 'draft-8',
   legacyHeaders: false,
   message: { error: 'Demasiadas solicitudes administrativas, intenta más tarde.' },
 });
 
-app.set('trust proxy', 1); // Railway usa proxy — necesario para express-rate-limit
 app.use('/api', generalLimiter);
 app.use(cors());
 app.use(express.json());
