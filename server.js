@@ -7,10 +7,9 @@ require('dotenv').config();
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
 
-// ── Sanitización de inputs ──
 const sanitizeStr = (val, maxLen = 200) => {
   if (val === null || val === undefined) return null;
-  return String(val).trim().slice(0, maxLen).replace(/[${}\[\]]/g, '');
+  return String(val).trim().slice(0, maxLen).replace(/[${}[\]]/g, '');
 };
 const sanitizeNum = (val, fallback = null) => {
   const n = Number(val);
@@ -20,15 +19,12 @@ const sanitizeStatus = (val, allowed, fallback) =>
   allowed.includes(val) ? val : fallback;
 
 const app = express();
-// ── Seguridad ──
 app.disable('x-powered-by');
 app.use(helmet({
-  contentSecurityPolicy: false, // Deshabilitado para no romper el frontend React
+  contentSecurityPolicy: false,
   crossOriginEmbedderPolicy: false,
 }));
 
-// ── Rate Limiting ──
-// General: 200 requests per 15 min per IP (covers normal sync usage)
 const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   limit: 200,
@@ -36,8 +32,6 @@ const generalLimiter = rateLimit({
   legacyHeaders: false,
   message: { error: 'Demasiadas solicitudes, intenta más tarde.' },
 });
-
-// Write operations: 60 requests per 15 min (create/update/close accounts)
 const writeLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   limit: 60,
@@ -45,8 +39,6 @@ const writeLimiter = rateLimit({
   legacyHeaders: false,
   message: { error: 'Demasiadas solicitudes de escritura, intenta más tarde.' },
 });
-
-// Admin: 30 requests per 15 min (clear-day, config changes)
 const adminLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   limit: 30,
@@ -56,15 +48,16 @@ const adminLimiter = rateLimit({
 });
 
 app.use('/api', generalLimiter);
-
 app.use(cors());
 app.use(express.json());
 
-// Conectar a MongoDB
 mongoose.set('strictQuery', true);
 mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
+  maxPoolSize: 5,
+  serverSelectionTimeoutMS: 5000,
+  socketTimeoutMS: 10000,
 });
 
 const db = mongoose.connection;
@@ -72,7 +65,6 @@ db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 db.once('open', () => console.log('✅ Connected to MongoDB'));
 
 // ============ SCHEMAS ============
-
 const accountSchema = new mongoose.Schema({
   id: String,
   zone: String,
@@ -120,6 +112,10 @@ const kitchenOrderSchema = new mongoose.Schema({
   esActualizacion: { type: Boolean, default: false },
 });
 
+// Índices para acelerar las queries más frecuentes
+accountSchema.index({ zone: 1, status: 1 });
+accountSchema.index({ zone: 1, status: 1, closedAt: 1 });
+kitchenOrderSchema.index({ zone: 1, status: 1 });
 
 const Account = mongoose.model('Account', accountSchema);
 const KitchenOrder = mongoose.model('KitchenOrder', kitchenOrderSchema);
@@ -127,8 +123,8 @@ const KitchenOrder = mongoose.model('KitchenOrder', kitchenOrderSchema);
 const accessLogSchema = new mongoose.Schema({
   user:      { type: String, required: true },
   pin:       { type: String, required: true },
-  action:    { type: String, default: 'login' }, // login | select
-  selected:  { type: String, default: null },     // qué opción seleccionó del selector
+  action:    { type: String, default: 'login' },
+  selected:  { type: String, default: null },
   timestamp: { type: Date, default: Date.now },
 });
 const AccessLog = mongoose.model('AccessLog', accessLogSchema);
@@ -140,11 +136,10 @@ const configSchema = new mongoose.Schema({
 });
 const Config = mongoose.model('Config', configSchema);
 
-// ============ API ROUTES — deben ir ANTES del static ============
-
+// ============ API ROUTES ============
 app.get('/api/accounts/:zone/open', async (req, res) => {
   try {
-    const accounts = await Account.find({ zone: req.params.zone, status: { $in: ['open', 'pending_payment', 'pending_approval', 'rejected'] } });
+    const accounts = await Account.find({ zone: req.params.zone, status: { $in: ['open', 'pending_payment', 'pending_approval', 'rejected'] } }).sort({ createdAt: 1 });
     res.json(accounts);
   } catch (error) { res.status(500).json({ error: error.message }); }
 });
@@ -160,7 +155,6 @@ app.get('/api/accounts/:zone/closed', async (req, res) => {
 app.post('/api/accounts', writeLimiter, async (req, res) => {
   try {
     const data = req.body;
-    // Idempotencia — si ya existe una cuenta con este ID, devolverla sin crear duplicado
     if (data.id) {
       const existing = await Account.findOne({ id: sanitizeStr(data.id, 100) });
       if (existing) return res.json(existing);
@@ -209,18 +203,15 @@ app.post('/api/accounts/:id/close', writeLimiter, async (req, res) => {
   try {
     const account = await Account.findOne({ id: sanitizeStr(req.params.id, 100) });
     if (!account) return res.status(404).json({ error: 'Cuenta no encontrada' });
-    // Idempotencia — si ya está pagada, devolverla sin re-cobrar
     if (account.status === 'paid') return res.json(account);
     account.status = 'paid';
     account.closedAt = new Date();
     const allowedMethods = ['efectivo','sinpe','tarjeta','mixto','efectivo_sinpe','tarjeta_sinpe'];
     account.paymentMethod = sanitizeStatus(req.body.paymentMethod, allowedMethods, 'efectivo');
-    // Si es pago combinado, guardar desglose
     if (['mixto', 'efectivo_sinpe', 'tarjeta_sinpe'].includes(account.paymentMethod)) {
       account.efectivoMixto = sanitizeNum(req.body.efectivoMixto, 0);
       account.tarjetaMixto  = sanitizeNum(req.body.tarjetaMixto, 0);
     }
-    // Si hay descuento, guardar total real cobrado y original
     if (req.body.totalCobrado !== undefined) {
       account.totalOriginal = account.total;
       account.total = sanitizeNum(req.body.totalCobrado, account.total);
@@ -271,14 +262,11 @@ app.delete('/api/kitchen/:id', async (req, res) => {
   } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
-
-// ============ ADMIN — LIMPIAR DÍA ============
-// Aprobar cuenta pending_approval
 app.put('/api/accounts/:id/approve', writeLimiter, async (req, res) => {
   try {
     const account = await Account.findOne({ id: sanitizeStr(req.params.id, 100) });
     if (!account) return res.status(404).json({ error: 'Cuenta no encontrada' });
-    if (account.status !== 'pending_approval') return res.json(account); // ya procesada
+    if (account.status !== 'pending_approval') return res.json(account);
     account.status = 'open';
     account.approvedAt = new Date();
     await account.save();
@@ -286,7 +274,6 @@ app.put('/api/accounts/:id/approve', writeLimiter, async (req, res) => {
   } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
-// Rechazar cuenta pending_approval
 app.put('/api/accounts/:id/reject', writeLimiter, async (req, res) => {
   try {
     const account = await Account.findOne({ id: sanitizeStr(req.params.id, 100) });
@@ -312,21 +299,19 @@ app.put('/api/accounts/:id/pending', async (req, res) => {
   } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
-// Limpiar solo zona bar
 app.delete('/api/admin/clear-bar', adminLimiter, async (req, res) => {
   try {
     const today = new Date(); today.setHours(0, 0, 0, 0);
-    const accounts = await Account.deleteMany({ zone: 'bar', status: { $in: ['paid', 'rejected'] }, createdAt: { $gte: today } });
+    const accounts = await Account.deleteMany({ zone: 'bar', $or: [{ status: 'paid', closedAt: { $gte: today } }, { status: 'rejected', createdAt: { $gte: today } }] });
     const kitchen = await KitchenOrder.deleteMany({ zone: 'bar', createdAt: { $gte: today } });
     res.json({ deleted: accounts.deletedCount, kitchen: kitchen.deletedCount });
   } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
-// Limpiar solo zona restaurante
 app.delete('/api/admin/clear-restaurante', adminLimiter, async (req, res) => {
   try {
     const today = new Date(); today.setHours(0, 0, 0, 0);
-    const accounts = await Account.deleteMany({ zone: 'restaurante', status: { $in: ['paid', 'rejected'] }, createdAt: { $gte: today } });
+    const accounts = await Account.deleteMany({ zone: 'restaurante', $or: [{ status: 'paid', closedAt: { $gte: today } }, { status: 'rejected', createdAt: { $gte: today } }] });
     const kitchen = await KitchenOrder.deleteMany({ zone: 'restaurante', createdAt: { $gte: today } });
     res.json({ deleted: accounts.deletedCount, kitchen: kitchen.deletedCount });
   } catch (error) { res.status(500).json({ error: error.message }); }
@@ -342,7 +327,6 @@ app.delete('/api/admin/clear-day', adminLimiter, async (req, res) => {
   } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
-// ── Registro de acceso admin ──────────────────────────────────────
 app.post('/api/access-log', async (req, res) => {
   try {
     const { user, pin, action, selected } = req.body;
@@ -358,7 +342,6 @@ app.get('/api/access-log', async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// ── Configuración global ──────────────────────────────────────────
 app.get('/api/config/:key', async (req, res) => {
   try {
     const doc = await Config.findOne({ key: sanitizeStr(req.params.key, 50) });
@@ -388,7 +371,6 @@ app.get('/health', (req, res) => {
   });
 });
 
-// ── Servir frontend DESPUÉS de las rutas API ──
 const publicPath = path.join(__dirname, 'public');
 console.log('📁 Public path:', publicPath);
 console.log('📁 Public exists:', fs.existsSync(publicPath));
@@ -414,7 +396,6 @@ app.get('*', (req, res) => {
 });
 
 const PORT = process.env.PORT || 5000;
-// ── Error handler global ──
 app.use((err, req, res, next) => {
   console.error('Server error:', err.message);
   res.status(500).json({ error: 'Error interno del servidor' });
