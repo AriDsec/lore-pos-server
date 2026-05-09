@@ -31,7 +31,7 @@ app.use(helmet({
 // General: 200 requests per 15 min per IP (covers normal sync usage)
 const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  limit: 200,
+  limit: 2000, // 6 dispositivos * sync 5s = ~1080/15min, 2000 da margen
   standardHeaders: 'draft-8',
   legacyHeaders: false,
   message: { error: 'Demasiadas solicitudes, intenta más tarde.' },
