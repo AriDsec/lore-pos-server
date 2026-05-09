@@ -66,14 +66,21 @@ mongoose.set('strictQuery', true);
 mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-  maxPoolSize: 5,        // limitar conexiones simultaneas — M0 tiene max 100 en total
+  maxPoolSize: 5,
   serverSelectionTimeoutMS: 5000,
   socketTimeoutMS: 10000,
+  heartbeatFrequencyMS: 10000,  // verificar conexión cada 10s
+  retryWrites: true,             // reintentar escrituras si falla
+  retryReads: true,              // reintentar lecturas si falla
 });
 
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 db.once('open', () => console.log('✅ Connected to MongoDB'));
+db.on('disconnected', () => {
+  console.log('⚠️ MongoDB disconnected — reconectando...');
+  mongoose.connect(process.env.MONGODB_URI).catch(err => console.error('Reconexión fallida:', err));
+});
 
 // ============ SCHEMAS ============
 
