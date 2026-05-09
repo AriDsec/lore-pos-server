@@ -31,7 +31,7 @@ app.use(helmet({
 // General: 200 requests per 15 min per IP (covers normal sync usage)
 const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  limit: 2000, // 6 dispositivos * sync 5s = ~1080/15min, 2000 da margen
+  limit: 200,
   standardHeaders: 'draft-8',
   legacyHeaders: false,
   message: { error: 'Demasiadas solicitudes, intenta más tarde.' },
@@ -65,18 +65,11 @@ mongoose.set('strictQuery', true);
 mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-  maxPoolSize: 5,
-  serverSelectionTimeoutMS: 5000,
-  socketTimeoutMS: 10000,
-  heartbeatFrequencyMS: 10000,  // verificar conexión cada 10s
-  retryWrites: true,             // reintentar escrituras si falla
-  retryReads: true,              // reintentar lecturas si falla
 });
 
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 db.once('open', () => console.log('✅ Connected to MongoDB'));
-db.on('disconnected', () => console.log('⚠️ MongoDB disconnected — Mongoose reconectará automáticamente'));
 
 // ============ SCHEMAS ============
 
@@ -127,10 +120,6 @@ const kitchenOrderSchema = new mongoose.Schema({
   esActualizacion: { type: Boolean, default: false },
 });
 
-// Índices para acelerar las queries más frecuentes
-accountSchema.index({ zone: 1, status: 1 });        // getOpenAccounts, getPaidAccounts
-accountSchema.index({ zone: 1, status: 1, closedAt: 1 }); // clear-bar, clear-restaurante
-kitchenOrderSchema.index({ zone: 1, status: 1 });   // getKitchenOrders
 
 const Account = mongoose.model('Account', accountSchema);
 const KitchenOrder = mongoose.model('KitchenOrder', kitchenOrderSchema);
@@ -155,7 +144,7 @@ const Config = mongoose.model('Config', configSchema);
 
 app.get('/api/accounts/:zone/open', async (req, res) => {
   try {
-    const accounts = await Account.find({ zone: req.params.zone, status: { $in: ['open', 'pending_payment', 'pending_approval', 'rejected'] } }).sort({ createdAt: 1 });
+    const accounts = await Account.find({ zone: req.params.zone, status: { $in: ['open', 'pending_payment', 'pending_approval', 'rejected'] } });
     res.json(accounts);
   } catch (error) { res.status(500).json({ error: error.message }); }
 });
@@ -327,7 +316,7 @@ app.put('/api/accounts/:id/pending', async (req, res) => {
 app.delete('/api/admin/clear-bar', adminLimiter, async (req, res) => {
   try {
     const today = new Date(); today.setHours(0, 0, 0, 0);
-    const accounts = await Account.deleteMany({ zone: 'bar', $or: [{ status: 'paid', closedAt: { $gte: today } }, { status: 'rejected', createdAt: { $gte: today } }] });
+    const accounts = await Account.deleteMany({ zone: 'bar', status: { $in: ['paid', 'rejected'] }, createdAt: { $gte: today } });
     const kitchen = await KitchenOrder.deleteMany({ zone: 'bar', createdAt: { $gte: today } });
     res.json({ deleted: accounts.deletedCount, kitchen: kitchen.deletedCount });
   } catch (error) { res.status(500).json({ error: error.message }); }
@@ -337,7 +326,7 @@ app.delete('/api/admin/clear-bar', adminLimiter, async (req, res) => {
 app.delete('/api/admin/clear-restaurante', adminLimiter, async (req, res) => {
   try {
     const today = new Date(); today.setHours(0, 0, 0, 0);
-    const accounts = await Account.deleteMany({ zone: 'restaurante', $or: [{ status: 'paid', closedAt: { $gte: today } }, { status: 'rejected', createdAt: { $gte: today } }] });
+    const accounts = await Account.deleteMany({ zone: 'restaurante', status: { $in: ['paid', 'rejected'] }, createdAt: { $gte: today } });
     const kitchen = await KitchenOrder.deleteMany({ zone: 'restaurante', createdAt: { $gte: today } });
     res.json({ deleted: accounts.deletedCount, kitchen: kitchen.deletedCount });
   } catch (error) { res.status(500).json({ error: error.message }); }
