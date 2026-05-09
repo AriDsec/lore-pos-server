@@ -128,10 +128,6 @@ export default function RestaurantePOS() {
   const [viewItemsOrder, setViewItemsOrder] = useState(null);
   const [splitOrder, setSplitOrder]         = useState(null);
 
-  // Mantener modalOpenRef actualizado para que el interval del sync lo vea correctamente
-  useEffect(() => {
-    modalOpenRef.current = !!splitOrder || !!billOrder || !!viewItemsOrder;
-  }, [splitOrder, billOrder, viewItemsOrder]);
   const [mesaConflict, setMesaConflict]     = useState(null); // {existingAcc, onConfirm}
 
   const [isLandscape, setIsLandscape] = useState(
@@ -144,6 +140,11 @@ export default function RestaurantePOS() {
     window.addEventListener('resize', check);
     return () => { mq.removeEventListener('change', check); window.removeEventListener('resize', check); };
   }, []);
+
+  // Mantener modalOpenRef actualizado para que el interval del sync lo vea correctamente
+  useEffect(() => {
+    modalOpenRef.current = !!splitOrder || !!billOrder || !!viewItemsOrder;
+  }, [splitOrder, billOrder, viewItemsOrder]);
 
   const loadData = useCallback(async (zone, role, silent = false) => {
     if (!silent) setLoading(true);
