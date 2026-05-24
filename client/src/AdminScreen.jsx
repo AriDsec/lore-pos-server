@@ -16,8 +16,11 @@ function StatRow({ label, value }) {
   );
 }
 
-export function AdminScreen({ barPaid, restPaid, loading, onLogout, setPaidOrders, showToast, adminUser }) {
+export function AdminScreen({ barPaid, restPaid, loading, onLogout, setPaidOrders, showToast, adminUser, meserasPerfiles = {}, onSavePerfiles }) {
   const isSuperAdmin = adminUser === 'Ariel';
+  const [perfilesEdit, setPerfilesEdit] = useState(meserasPerfiles);
+  const [perfilesSaved, setPerfilesSaved] = useState(false);
+  useEffect(() => { setPerfilesEdit(meserasPerfiles); }, [meserasPerfiles]);
   const isBarAdmin   = adminUser === 'Guido' || adminUser === 'Lindsey';
   const isRestAdmin  = adminUser === 'Aaron';
 
@@ -108,7 +111,7 @@ export function AdminScreen({ barPaid, restPaid, loading, onLogout, setPaidOrder
   // Cálculo del servicio 10% — solo cuentas de MESA en bar (no barras)
   // El 10% solo se aplica en mesas, entonces solo esas cuentas lo tienen incluido
   const totalMesasBar = barPaid
-    .filter(o => o.table !== null && o.table !== undefined)
+    .filter(o => o.table !== null && o.table !== undefined && !o.barra)
     .reduce((s, o) => s + o.total, 0);
   const roundDown50 = (n) => Math.floor(n / 50) * 50;
   const totalServicio = servicioActivo ? roundDown50(totalMesasBar / 11) : 0;
@@ -446,6 +449,60 @@ ${countMethod(restPaid,'tarjeta_sinpe')>0?`<span style="background:#1e1b4b;color
             </div>
           </div>
         </div>
+
+        {/* ── Perfiles Meseras ── */}
+        {(isSuperAdmin || isBarAdmin) && (
+          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-slate-600/40 p-5 shadow-2xl">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-bold text-xl text-slate-300">👥 Perfiles Meseras</h3>
+              {perfilesSaved && <span className="text-[#94cb47] text-xs font-bold">✅ Guardado</span>}
+            </div>
+            <div className="space-y-3">
+              {Object.entries(perfilesEdit).map(([slot, perfil]) => (
+                <div key={slot} className="bg-slate-700/50 rounded-xl p-3 border border-slate-600/50">
+                  <div className="text-slate-500 text-xs mb-2">Slot: {slot}</div>
+                  <div className="flex gap-2">
+                    <div className="flex-1">
+                      <div className="text-slate-400 text-xs mb-1">Nombre</div>
+                      <input
+                        type="text"
+                        value={perfil.nombre}
+                        onChange={e => setPerfilesEdit(prev => ({ ...prev, [slot]: { ...prev[slot], nombre: e.target.value } }))}
+                        className="w-full bg-slate-800 border border-slate-600 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#94cb47]"
+                        placeholder="Nombre"
+                      />
+                    </div>
+                    {isSuperAdmin && (
+                      <div className="w-24">
+                        <div className="text-slate-400 text-xs mb-1">PIN</div>
+                        <input
+                          type="text"
+                          value={perfil.pin}
+                          maxLength={4}
+                          onChange={e => setPerfilesEdit(prev => ({ ...prev, [slot]: { ...prev[slot], pin: e.target.value.replace(/\D/g,'') } }))}
+                          className="w-full bg-slate-800 border border-slate-600 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#94cb47] font-mono tracking-widest"
+                          placeholder="PIN"
+                        />
+                      </div>
+                    )}
+                    {!isSuperAdmin && (
+                      <div className="w-24">
+                        <div className="text-slate-400 text-xs mb-1">PIN</div>
+                        <div className="bg-slate-800 border border-slate-700 text-slate-300 rounded-lg px-3 py-2 text-sm font-mono tracking-widest">{perfil.pin}</div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+            <button
+              onClick={() => { onSavePerfiles(perfilesEdit); setPerfilesSaved(true); setTimeout(() => setPerfilesSaved(false), 3000); }}
+              className="mt-4 w-full bg-[#94cb47] hover:bg-[#7ab035] text-black font-bold py-2.5 rounded-xl transition"
+            >
+              Guardar Cambios
+            </button>
+          </div>
+        )}
 
         {/* ── Modo Restaurante Meseras ── */}
         {(isSuperAdmin || isRestAdmin) && (
