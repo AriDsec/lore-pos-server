@@ -23,10 +23,10 @@ export function ItemButton({ item, onSelectItem }) {
     <div className="space-y-1">
       <div className="flex items-center gap-2 bg-gradient-to-r from-slate-700 to-slate-800 border border-[#94cb47]/20 hover:border-[#94cb47]/40 rounded-lg p-3 transition-all">
         <span className="flex-1 font-bold text-white text-sm leading-tight">{item.name}</span>
-        {added ? <span className="text-white text-xs font-bold bg-[#7ab035] px-2 py-0.5 rounded-full">{added}</span> : <span className="text-[#94cb47] font-bold text-sm whitespace-nowrap">₡{item.price.toLocaleString()}</span>}
+        {added ? <span className="text-black text-xs font-bold bg-green-400 px-2 py-0.5 rounded-full">{added}</span> : <span className="text-[#94cb47] font-bold text-sm whitespace-nowrap">₡{item.price.toLocaleString()}</span>}
         <button
           onClick={() => handleSelect(false)}
-          className={`text-black rounded-md w-7 h-7 flex items-center justify-center flex-shrink-0 transition ${added ? 'bg-white' : 'bg-[#94cb47] hover:bg-[#7ab035]'}`}
+          className={`text-black rounded-md w-7 h-7 flex items-center justify-center flex-shrink-0 transition ${added ? 'bg-green-200' : 'bg-[#94cb47] hover:bg-[#7ab035]'}`}
         >
           <Plus size={14} />
         </button>
