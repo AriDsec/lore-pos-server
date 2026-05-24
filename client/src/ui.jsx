@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { LogOut } from 'lucide-react';
+import { LogOut, Check, X, AlertTriangle } from 'lucide-react';
 
 // ─────────────────────────────────────────────
 // UI COMPONENTS — Spinner, Toast, Header, payBadge, imprimirTiquete
@@ -37,10 +37,12 @@ export function Toast({ toasts, offline }) {
           ${t.type === 'error'   ? 'bg-red-950 border-red-500 text-red-100' :
             t.type === 'warning' ? 'bg-amber-950 border-amber-400 text-amber-100' :
                                    'bg-slate-900 border-[#94cb47] text-white'}`}>
-          <span className="text-2xl flex-shrink-0">
-            <span className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${t.type === 'error' ? 'bg-red-400' : t.type === 'warning' ? 'bg-amber-400' : 'bg-[#94cb47]'}`}></span>
+          <span className="flex-shrink-0">
+            {t.type === 'error' ? <X size={18} className="text-red-400" /> : t.type === 'warning' ? <AlertTriangle size={18} className="text-amber-400" /> : <Check size={18} className="text-[#94cb47]" />}
           </span>
-          <span className="font-bold text-base leading-tight">{t.message}</span>
+          <div className="flex-1 min-w-0">
+            <span className="font-bold text-base leading-tight">{t.message}</span>
+          </div>
         </div>
       ))}
     </div>
