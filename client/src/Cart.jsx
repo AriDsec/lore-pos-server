@@ -47,18 +47,39 @@ export function ShoppingCart({
         {/* Selector cuenta */}
         <div>
           <label className="text-slate-400 text-xs mb-1 block">Cuenta abierta</label>
-          <select
-            value={selectedAccount || ''}
-            onChange={(e) => onSelectAccount(e.target.value || null)}
-            className="w-full bg-slate-700 border border-[#94cb47]/30 text-white rounded-lg p-2 text-xs focus:outline-none"
-          >
-            <option value="">➕ Nueva Cuenta</option>
-            {openAccounts.filter(a => a.status !== 'pending_payment' && a.status !== 'pending_approval' && a.status !== 'rejected').map(acc => (
-              <option key={acc.id} value={acc.id}>
-                {acc.barra ? acc.barra : (acc.table !== null && acc.table !== undefined) ? `Mesa ${acc.table}` : 'Sin mesa'}{acc.clientName ? ` — ${acc.clientName}` : ''}
-              </option>
-            ))}
-          </select>
+          {/* Lista de cuentas abiertas */}
+          {(() => {
+            const COLORES = { 'Mari': 'border-blue-400', 'Mile': 'border-purple-400', 'Lin': 'border-orange-400', 'Temp Bar': 'border-pink-400', 'Guido Bar': 'border-yellow-400' };
+            const cuentas = openAccounts.filter(a => a.status !== 'pending_payment' && a.status !== 'pending_approval' && a.status !== 'rejected');
+            const mesas = cuentas.filter(a => !a.barra).sort((a, b) => (a.table ?? 99) - (b.table ?? 99));
+            const barras = cuentas.filter(a => !!a.barra).sort((a, b) => (a.barra || '').localeCompare(b.barra || ''));
+            const grupos = [...mesas, ...barras];
+            return (
+              <div className="space-y-1 max-h-48 overflow-y-auto pr-1">
+                <button
+                  onClick={() => onSelectAccount(null)}
+                  className={`w-full text-left px-3 py-2 rounded-lg border text-xs font-bold transition ${!selectedAccount ? 'bg-[#94cb47]/20 border-[#94cb47] text-[#94cb47]' : 'bg-slate-700/50 border-slate-600 text-slate-300 hover:border-slate-500'}`}>
+                  + Nueva Cuenta
+                </button>
+                {grupos.map(acc => {
+                  const ubicacion = acc.barra ? acc.barra : (acc.table !== null && acc.table !== undefined) ? `Mesa ${acc.table}` : 'Sin mesa';
+                  const color = COLORES[acc.mesera] || 'border-slate-500';
+                  const isSelected = selectedAccount === acc.id || selectedAccount === acc._id;
+                  return (
+                    <button key={acc.id || acc._id}
+                      onClick={() => onSelectAccount(acc.id || acc._id)}
+                      className={`w-full text-left px-3 py-2 rounded-lg border-l-4 border border-slate-600/50 text-xs transition ${color} ${isSelected ? 'bg-[#94cb47]/10' : 'bg-slate-700/50 hover:bg-slate-700'}`}>
+                      <div className="flex justify-between items-center">
+                        <span className="font-bold text-white">{ubicacion}</span>
+                        <span className="text-[#94cb47] font-bold">₡{(acc.total || 0).toLocaleString()}</span>
+                      </div>
+                      <div className="text-slate-400 mt-0.5">{acc.clientName || '—'} · {acc.mesera}</div>
+                    </button>
+                  );
+                })}
+              </div>
+            );
+          })()}
 
           {/* Pendientes aprobación */}
           {openAccounts.filter(a => a.status === 'pending_approval' && a.mesera === currentUser).map(acc => (
