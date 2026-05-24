@@ -111,7 +111,7 @@ export function AdminScreen({ barPaid, restPaid, loading, onLogout, setPaidOrder
   // Cálculo del servicio 10% — solo cuentas de MESA en bar (no barras)
   // El 10% solo se aplica en mesas, entonces solo esas cuentas lo tienen incluido
   const totalMesasBar = barPaid
-    .filter(o => o.table !== null && o.table !== undefined && !o.barra)
+    .filter(o => o.table !== null && o.table !== undefined && !o.barra && o.type !== 'direct')
     .reduce((s, o) => s + o.total, 0);
   const roundDown50 = (n) => Math.floor(n / 50) * 50;
   const totalServicio = servicioActivo ? Math.round(totalMesasBar / 11) : 0;
