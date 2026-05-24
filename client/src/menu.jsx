@@ -10,15 +10,23 @@ export function ItemButton({ item, onSelectItem }) {
   // altLabel: item tiene opcion alternativa (yuca, pure)
   // altFree: la alternativa no cuesta extra (costilla frita: yuca = mismo precio)
   const hasAlt = !!item.altLabel;
+  const [added, setAdded] = useState(null); // nombre del item agregado, null = inactivo
+
+  const handleSelect = (withPotatoes) => {
+    onSelectItem(item, withPotatoes);
+    const label = withPotatoes === 'alt' ? item.altLabel : withPotatoes ? (item.papasLabel || 'Con Papas') : item.name;
+    setAdded(label);
+    setTimeout(() => setAdded(null), 800);
+  };
 
   return (
     <div className="space-y-1">
       <div className="flex items-center gap-2 bg-gradient-to-r from-slate-700 to-slate-800 border border-[#94cb47]/20 hover:border-[#94cb47]/40 rounded-lg p-3 transition-all">
         <span className="flex-1 font-bold text-white text-sm leading-tight">{item.name}</span>
-        <span className="text-[#94cb47] font-bold text-sm whitespace-nowrap">₡{item.price.toLocaleString()}</span>
+        {added ? <span className="text-white text-xs font-bold bg-[#7ab035] px-2 py-0.5 rounded-full">{added}</span> : <span className="text-[#94cb47] font-bold text-sm whitespace-nowrap">₡{item.price.toLocaleString()}</span>}
         <button
-          onClick={() => onSelectItem(item, false)}
-          className="bg-[#94cb47] hover:bg-[#7ab035] text-black rounded-md w-7 h-7 flex items-center justify-center flex-shrink-0 transition"
+          onClick={() => handleSelect(false)}
+          className={`text-black rounded-md w-7 h-7 flex items-center justify-center flex-shrink-0 transition ${added ? 'bg-white' : 'bg-[#94cb47] hover:bg-[#7ab035]'}`}
         >
           <Plus size={14} />
         </button>
@@ -32,7 +40,7 @@ export function ItemButton({ item, onSelectItem }) {
               {item.altFree ? `₡${item.price.toLocaleString()}` : `₡${(item.price + 500).toLocaleString()}`}
             </span>
             <button
-              onClick={() => onSelectItem(item, 'alt')}
+              onClick={() => handleSelect('alt')}
               className="bg-[#94cb47] hover:bg-[#7ab035] text-black rounded-md w-6 h-6 flex items-center justify-center flex-shrink-0 transition"
             >
               <Plus size={12} />
@@ -43,7 +51,7 @@ export function ItemButton({ item, onSelectItem }) {
             <span className="flex-1 text-slate-400 text-xs">↳ {item.papasLabel || 'con Papas'}</span>
             <span className="text-[#94cb47] font-bold text-xs whitespace-nowrap">₡{(item.price + 500).toLocaleString()}</span>
             <button
-              onClick={() => onSelectItem(item, true)}
+              onClick={() => handleSelect(true)}
               className="bg-[#94cb47] hover:bg-[#7ab035] text-black rounded-md w-6 h-6 flex items-center justify-center flex-shrink-0 transition"
             >
               <Plus size={12} />
@@ -56,7 +64,7 @@ export function ItemButton({ item, onSelectItem }) {
           <span className="flex-1 text-slate-400 text-xs">↳ con Papas</span>
           <span className="text-[#94cb47] font-bold text-xs whitespace-nowrap">₡{(item.price + 500).toLocaleString()}</span>
           <button
-            onClick={() => onSelectItem(item, true)}
+            onClick={() => handleSelect(true)}
             className="bg-[#94cb47] hover:bg-[#7ab035] text-black rounded-md w-6 h-6 flex items-center justify-center flex-shrink-0 transition"
           >
             <Plus size={12} />
