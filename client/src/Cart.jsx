@@ -49,7 +49,7 @@ export function ShoppingCart({
           <label className="text-slate-400 text-xs mb-1 block">Cuenta abierta</label>
           {/* Lista de cuentas abiertas */}
           {(() => {
-            const COLORES = { 'Mari': 'border-blue-400', 'Mile': 'border-purple-400', 'Lin': 'border-orange-400', 'Temp Bar': 'border-pink-400', 'Guido Bar': 'border-yellow-400' };
+            const COLORES = { 'Mari': '#60a5fa', 'Mile': '#c084fc', 'Lin': '#fb923c', 'Temp Bar': '#f472b6', 'Guido Bar': '#facc15' };
             const cuentas = openAccounts.filter(a => a.status !== 'pending_payment' && a.status !== 'pending_approval' && a.status !== 'rejected');
             const mesas = cuentas.filter(a => !a.barra).sort((a, b) => (a.table ?? 99) - (b.table ?? 99));
             const barras = cuentas.filter(a => !!a.barra).sort((a, b) => (a.barra || '').localeCompare(b.barra || ''));
@@ -68,7 +68,8 @@ export function ShoppingCart({
                   return (
                     <button key={acc.id || acc._id}
                       onClick={() => onSelectAccount(acc.id || acc._id)}
-                      className={`w-full text-left px-3 py-2 rounded-lg border-l-4 border border-slate-600/50 text-xs transition ${color} ${isSelected ? 'bg-[#94cb47]/10' : 'bg-slate-700/50 hover:bg-slate-700'}`}>
+                      className={`w-full text-left px-3 py-2 rounded-lg border border-slate-600/50 text-xs transition ${isSelected ? 'bg-[#94cb47]/10' : 'bg-slate-700/50 hover:bg-slate-700'}`}
+                      style={{borderLeftWidth: '4px', borderLeftColor: color}}>
                       <div className="flex justify-between items-center">
                         <span className="font-bold text-white">{ubicacion}</span>
                         <span className="text-[#94cb47] font-bold">₡{(acc.total || 0).toLocaleString()}</span>
