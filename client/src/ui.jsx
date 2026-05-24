@@ -22,7 +22,7 @@ export function Toast({ toasts, offline }) {
   const hasContent = (toasts && toasts.length > 0) || offline;
   if (!hasContent) return null;
   return (
-    <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-2.5 pointer-events-none" style={{minWidth: '280px', maxWidth: '90vw'}}>
+    <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-2.5 pointer-events-none" style={{maxWidth: '90vw'}}>
       {offline && (
         <div className="w-full flex items-center gap-3 px-5 py-3.5 rounded-2xl shadow-2xl border-2 bg-slate-900 border-orange-500 text-orange-100">
           <span className="text-2xl flex-shrink-0 animate-pulse">📡</span>
