@@ -49,12 +49,16 @@ export default function RestaurantePOS() {
 
   // Al iniciar, sincronizar — sábado siempre activo, cualquier otro día siempre desactivo
   useEffect(() => {
-    const now = new Date();
-    const day = now.getDay();
-    const hour = now.getHours();
-    const esSabado = (day === 6 && hour >= 16) || (day === 0 && hour < 4);
-    setServicioActivoGlobal(esSabado);
-    localStorage.setItem('lore_servicio', String(esSabado));
+    const checkSabado = () => {
+      const now = new Date();
+      const day = now.getDay();
+      const hour = now.getHours();
+      const esSabado = (day === 6 && hour >= 16) || (day === 0 && hour < 4);
+      setServicioActivoGlobal(esSabado);
+      localStorage.setItem('lore_servicio', String(esSabado));
+    };
+    checkSabado();
+    const intervaloSabado = setInterval(checkSabado, 60 * 1000);
     // Si admin lo cambió manualmente hoy, respetar solo si el servidor lo dice Y es sábado
     // Cargar modo restaurante siempre, independiente del día
     api.getConfig('modo_restaurante_activo').then(({ value }) => {
@@ -69,6 +73,7 @@ export default function RestaurantePOS() {
         // Para simplificar: no sábado = siempre false al cargar, admin puede activar
       }).catch(() => {});
     }
+    return () => clearInterval(intervaloSabado);
   }, []);
 
   const showToast = (message, type = 'success') => {
