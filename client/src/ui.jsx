@@ -38,7 +38,7 @@ export function Toast({ toasts, offline }) {
             t.type === 'warning' ? 'bg-amber-950 border-amber-400 text-amber-100' :
                                    'bg-slate-900 border-[#94cb47] text-white'}`}>
           <span className="text-2xl flex-shrink-0">
-            {t.type === 'error' ? '❌' : t.type === 'warning' ? '⚠️' : '✅'}
+            {t.type === 'error' ? 'Error:' : t.type === 'warning' ? 'Aviso:' : ''}
           </span>
           <span className="font-bold text-base leading-tight">{t.message}</span>
         </div>
