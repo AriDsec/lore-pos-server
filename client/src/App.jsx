@@ -439,7 +439,7 @@ export default function RestaurantePOS() {
       const bd = { [currentUser]: 1 };
       return [...prev, { ...item, id: baseId, price, name: displayName, quantity: 1, notes: '', addedBy: currentUser, breakdown: bd, conServicio: aplicaServicio }];
     });
-    showToast(displayName + ' agregado', 'success');
+    showToast(displayName + ' agregado al carrito', 'success');
   };
 
   const removeFromCart = (id) => setCartItems(prev => prev.filter(i => i.id !== id));
