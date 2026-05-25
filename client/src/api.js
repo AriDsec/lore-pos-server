@@ -7,6 +7,29 @@
 
 const BASE = '/api';
 
+// ── Token JWT ──
+const getToken = () => sessionStorage.getItem('lore_token');
+const authHeaders = () => {
+  const token = getToken();
+  return token
+    ? { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }
+    : { 'Content-Type': 'application/json' };
+};
+
+export const loginWithPinServer = async (pin) => {
+  const res = await fetch(`${BASE}/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ pin }),
+  });
+  if (!res.ok) return null;
+  const data = await res.json();
+  if (data.token) sessionStorage.setItem('lore_token', data.token);
+  return data;
+};
+
+export const clearToken = () => sessionStorage.removeItem('lore_token');
+
 const handleResponse = async (res) => {
   if (!res.ok) {
     const err = await res.json().catch(() => ({ error: 'Error desconocido' }));
@@ -18,29 +41,29 @@ const handleResponse = async (res) => {
 // ── CUENTAS ABIERTAS ──────────────────────────
 
 export const getOpenAccounts = (zone) =>
-  fetch(`${BASE}/accounts/${zone}/open`).then(handleResponse);
+  fetch(`${BASE}/accounts/${zone}/open`, { headers: authHeaders() }).then(handleResponse);
 
 export const getPaidAccounts = (zone) =>
-  fetch(`${BASE}/accounts/${zone}/closed`).then(handleResponse);
+  fetch(`${BASE}/accounts/${zone}/closed`, { headers: authHeaders() }).then(handleResponse);
 
 export const createAccount = (data) =>
   fetch(`${BASE}/accounts`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: authHeaders(),
     body: JSON.stringify(data),
   }).then(handleResponse);
 
 export const updateAccount = (id, data) =>
   fetch(`${BASE}/accounts/${id}`, {
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
+    headers: authHeaders(),
     body: JSON.stringify(data),
   }).then(handleResponse);
 
 export const closeAccount = (id, paymentMethod = 'efectivo', descuentoData = null, mixtoData = null) =>
   fetch(`${BASE}/accounts/${id}/close`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: authHeaders(),
     body: JSON.stringify({
       paymentMethod,
       ...(descuentoData || {}),
@@ -51,30 +74,30 @@ export const closeAccount = (id, paymentMethod = 'efectivo', descuentoData = nul
 // ── COCINA ────────────────────────────────────
 
 export const getKitchenOrders = (zone) =>
-  fetch(`${BASE}/kitchen/${zone}`).then(handleResponse);
+  fetch(`${BASE}/kitchen/${zone}`, { headers: authHeaders() }).then(handleResponse);
 
 export const createKitchenOrder = (data) =>
   fetch(`${BASE}/kitchen`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: authHeaders(),
     body: JSON.stringify(data),
   }).then(handleResponse);
 
 export const updateKitchenOrder = (id, status) =>
   fetch(`${BASE}/kitchen/${id}`, {
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
+    headers: authHeaders(),
     body: JSON.stringify({ status }),
   }).then(handleResponse);
 
 export const deleteKitchenOrder = (id) =>
-  fetch(`${BASE}/kitchen/${id}`, { method: 'DELETE' }).then(handleResponse);
+  fetch(`${BASE}/kitchen/${id}`, { method: 'DELETE', headers: authHeaders() }).then(handleResponse);
 
 // ── REPORTES ──────────────────────────────────
 
 export const markPendingPayment = (id, note = '') =>
   fetch(`${BASE}/accounts/${id}/pending`, {
-    method: 'PUT', headers: {'Content-Type':'application/json'},
+    method: 'PUT', headers: authHeaders(),
     body: JSON.stringify({ note })
   }).then(handleResponse);
 
@@ -88,7 +111,7 @@ export const clearBar        = () => fetch(`${BASE}/admin/clear-bar`, { method: 
 export const clearRestaurante = () => fetch(`${BASE}/admin/clear-restaurante`, { method: 'DELETE' }).then(handleResponse);
 
 export const deleteAccount = (id) =>
-  fetch(`${BASE}/accounts/${id}`, { method: 'DELETE' }).then(handleResponse);
+  fetch(`${BASE}/accounts/${id}`, { method: 'DELETE', headers: authHeaders() }).then(handleResponse);
 
 export const getMeserasPerfiles = () =>
   fetch(`${BASE}/config/meseras_perfiles`).then(r => r.ok ? r.json() : null).catch(() => null);
