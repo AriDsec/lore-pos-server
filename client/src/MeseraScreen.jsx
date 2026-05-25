@@ -468,31 +468,30 @@ export function MeseraScreen({
               <div className="text-slate-400 text-xs font-bold uppercase tracking-wide mb-2">Mesas</div>
               <div className="grid grid-cols-4 gap-2">
                 {(tables || Array.from({ length: maxTables + 1 }, (_, i) => i)).map(n => {
-                  const tieneC = openAccounts.some(a => a.status === 'open' && a.type !== 'direct' && String(a.table) === String(n));
+                  const existingAcc = openAccounts.find(a => a.status === 'open' && a.type !== 'direct' && String(a.table) === String(n));
+                  const tieneC = !!existingAcc;
+                  const mesaColor = tieneC ? (COLORES_MESERA[existingAcc.mesera] || '#f59e0b') : null;
                   const isSelected = selectedTable === n && !selectedBarra;
                   return (
                     <button key={n}
                       onClick={() => {
-                        const existing = openAccounts.find(a => a.status === 'open' && a.type !== 'direct' && String(a.table) === String(n));
+                        const existing = existingAcc;
                         if (existing && !selectedAccount) {
                           setShowMesaModal(false);
                           setSelectedTable(n);
                           setSelectedBarra(null);
                           setConfirmAccount(existing);
                         } else {
-                          if (selectedAccount) onSelectAccount(null);
+                          if (selectedAccount) { onSelectAccount(null); setClientName(''); }
                           setSelectedTable(n);
                           setSelectedBarra(null);
                           setShowMesaModal(false);
                         }
                       }}
-                      className={`py-3 rounded-xl font-bold text-sm border transition relative ${
-                        isSelected ? 'bg-[#94cb47] text-black border-[#94cb47]' :
-                        tieneC ? 'bg-slate-700 text-amber-400 border-amber-500/50 hover:border-amber-400' :
-                        'bg-slate-700 text-slate-300 border-slate-600 hover:border-slate-500'
-                      }`}>
+                      className={`py-3 rounded-xl font-bold text-sm border transition relative ${isSelected ? 'bg-[#94cb47] text-black border-[#94cb47]' : 'bg-slate-700 text-slate-300 border-slate-600'}`}
+                      style={!isSelected && tieneC ? {borderColor: mesaColor, color: mesaColor} : {}}>
                       {n}
-                      {tieneC && <span className="absolute top-1 right-1 w-1.5 h-1.5 bg-amber-400 rounded-full"></span>}
+                      {tieneC && <span className="absolute top-1 right-1 w-2 h-2 rounded-full" style={{backgroundColor: mesaColor}}></span>}
                     </button>
                   );
                 })}
@@ -505,7 +504,7 @@ export function MeseraScreen({
                 <div className="grid grid-cols-2 gap-2">
                   {barras.map(b => (
                     <button key={b}
-                      onClick={() => { setSelectedBarra(b); setSelectedTable(null); if (selectedAccount) onSelectAccount(null); setShowMesaModal(false); }}
+                      onClick={() => { setSelectedBarra(b); setSelectedTable(null); if (selectedAccount) { onSelectAccount(null); setClientName(''); } setShowMesaModal(false); }}
                       className={`py-3 rounded-xl font-bold text-sm border transition ${
                         selectedBarra === b ? 'bg-[#94cb47] text-black border-[#94cb47]' : 'bg-slate-700 text-slate-300 border-slate-600 hover:border-slate-500'
                       }`}>
