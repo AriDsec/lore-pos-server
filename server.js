@@ -76,7 +76,8 @@ app.post('/api/auth/login', async (req, res) => {
       }
     }
 
-    if (!nombre) return res.status(401).json({ error: 'PIN incorrecto' });
+    console.log('LOGIN ATTEMPT - nombre:', nombre, 'role:', role);
+    if (!nombre) { console.log('PIN no encontrado'); return res.status(401).json({ error: 'PIN incorrecto' }); }
 
     const token = jwt.sign({ name: nombre, role, zone }, JWT_SECRET, { expiresIn: '24h' });
     res.json({ token, name: nombre, role, zone });
