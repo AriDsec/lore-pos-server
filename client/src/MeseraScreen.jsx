@@ -244,10 +244,12 @@ export function MeseraScreen({
                               );
                               if (existing) {
                                 setConfirmAccount(existing);
-                              } else {
+                              }
+                              // Si había cuenta seleccionada, limpiarla
+                              else if (selectedAccount) {
                                 onSelectAccount(null);
                               }
-                            } else {
+                            } else if (selectedAccount) {
                               onSelectAccount(null);
                             }
                           }}
