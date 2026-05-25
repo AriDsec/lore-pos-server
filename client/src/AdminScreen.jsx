@@ -1,4 +1,5 @@
 import { Header, payBadge, Spinner } from './ui.jsx';
+import * as api from './api.js';
 import { ItemsModal } from './modals.jsx';
 import { useState, useEffect } from 'react';
 import * as api from './api.js';
@@ -20,6 +21,10 @@ export function AdminScreen({ barPaid, restPaid, loading, onLogout, setPaidOrder
   const isSuperAdmin = adminUser === 'Ariel';
   const [perfilesEdit, setPerfilesEdit] = useState(meserasPerfiles);
   const [perfilesSaved, setPerfilesSaved] = useState(false);
+  const [historial, setHistorial] = useState([]);
+  const [loadingHistorial, setLoadingHistorial] = useState(false);
+  const [showHistorial, setShowHistorial] = useState(false);
+  const [cleaningOld, setCleaningOld] = useState(false);
   useEffect(() => { setPerfilesEdit(meserasPerfiles); }, [meserasPerfiles]);
   const isBarAdmin   = adminUser === 'Guido' || adminUser === 'Lindsey';
   const isRestAdmin  = adminUser === 'Aaron';
@@ -35,9 +40,7 @@ export function AdminScreen({ barPaid, restPaid, loading, onLogout, setPaidOrder
   const now = new Date();
   const isSabado = (now.getDay() === 6 && now.getHours() >= 16) || (now.getDay() === 0 && now.getHours() < 4);
   const [servicioActivo, setServicioActivo] = useState(() => {
-    const saved = localStorage.getItem('lore_servicio');
-    if (saved !== null) return saved === 'true';
-    return isSabado; // default: activo si es sábado
+    return isSabado; // siempre calcular desde hora actual, ignorar localStorage si es sábado
   });
   const [numMeseras, setNumMeseras] = useState(() => {
     return parseInt(localStorage.getItem('lore_num_meseras') || '3');
@@ -523,6 +526,69 @@ ${countMethod(restPaid,'tarjeta_sinpe')>0?`<span style="background:#1e1b4b;color
                 {modoRestActivo ? '✅ Activo' : '⭕ Inactivo'}
               </button>
             </div>
+          </div>
+        )}
+
+        {/* ── Historial y limpieza ── */}
+        {isSuperAdmin && (
+          <div className="bg-slate-800/50 border border-slate-600/40 rounded-2xl p-5 shadow-2xl space-y-3">
+            <h3 className="font-bold text-xl text-slate-300">Historial y datos</h3>
+
+            {/* Ver historial */}
+            <button
+              onClick={async () => {
+                if (!showHistorial) {
+                  setLoadingHistorial(true);
+                  const data = await api.getReportsHistory();
+                  setHistorial(data || []);
+                  setLoadingHistorial(false);
+                }
+                setShowHistorial(v => !v);
+              }}
+              className="w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-2.5 rounded-xl transition text-sm">
+              {showHistorial ? 'Ocultar historial' : 'Ver historial de ventas'}
+            </button>
+
+            {showHistorial && (
+              <div className="space-y-2 max-h-64 overflow-y-auto">
+                {loadingHistorial ? (
+                  <p className="text-slate-500 text-sm text-center py-4">Cargando...</p>
+                ) : historial.length === 0 ? (
+                  <p className="text-slate-500 text-sm text-center py-4">No hay reportes aún</p>
+                ) : historial.map((r, i) => (
+                  <div key={i} className="bg-slate-700/60 rounded-xl p-3 border border-slate-600/50">
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="text-white font-bold text-sm">{r.fecha}</span>
+                      <span className="text-[#94cb47] font-bold text-sm">₡{(r.totalVendido || 0).toLocaleString()}</span>
+                    </div>
+                    <div className="text-slate-400 text-xs mb-1">{r.zona} · {r.cuentasCobradas} cuentas</div>
+                    <div className="text-slate-500 text-xs">
+                      Ef: ₡{(r.porMetodo?.efectivo || 0).toLocaleString()} · 
+                      Sinpe: ₡{(r.porMetodo?.sinpe || 0).toLocaleString()} · 
+                      Tarjeta: ₡{(r.porMetodo?.tarjeta || 0).toLocaleString()}
+                    </div>
+                    {r.porMesera && Object.keys(r.porMesera).length > 0 && (
+                      <div className="text-slate-500 text-xs mt-1">
+                        {Object.entries(r.porMesera).map(([m, t]) => `${m}: ₡${t.toLocaleString()}`).join(' · ')}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Limpiar datos viejos */}
+            <button
+              onClick={async () => {
+                if (!window.confirm('¿Borrar cuentas pagadas/rechazadas de más de 30 días? No afecta cuentas pendientes.')) return;
+                setCleaningOld(true);
+                const r = await api.cleanOldData();
+                setCleaningOld(false);
+                if (r) alert(`Eliminadas ${r.deleted} cuentas antiguas`);
+              }}
+              className="w-full bg-red-900/40 hover:bg-red-900/60 text-red-300 font-bold py-2.5 rounded-xl transition text-sm border border-red-800/50">
+              {cleaningOld ? 'Limpiando...' : 'Limpiar datos antiguos (+30 días)'}
+            </button>
           </div>
         )}
 
