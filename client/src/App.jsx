@@ -226,7 +226,7 @@ export default function RestaurantePOS() {
   // Recalcular precios del carrito cuando cambia mesa/barra (servicio 10%)
   useEffect(() => {
     if (cartItems.length === 0 || currentZone !== 'bar' || modoRestaurante) return;
-    const esmesa = (selectedTable !== null && selectedTable !== undefined) && !selectedBarra;
+    const esmesa = servicioActivoGlobal && (selectedTable !== null && selectedTable !== undefined) && !selectedBarra;
     setCartItems(prev => prev.map(item => {
       // Solo recalcular items con conServicio explícitamente definido (boolean)
       // Items sin conServicio (cuentas antiguas) NO se tocan para evitar doble 10%
