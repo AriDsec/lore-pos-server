@@ -232,7 +232,25 @@ export function MeseraScreen({
                       <div>
                         <label className="text-slate-400 text-xs mb-0.5 block">Mesa</label>
                         <select value={selectedTable !== null && selectedTable !== undefined ? selectedTable : ''}
-                          onChange={(e) => { setSelectedTable(e.target.value !== '' ? Number(e.target.value) : null); setSelectedBarra(null); }}
+                          onChange={(e) => {
+                            const newTable = e.target.value !== '' ? Number(e.target.value) : null;
+                            setSelectedTable(newTable);
+                            setSelectedBarra(null);
+                            // Si hay cuenta en esa mesa, mostrar toast de confirmación
+                            if (newTable !== null) {
+                              const existing = openAccounts.find(a =>
+                                a.status === 'open' && a.type !== 'direct' &&
+                                String(a.table) === String(newTable)
+                              );
+                              if (existing) {
+                                setConfirmAccount(existing);
+                              } else {
+                                onSelectAccount(null);
+                              }
+                            } else {
+                              onSelectAccount(null);
+                            }
+                          }}
                           className="w-full bg-slate-700 border border-[#94cb47]/30 text-white rounded-lg p-2 text-sm focus:outline-none">
                           <option value="">—</option>
                           {(tables || Array.from({ length: maxTables }, (_, i) => i + 1)).map(n => (
@@ -243,7 +261,7 @@ export function MeseraScreen({
                       {isBar && !modoRestaurante && (
                         <div>
                           <label className="text-slate-400 text-xs mb-0.5 block">Barra</label>
-                          <select value={selectedBarra || ''} onChange={(e) => { setSelectedBarra(e.target.value); setSelectedTable(null); }}
+                          <select value={selectedBarra || ''} onChange={(e) => { setSelectedBarra(e.target.value); setSelectedTable(null); onSelectAccount(null); }}
                             className="w-full bg-slate-700 border border-[#94cb47]/30 text-white rounded-lg p-2 text-sm focus:outline-none">
                             <option value="">—</option>
                             {barras.map(b => <option key={b} value={b}>{b}</option>)}
@@ -466,9 +484,9 @@ export function MeseraScreen({
       {confirmAccount && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-6 w-full max-w-sm shadow-2xl">
-            <h2 className="text-[#94cb47] font-bold text-lg mb-1">Abrir cuenta</h2>
+            <h2 className="text-[#94cb47] font-bold text-lg mb-1">Mesa ocupada</h2>
             <p className="text-slate-400 text-sm mb-4">
-              {confirmAccount.barra ? confirmAccount.barra : `Mesa ${confirmAccount.table}`} — {confirmAccount.clientName}
+              {confirmAccount.barra ? confirmAccount.barra : `Mesa ${confirmAccount.table}`} — {confirmAccount.clientName} · {confirmAccount.mesera}
             </p>
             <div className="space-y-2">
               <button
