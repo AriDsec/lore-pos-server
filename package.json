@@ -12,11 +12,7 @@
   "engines": {
     "node": ">=18.0.0"
   },
-  "keywords": [
-    "pos",
-    "restaurant",
-    "lore"
-  ],
+  "keywords": ["pos", "restaurant", "lore"],
   "author": "",
   "license": "ISC",
   "dependencies": {
@@ -25,7 +21,8 @@
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express-rate-limit": "^7.5.0",
-    "helmet": "^8.0.0"
+    "helmet": "^8.0.0",
+    "jsonwebtoken": "^9.0.0"
   },
   "devDependencies": {
     "nodemon": "^2.0.20"
