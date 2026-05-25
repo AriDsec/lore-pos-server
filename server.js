@@ -6,6 +6,8 @@ const fs = require('fs');
 require('dotenv').config();
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
+const jwt = require('jsonwebtoken');
+const JWT_SECRET = process.env.JWT_SECRET || 'lore-pos-secret-fallback';
 
 const sanitizeStr = (val, maxLen = 200) => {
   if (val === null || val === undefined) return null;
@@ -63,6 +65,32 @@ mongoose.connect(process.env.MONGODB_URI, {
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 db.once('open', () => console.log('✅ Connected to MongoDB'));
+
+// ── PINs de acceso — fuente de verdad en servidor ──
+const PINES_SERVER = {
+  'Caja Bar':        { pin: '1970', role: 'caja',   zone: 'bar' },
+  'Caja Restaurante':{ pin: '1969', role: 'caja',   zone: 'restaurante' },
+  'Mari':            { pin: '5456', role: 'mesera', zone: 'bar' },
+  'Mile':            { pin: '8995', role: 'mesera', zone: 'bar' },
+  'Lin':             { pin: '7777', role: 'mesera', zone: 'bar' },
+  'Temp Bar':        { pin: '1221', role: 'mesera', zone: 'bar' },
+  'Guido':           { pin: '0000', role: 'admin',  zone: 'admin' },
+  'Lindsey':         { pin: '1324', role: 'admin',  zone: 'admin' },
+  'Ariel':           { pin: '3306', role: 'admin',  zone: 'admin' },
+  'Aaron':           { pin: '7878', role: 'admin',  zone: 'admin' },
+};
+
+// ── Middleware de autenticación ──
+const requireAuth = (req, res, next) => {
+  const token = req.headers['authorization']?.replace('Bearer ', '');
+  if (!token) return res.status(401).json({ error: 'No autorizado' });
+  try {
+    req.user = jwt.verify(token, JWT_SECRET);
+    next();
+  } catch {
+    return res.status(401).json({ error: 'Token inválido' });
+  }
+};
 
 // ============ SCHEMAS ============
 const accountSchema = new mongoose.Schema({
@@ -152,15 +180,55 @@ const dailyReportSchema = new mongoose.Schema({
 });
 const DailyReport = mongoose.model('DailyReport', dailyReportSchema);
 
+// ── Endpoint de login — valida PIN y devuelve JWT ──
+app.post('/api/auth/login', async (req, res) => {
+  try {
+    const { pin } = req.body;
+    if (!pin) return res.status(400).json({ error: 'PIN requerido' });
+
+    // Buscar en perfiles editables primero
+    const perfilesConfig = await Config.findOne({ key: 'meseras_perfiles' });
+    const perfiles = perfilesConfig?.value || {};
+
+    // Buscar PIN en perfiles editables
+    let nombre = null, role = null, zone = null;
+    for (const [slot, perfil] of Object.entries(perfiles)) {
+      if (perfil.pin === pin && PINES_SERVER[slot]) {
+        nombre = perfil.nombre || slot;
+        role = PINES_SERVER[slot].role;
+        zone = PINES_SERVER[slot].zone;
+        break;
+      }
+    }
+
+    // Si no encontró en perfiles, buscar en PINES_SERVER directo
+    if (!nombre) {
+      for (const [name, data] of Object.entries(PINES_SERVER)) {
+        if (data.pin === pin) {
+          nombre = name;
+          role = data.role;
+          zone = data.zone;
+          break;
+        }
+      }
+    }
+
+    if (!nombre) return res.status(401).json({ error: 'PIN incorrecto' });
+
+    const token = jwt.sign({ name: nombre, role, zone }, JWT_SECRET, { expiresIn: '24h' });
+    res.json({ token, name: nombre, role, zone });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
 // ============ API ROUTES ============
-app.get('/api/accounts/:zone/open', async (req, res) => {
+app.get('/api/accounts/:zone/open', requireAuth, async (req, res) => {
   try {
     const accounts = await Account.find({ zone: req.params.zone, status: { $in: ['open', 'pending_payment', 'pending_approval', 'rejected'] } }).sort({ createdAt: 1 });
     res.json(accounts);
   } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
-app.get('/api/accounts/:zone/closed', async (req, res) => {
+app.get('/api/accounts/:zone/closed', requireAuth, async (req, res) => {
   try {
     const today = new Date(); today.setHours(0, 0, 0, 0);
     const accounts = await Account.find({ zone: req.params.zone, status: 'paid', closedAt: { $gte: today } });
@@ -168,7 +236,7 @@ app.get('/api/accounts/:zone/closed', async (req, res) => {
   } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
-app.post('/api/accounts', writeLimiter, async (req, res) => {
+app.post('/api/accounts', requireAuth, writeLimiter, async (req, res) => {
   try {
     const data = req.body;
     if (data.id) {
@@ -199,7 +267,7 @@ app.post('/api/accounts', writeLimiter, async (req, res) => {
   } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
-app.put('/api/accounts/:id', writeLimiter, async (req, res) => {
+app.put('/api/accounts/:id', requireAuth, writeLimiter, async (req, res) => {
   try {
     const { items, total } = req.body;
     const account = await Account.findOne({ id: sanitizeStr(req.params.id, 100) });
@@ -215,7 +283,7 @@ app.put('/api/accounts/:id', writeLimiter, async (req, res) => {
   } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
-app.post('/api/accounts/:id/close', writeLimiter, async (req, res) => {
+app.post('/api/accounts/:id/close', requireAuth, writeLimiter, async (req, res) => {
   try {
     const account = await Account.findOne({ id: sanitizeStr(req.params.id, 100) });
     if (!account) return res.status(404).json({ error: 'Cuenta no encontrada' });
@@ -238,7 +306,7 @@ app.post('/api/accounts/:id/close', writeLimiter, async (req, res) => {
   } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
-app.get('/api/kitchen/:zone', async (req, res) => {
+app.get('/api/kitchen/:zone', requireAuth, async (req, res) => {
   try {
     const today = new Date(); today.setHours(0, 0, 0, 0);
     const orders = await KitchenOrder.find({ zone: req.params.zone, createdAt: { $gte: today }, status: { $ne: 'delivered' } });
@@ -246,7 +314,7 @@ app.get('/api/kitchen/:zone', async (req, res) => {
   } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
-app.post('/api/kitchen', writeLimiter, async (req, res) => {
+app.post('/api/kitchen', requireAuth, writeLimiter, async (req, res) => {
   try {
     const newOrder = new KitchenOrder({ ...req.body, createdAt: new Date() });
     await newOrder.save();
@@ -264,14 +332,14 @@ app.put('/api/kitchen/:id', async (req, res) => {
   } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
-app.delete('/api/accounts/:id', async (req, res) => {
+app.delete('/api/accounts/:id', requireAuth, async (req, res) => {
   try {
     await Account.deleteOne({ id: sanitizeStr(req.params.id, 100) });
     res.json({ deleted: true });
   } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
-app.delete('/api/kitchen/:id', async (req, res) => {
+app.delete('/api/kitchen/:id', requireAuth, async (req, res) => {
   try {
     await KitchenOrder.deleteOne({ id: sanitizeStr(req.params.id, 100) });
     res.json({ deleted: true });
