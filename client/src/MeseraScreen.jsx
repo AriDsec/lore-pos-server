@@ -75,6 +75,7 @@ export function MeseraScreen({
     () => window.matchMedia('(orientation: landscape)').matches
   );
   const [confirmAccount, setConfirmAccount] = useState(null); // cuenta a confirmar abrir
+  const [showMesaModal, setShowMesaModal] = useState(false);
   const [menuTab, setMenuTab] = useState('productos');
   const [expandedCat, setExpandedCat] = useState(null);
   const [expandedLicorCat, setExpandedLicorCat] = useState(null);
@@ -217,59 +218,31 @@ export function MeseraScreen({
                   {!selectedAcc && (
                     <div>
                       <label className="text-slate-400 text-xs mb-0.5 block">Tipo</label>
-                      <select value={orderType || ''} onChange={(e) => setOrderType(e.target.value)}
-                        className="w-full bg-slate-700 border border-[#94cb47]/30 text-white rounded-lg p-2 text-sm focus:outline-none">
-                        <option value="">Seleccionar...</option>
-                        <option value="dine-in">Local</option>
-                        <option value="takeout">Llevar</option>
-                      </select>
+                      <div className="grid grid-cols-2 gap-2">
+                        <button onClick={() => setOrderType('dine-in')}
+                          className={`py-2.5 rounded-xl font-bold text-sm border transition ${orderType === 'dine-in' ? 'bg-[#94cb47] text-black border-[#94cb47]' : 'bg-slate-700 text-slate-300 border-slate-600 hover:border-slate-500'}`}>
+                          Local
+                        </button>
+                        <button onClick={() => setOrderType('takeout')}
+                          className={`py-2.5 rounded-xl font-bold text-sm border transition ${orderType === 'takeout' ? 'bg-[#94cb47] text-black border-[#94cb47]' : 'bg-slate-700 text-slate-300 border-slate-600 hover:border-slate-500'}`}>
+                          Llevar
+                        </button>
+                      </div>
                     </div>
                   )}
           
-                  {/* Mesa + Barra */}
+                                    {/* Mesa + Barra */}
                   {(orderType === 'dine-in' || selectedAcc) && (
-                    <div className={(isBar && !modoRestaurante) ? "grid grid-cols-2 gap-2" : "grid grid-cols-1"}>
-                      <div>
-                        <label className="text-slate-400 text-xs mb-0.5 block">Mesa</label>
-                        <select value={selectedTable !== null && selectedTable !== undefined ? selectedTable : ''}
-                          onChange={(e) => {
-                            const newTable = e.target.value !== '' ? Number(e.target.value) : null;
-                            setSelectedTable(newTable);
-                            setSelectedBarra(null);
-                            // Si hay cuenta en esa mesa, mostrar toast de confirmación
-                            if (newTable !== null) {
-                              const existing = openAccounts.find(a =>
-                                a.status === 'open' && a.type !== 'direct' &&
-                                String(a.table) === String(newTable)
-                              );
-                              if (existing) {
-                                setConfirmAccount(existing);
-                              }
-                              // Si había cuenta seleccionada, limpiarla
-                              else if (selectedAccount) {
-                                onSelectAccount(null);
-                              }
-                            } else if (selectedAccount) {
-                              onSelectAccount(null);
-                            }
-                          }}
-                          className="w-full bg-slate-700 border border-[#94cb47]/30 text-white rounded-lg p-2 text-sm focus:outline-none">
-                          <option value="">—</option>
-                          {(tables || Array.from({ length: maxTables }, (_, i) => i + 1)).map(n => (
-                            <option key={n} value={n}>Mesa {n}</option>
-                          ))}
-                        </select>
-                      </div>
-                      {isBar && !modoRestaurante && (
-                        <div>
-                          <label className="text-slate-400 text-xs mb-0.5 block">Barra</label>
-                          <select value={selectedBarra || ''} onChange={(e) => { setSelectedBarra(e.target.value); setSelectedTable(null); onSelectAccount(null); }}
-                            className="w-full bg-slate-700 border border-[#94cb47]/30 text-white rounded-lg p-2 text-sm focus:outline-none">
-                            <option value="">—</option>
-                            {barras.map(b => <option key={b} value={b}>{b}</option>)}
-                          </select>
-                        </div>
-                      )}
+                    <div>
+                      <label className="text-slate-400 text-xs mb-0.5 block">Ubicación</label>
+                      <button onClick={() => setShowMesaModal(true)}
+                        className={`w-full py-2.5 px-3 rounded-xl font-bold text-sm border transition text-left ${
+                          (selectedTable !== null && selectedTable !== undefined) || selectedBarra
+                            ? 'bg-[#94cb47]/10 border-[#94cb47] text-[#94cb47]'
+                            : 'bg-slate-700 border-slate-600 text-slate-400 hover:border-slate-500'
+                        }`}>
+                        {selectedBarra ? selectedBarra : (selectedTable !== null && selectedTable !== undefined) ? `Mesa ${selectedTable}` : 'Seleccionar mesa o barra...'}
+                      </button>
                     </div>
                   )}
           
@@ -481,6 +454,70 @@ export function MeseraScreen({
           </button>
         </div>
       </div>
+
+      {/* Modal mesa/barra */}
+      {showMesaModal && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-end justify-center z-50">
+          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-t-2xl border-t border-[#94cb47]/30 p-5 w-full max-w-lg shadow-2xl">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-[#94cb47] font-bold text-lg">Seleccionar ubicación</h2>
+              <button onClick={() => setShowMesaModal(false)} className="text-slate-400 hover:text-white text-sm">Cerrar</button>
+            </div>
+            {/* Mesas */}
+            <div className="mb-4">
+              <div className="text-slate-400 text-xs font-bold uppercase tracking-wide mb-2">Mesas</div>
+              <div className="grid grid-cols-4 gap-2">
+                {(tables || Array.from({ length: maxTables + 1 }, (_, i) => i)).map(n => {
+                  const tieneC = openAccounts.some(a => a.status === 'open' && a.type !== 'direct' && String(a.table) === String(n));
+                  const isSelected = selectedTable === n && !selectedBarra;
+                  return (
+                    <button key={n}
+                      onClick={() => {
+                        const existing = openAccounts.find(a => a.status === 'open' && a.type !== 'direct' && String(a.table) === String(n));
+                        if (existing && !selectedAccount) {
+                          setShowMesaModal(false);
+                          setSelectedTable(n);
+                          setSelectedBarra(null);
+                          setConfirmAccount(existing);
+                        } else {
+                          if (selectedAccount) onSelectAccount(null);
+                          setSelectedTable(n);
+                          setSelectedBarra(null);
+                          setShowMesaModal(false);
+                        }
+                      }}
+                      className={`py-3 rounded-xl font-bold text-sm border transition relative ${
+                        isSelected ? 'bg-[#94cb47] text-black border-[#94cb47]' :
+                        tieneC ? 'bg-slate-700 text-amber-400 border-amber-500/50 hover:border-amber-400' :
+                        'bg-slate-700 text-slate-300 border-slate-600 hover:border-slate-500'
+                      }`}>
+                      {n}
+                      {tieneC && <span className="absolute top-1 right-1 w-1.5 h-1.5 bg-amber-400 rounded-full"></span>}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+            {/* Barras */}
+            {isBar && !modoRestaurante && (
+              <div>
+                <div className="text-slate-400 text-xs font-bold uppercase tracking-wide mb-2">Barras</div>
+                <div className="grid grid-cols-2 gap-2">
+                  {barras.map(b => (
+                    <button key={b}
+                      onClick={() => { setSelectedBarra(b); setSelectedTable(null); if (selectedAccount) onSelectAccount(null); setShowMesaModal(false); }}
+                      className={`py-3 rounded-xl font-bold text-sm border transition ${
+                        selectedBarra === b ? 'bg-[#94cb47] text-black border-[#94cb47]' : 'bg-slate-700 text-slate-300 border-slate-600 hover:border-slate-500'
+                      }`}>
+                      {b}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Modal confirmar abrir cuenta */}
       {confirmAccount && (
