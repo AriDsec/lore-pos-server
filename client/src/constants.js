@@ -313,20 +313,18 @@ export const MENU = {
 // ─────────────────────────────────────────────
 export const PINES = {
   // ── Caja ──
-  'Caja Bar':           { pin: '1970', role: 'caja',   zone: 'bar' },
-  'Caja Restaurante':   { pin: '1969', role: 'caja',   zone: 'restaurante' },
+  'Caja Bar':           { role: 'caja',   zone: 'bar' },
+  'Caja Restaurante':   { role: 'caja',   zone: 'restaurante' },
   // ── Meseras Bar ──
-  'Mari':               { pin: '5456', role: 'mesera', zone: 'bar' },
-  'Mile':               { pin: '8995', role: 'mesera', zone: 'bar' },
-  'Lin':                { pin: '7777', role: 'mesera', zone: 'bar' },
-  'Temp Bar':           { pin: '1221', role: 'mesera', zone: 'bar' },
-  // ── Admins (selector completo + registro de acceso) ──
-  // Guido, Lindsey, Ariel: admin general
-  // Aaron: también usa Tablet Restaurante y Cocina desde su selector
-  'Guido':              { pin: '0000', role: 'admin',  zone: 'admin' },
-  'Lindsey':            { pin: '1324', role: 'admin',  zone: 'admin' },
-  'Ariel':              { pin: '3306', role: 'admin',  zone: 'admin' },
-  'Aaron':              { pin: '7878', role: 'admin',  zone: 'admin' },
+  'Mari':               { role: 'mesera', zone: 'bar' },
+  'Mile':               { role: 'mesera', zone: 'bar' },
+  'Lin':                { role: 'mesera', zone: 'bar' },
+  'Temp Bar':           { role: 'mesera', zone: 'bar' },
+  // ── Admins ──
+  'Guido':              { role: 'admin',  zone: 'admin' },
+  'Lindsey':            { role: 'admin',  zone: 'admin' },
+  'Ariel':              { role: 'admin',  zone: 'admin' },
+  'Aaron':              { role: 'admin',  zone: 'admin' },
 };
 
 export const meseras = ['Mari', 'Mile', 'Lin', 'Temp Bar', 'Guido Bar'];
