@@ -56,9 +56,11 @@ const adminLimiter = rateLimit({
 app.post('/api/auth/login', async (req, res) => {
   try {
     const { pin } = req.body;
+    console.log('LOGIN REQUEST - pin recibido:', pin ? 'si' : 'no');
     if (!pin) return res.status(400).json({ error: 'PIN requerido' });
 
     const perfilesConfig = await Config.findOne({ key: 'meseras_perfiles' });
+    console.log('perfiles encontrados:', perfilesConfig ? 'si' : 'no');
     const perfiles = perfilesConfig?.value || {};
 
     let nombre = null, role = null, zone = null;
