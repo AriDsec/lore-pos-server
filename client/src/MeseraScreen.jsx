@@ -137,6 +137,13 @@ export function MeseraScreen({
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-slate-900 to-black flex flex-col">
       <Header mesera={currentUser} zona={zona} onLogout={onLogout} />
+      {/* Indicador color mesera */}
+      {COLORES_MESERA[currentUser] && (
+        <div className="px-4 py-1 flex items-center gap-2" style={{borderBottom: `2px solid ${COLORES_MESERA[currentUser]}`}}>
+          <div className="w-3 h-3 rounded-full flex-shrink-0" style={{backgroundColor: COLORES_MESERA[currentUser]}}></div>
+          <span className="text-xs font-bold" style={{color: COLORES_MESERA[currentUser]}}>{currentUser}</span>
+        </div>
+      )}
 
       {/* Banner pedidos listos */}
       {currentUser !== 'Tablet Restaurante' && (() => {
@@ -214,8 +221,43 @@ export function MeseraScreen({
           )}
         </div>
 
-        {/* Derecha: items + total + botones */}
+        {/* Derecha: cuentas + items + total + botones */}
         <div style={{width: "min(400px, 38vw)", flexShrink: 0}} className="flex flex-col gap-3 overflow-y-auto">
+
+          {/* Cuentas abiertas */}
+          {(() => {
+            const cuentasL = openAccounts.filter(a => a.status !== 'pending_payment' && a.status !== 'pending_approval' && a.status !== 'rejected');
+            const mesasL = cuentasL.filter(a => !a.barra).sort((a, b) => (a.table ?? 99) - (b.table ?? 99));
+            const barrasLL = cuentasL.filter(a => !!a.barra).sort((a, b) => (a.barra || '').localeCompare(b.barra || ''));
+            const gruposL = [...mesasL, ...barrasLL];
+            if (gruposL.length === 0) return null;
+            return (
+              <div className="rounded-xl border border-slate-600/50 overflow-hidden">
+                <div className="bg-slate-700/40 px-3 py-1.5">
+                  <span className="text-slate-400 text-xs font-bold uppercase tracking-wide">Cuentas abiertas</span>
+                </div>
+                <div className="divide-y divide-slate-700/40 max-h-40 overflow-y-auto">
+                  {gruposL.map(acc => {
+                    const ubicacion = acc.barra ? acc.barra : (acc.table !== null && acc.table !== undefined) ? `Mesa ${acc.table}` : 'Sin mesa';
+                    const color = COLORES_MESERA[acc.mesera] || '#64748b';
+                    const isSelected = selectedAccount === acc.id || selectedAccount === acc._id;
+                    return (
+                      <button key={acc.id || acc._id}
+                        onClick={() => { onSelectAccount(acc.id || acc._id); }}
+                        className={`w-full text-left px-3 py-2 transition ${isSelected ? 'bg-[#94cb47]/10' : 'bg-slate-800/60 hover:bg-slate-700/60'}`}
+                        style={{borderLeftWidth: '3px', borderLeftColor: color}}>
+                        <div className="flex justify-between items-center">
+                          <span className="font-bold text-white text-xs">{ubicacion}</span>
+                          <span className="text-[#94cb47] font-bold text-xs">₡{(acc.total || 0).toLocaleString()}</span>
+                        </div>
+                        <div className="text-slate-400 text-xs">{acc.clientName || '—'} · {acc.mesera}</div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })()}
 
           {/* Items en cuenta */}
           {selectedAcc && (selectedAcc.items || []).length > 0 && (
