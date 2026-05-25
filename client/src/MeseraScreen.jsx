@@ -126,254 +126,12 @@ export function MeseraScreen({
   ) && !!orderType;
 
   // ── Comanda portrait ──
-  const ComandaPanel = () => (
-    <div className="space-y-3 p-3">
 
-      {/* Indicador 10% */}
-      {aplicaServicio && (
-        <div className="bg-[#94cb47]/10 border border-[#94cb47]/30 rounded-lg px-3 py-1.5">
-          <span className="text-[#94cb47] text-xs font-bold">Servicio 10% activo</span>
-        </div>
-      )}
-
-      {/* Paso 1 — Datos de la cuenta */}
-      <div className="bg-slate-800/60 border border-slate-700 rounded-xl p-3 space-y-2">
-        <div className="text-slate-400 text-xs font-bold uppercase tracking-wide mb-1">Datos de la cuenta</div>
-
-        {/* Tipo */}
-        {!selectedAcc && (
-          <div>
-            <label className="text-slate-400 text-xs mb-0.5 block">Tipo</label>
-            <select value={orderType || ''} onChange={(e) => setOrderType(e.target.value)}
-              className="w-full bg-slate-700 border border-[#94cb47]/30 text-white rounded-lg p-2 text-sm focus:outline-none">
-              <option value="">Seleccionar...</option>
-              <option value="dine-in">Local</option>
-              <option value="takeout">Llevar</option>
-            </select>
-          </div>
-        )}
-
-        {/* Mesa + Barra */}
-        {(orderType === 'dine-in' || selectedAcc) && (
-          <div className={(isBar && !modoRestaurante) ? "grid grid-cols-2 gap-2" : "grid grid-cols-1"}>
-            <div>
-              <label className="text-slate-400 text-xs mb-0.5 block">Mesa</label>
-              <select value={selectedTable !== null && selectedTable !== undefined ? selectedTable : ''}
-                onChange={(e) => { setSelectedTable(e.target.value !== '' ? Number(e.target.value) : null); setSelectedBarra(null); }}
-                className="w-full bg-slate-700 border border-[#94cb47]/30 text-white rounded-lg p-2 text-sm focus:outline-none">
-                <option value="">—</option>
-                {(tables || Array.from({ length: maxTables }, (_, i) => i + 1)).map(n => (
-                  <option key={n} value={n}>Mesa {n}</option>
-                ))}
-              </select>
-            </div>
-            {isBar && !modoRestaurante && (
-              <div>
-                <label className="text-slate-400 text-xs mb-0.5 block">Barra</label>
-                <select value={selectedBarra || ''} onChange={(e) => { setSelectedBarra(e.target.value); setSelectedTable(null); }}
-                  className="w-full bg-slate-700 border border-[#94cb47]/30 text-white rounded-lg p-2 text-sm focus:outline-none">
-                  <option value="">—</option>
-                  {barras.map(b => <option key={b} value={b}>{b}</option>)}
-                </select>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Nombre */}
-        <input type="text" value={clientName} onChange={(e) => setClientName(e.target.value)}
-          placeholder="Nombre / Seña del cliente..."
-          className="w-full bg-slate-700 border border-[#94cb47]/30 text-white rounded-lg p-2 text-sm focus:outline-none placeholder-slate-600" />
-      </div>
-
-      {/* Paso 2 — Menú (solo si datos completos) */}
-      {datosCompletos ? (
-        <>
-          <MenuCenter menuTab={menuTab} setMenuTab={setMenuTab} menu={menu} licores={licores}
-            addToCart={addToCart} onModalChange={onModalChange} isBar={isBar}
-            modoRestaurante={modoRestaurante} onToggleModoRestaurante={onToggleModoRestaurante}
-            modoRestHabilitado={modoRestHabilitado}
-            expandedCat={expandedCat} setExpandedCat={setExpandedCat}
-            expandedLicorCat={expandedLicorCat} setExpandedLicorCat={setExpandedLicorCat} />
-
-          {/* Items existentes en cuenta */}
-          {selectedAcc && (selectedAcc.items || []).length > 0 && (
-            <div className="rounded-xl border border-slate-600/50 overflow-hidden">
-              <div className="bg-slate-700/40 px-3 py-1.5 flex justify-between items-center">
-                <span className="text-slate-400 text-xs font-bold uppercase tracking-wide">En la cuenta</span>
-                <span className="text-[#94cb47] text-xs font-bold">₡{accTotal.toLocaleString()}</span>
-              </div>
-              <div className="divide-y divide-slate-700/40">
-                {(selectedAcc.items || []).map((item, i) => (
-                  <div key={i} className="flex justify-between items-center px-3 py-2">
-                    <span className="text-white text-xs">{item.quantity}x {item.name}</span>
-                    <span className="text-slate-400 text-xs">₡{(item.price * item.quantity).toLocaleString()}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Items nuevos en comanda */}
-          {cartItems.length > 0 && (
-            <div className="rounded-xl border border-[#94cb47]/30 overflow-hidden">
-              <div className="bg-[#94cb47]/10 px-3 py-1.5 flex justify-between items-center">
-                <span className="text-[#94cb47] text-xs font-bold uppercase tracking-wide">
-                  {selectedAcc ? 'Agregando' : 'Comanda'}
-                </span>
-                <span className="text-[#94cb47] text-xs font-bold">₡{cartTotal.toLocaleString()}</span>
-              </div>
-              <div className="divide-y divide-slate-700/40">
-                {cartItems.map(item => (
-                  <div key={item.id} className="px-3 py-2">
-                    <div className="flex justify-between items-center">
-                      <span className="text-white text-sm font-bold flex-1 pr-2">{item.name}</span>
-                      <span className="text-[#94cb47] text-sm font-bold">₡{(item.price * item.quantity).toLocaleString()}</span>
-                      {!isOthersMesera && (
-                        <button onClick={() => removeFromCart(item.id)} className="text-red-400 hover:text-red-300 ml-2">
-                          <Trash2 size={13} />
-                        </button>
-                      )}
-                    </div>
-                    {!isOthersMesera && (
-                      <div className="flex items-center gap-2 mt-1">
-                        <button onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                          className="w-7 h-7 flex items-center justify-center bg-slate-700 hover:bg-slate-600 rounded-lg border border-slate-600 transition">
-                          <Minus size={12} className="text-slate-300" />
-                        </button>
-                        <span className="flex-1 text-center text-white font-bold text-sm">{item.quantity}</span>
-                        <button onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                          className="w-7 h-7 flex items-center justify-center bg-slate-700 hover:bg-slate-600 rounded-lg border border-slate-600 transition">
-                          <Plus size={12} className="text-slate-300" />
-                        </button>
-                      </div>
-                    )}
-                    <input type="text" placeholder="Notas..."
-                      value={item.notes || ''}
-                      onChange={(e) => updateNotes(item.id, e.target.value.slice(0, 80))} maxLength={80}
-                      className="w-full mt-1 bg-slate-900/50 border border-[#94cb47]/20 text-white text-xs rounded p-1 focus:outline-none focus:border-[#94cb47] placeholder-slate-600" />
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Total y botones */}
-          {(cartItems.length > 0 || selectedAcc) && (
-            <div className="space-y-2">
-              <div className="bg-[#94cb47]/20 rounded-lg px-3 py-2 border border-[#94cb47]/40">
-                {selectedAcc && cartItems.length > 0 ? (
-                  <div className="space-y-0.5">
-                    <div className="flex justify-between text-xs text-slate-400">
-                      <span>En cuenta</span><span>₡{accTotal.toLocaleString()}</span>
-                    </div>
-                    <div className="flex justify-between text-xs text-slate-400">
-                      <span>Nuevo</span><span>₡{cartTotal.toLocaleString()}</span>
-                    </div>
-                    <div className="flex justify-between items-center border-t border-[#94cb47]/30 pt-1 mt-1">
-                      <span className="text-slate-300 text-xs">Total cuenta</span>
-                      <span className="text-lg font-bold text-[#94cb47]">₡{combinedTotal.toLocaleString()}</span>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="flex items-center justify-between">
-                    <span className="text-slate-300 text-xs">Total</span>
-                    <span className="text-lg font-bold text-[#94cb47]">₡{(selectedAcc ? accTotal : cartTotal).toLocaleString()}</span>
-                  </div>
-                )}
-              </div>
-
-              {cartItems.length > 0 && (
-                <button onClick={completeOrder} disabled={loading}
-                  className={`w-full font-bold py-2.5 rounded-xl transition text-sm ${loading ? 'bg-slate-600 text-slate-400 cursor-not-allowed' : 'bg-[#94cb47] hover:bg-[#7ab035] text-black'}`}>
-                  {loading ? 'Guardando...' : selectedAcc ? 'Agregar a cuenta' : 'Guardar Cuenta'}
-                </button>
-              )}
-
-              {isBar && !modoRestaurante && onDirectPay && !selectedAccount && cartItems.length > 0 && (
-                <button onClick={onDirectPay}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl transition text-sm">
-                  Cobro Directo
-                </button>
-              )}
-
-              {selectedAccount && cartItems.length > 1 && onSplit && (
-                <button onClick={() => { const acc = openAccounts.find(a => a.id === selectedAccount || a._id === selectedAccount); if (acc) setSplitOrder(acc); }}
-                  className="w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-2.5 rounded-xl transition text-sm">
-                  Separar Cuenta
-                </button>
-              )}
-            </div>
-          )}
-
-          {/* Pendientes aprobación */}
-          {openAccounts.filter(a => a.status === 'pending_approval' && a.mesera === currentUser).map(acc => (
-            <div key={acc.id || acc._id} className="text-xs text-amber-400 bg-amber-900/20 border border-amber-500/30 rounded-lg px-3 py-1.5">
-              Esperando aprobación: {acc.clientName || acc.locationLabel}
-            </div>
-          ))}
-
-          {/* Rechazadas */}
-          {openAccounts.filter(a => a.status === 'rejected' && a.mesera === currentUser).map(acc => (
-            <div key={acc.id || acc._id} className="text-xs text-red-400 bg-red-900/20 border border-red-500/30 rounded-lg px-3 py-2">
-              <div className="mb-1">Rechazada: {acc.clientName || acc.locationLabel}</div>
-              {acc.rejectedReason && <div className="text-red-300 mb-1.5">Motivo: {acc.rejectedReason}</div>}
-              <div className="flex gap-2">
-                <button onClick={() => onPayRejected && onPayRejected(acc)}
-                  className="flex-1 bg-[#94cb47] hover:bg-[#7ab035] text-black font-bold py-1 rounded text-xs transition">
-                  Cobrar directo
-                </button>
-                <button onClick={() => onDeleteRejected && onDeleteRejected(acc)}
-                  className="flex-1 bg-red-900/60 hover:bg-red-900 text-red-300 font-bold py-1 rounded text-xs transition">
-                  Borrar
-                </button>
-              </div>
-            </div>
-          ))}
-        </>
-      ) : (
-        <div className="text-center py-8 text-slate-600">
-          <Utensils size={32} className="mx-auto mb-3 opacity-30" />
-          <p className="text-sm">Completa los datos para agregar productos</p>
-        </div>
-      )}
-    </div>
-  );
-
-  // ── Cuentas portrait ──
-  const CuentasPanel = () => {
-    const cuentas = openAccounts.filter(a => a.status !== 'pending_payment' && a.status !== 'pending_approval' && a.status !== 'rejected');
-    const mesas = cuentas.filter(a => !a.barra).sort((a, b) => (a.table ?? 99) - (b.table ?? 99));
-    const barrasL = cuentas.filter(a => !!a.barra).sort((a, b) => (a.barra || '').localeCompare(b.barra || ''));
-    const grupos = [...mesas, ...barrasL];
-
-    return (
-      <div className="p-3 space-y-2">
-        {grupos.length === 0 ? (
-          <div className="text-center py-8 text-slate-600">
-            <ClipboardList size={32} className="mx-auto mb-3 opacity-30" />
-            <p className="text-sm">No hay cuentas abiertas</p>
-          </div>
-        ) : grupos.map(acc => {
-          const ubicacion = acc.barra ? acc.barra : (acc.table !== null && acc.table !== undefined) ? `Mesa ${acc.table}` : 'Sin mesa';
-          const color = COLORES_MESERA[acc.mesera] || '#64748b';
-          const isSelected = selectedAccount === acc.id || selectedAccount === acc._id;
-          return (
-            <button key={acc.id || acc._id}
-              onClick={() => setConfirmAccount(acc)}
-              className={`w-full text-left px-3 py-3 rounded-xl border border-slate-600/50 transition ${isSelected ? 'bg-[#94cb47]/10' : 'bg-slate-800/60 hover:bg-slate-700/60'}`}
-              style={{borderLeftWidth: '4px', borderLeftColor: color}}>
-              <div className="flex justify-between items-center">
-                <span className="font-bold text-white text-sm">{ubicacion}</span>
-                <span className="text-[#94cb47] font-bold text-sm">₡{(acc.total || 0).toLocaleString()}</span>
-              </div>
-              <div className="text-slate-400 text-xs mt-0.5">{acc.clientName || '—'} · {acc.mesera}</div>
-            </button>
-          );
-        })}
-      </div>
-    );
-  };
+  // Cuentas variables
+  const cuentas = openAccounts.filter(a => a.status !== 'pending_payment' && a.status !== 'pending_approval' && a.status !== 'rejected');
+      const mesas = cuentas.filter(a => !a.barra).sort((a, b) => (a.table ?? 99) - (b.table ?? 99));
+      const barrasL = cuentas.filter(a => !!a.barra).sort((a, b) => (a.barra || '').localeCompare(b.barra || ''));
+      const grupos = [...mesas, ...barrasL];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-slate-900 to-black flex flex-col">
@@ -440,8 +198,246 @@ export function MeseraScreen({
       {/* ── Portrait ── */}
       <div className={`${isLandscape ? "hidden" : "flex"} flex-col flex-1 overflow-hidden`}>
         <div className="flex-1 overflow-y-auto">
-          {mobileTab === 'comanda' && <ComandaPanel />}
-          {mobileTab === 'cuentas' && <CuentasPanel />}
+          {mobileTab === 'comanda' && (
+          
+              <div className="space-y-3 p-3">
+          
+                {/* Indicador 10% */}
+                {aplicaServicio && (
+                  <div className="bg-[#94cb47]/10 border border-[#94cb47]/30 rounded-lg px-3 py-1.5">
+                    <span className="text-[#94cb47] text-xs font-bold">Servicio 10% activo</span>
+                  </div>
+                )}
+          
+                {/* Paso 1 — Datos de la cuenta */}
+                <div className="bg-slate-800/60 border border-slate-700 rounded-xl p-3 space-y-2">
+                  <div className="text-slate-400 text-xs font-bold uppercase tracking-wide mb-1">Datos de la cuenta</div>
+          
+                  {/* Tipo */}
+                  {!selectedAcc && (
+                    <div>
+                      <label className="text-slate-400 text-xs mb-0.5 block">Tipo</label>
+                      <select value={orderType || ''} onChange={(e) => setOrderType(e.target.value)}
+                        className="w-full bg-slate-700 border border-[#94cb47]/30 text-white rounded-lg p-2 text-sm focus:outline-none">
+                        <option value="">Seleccionar...</option>
+                        <option value="dine-in">Local</option>
+                        <option value="takeout">Llevar</option>
+                      </select>
+                    </div>
+                  )}
+          
+                  {/* Mesa + Barra */}
+                  {(orderType === 'dine-in' || selectedAcc) && (
+                    <div className={(isBar && !modoRestaurante) ? "grid grid-cols-2 gap-2" : "grid grid-cols-1"}>
+                      <div>
+                        <label className="text-slate-400 text-xs mb-0.5 block">Mesa</label>
+                        <select value={selectedTable !== null && selectedTable !== undefined ? selectedTable : ''}
+                          onChange={(e) => { setSelectedTable(e.target.value !== '' ? Number(e.target.value) : null); setSelectedBarra(null); }}
+                          className="w-full bg-slate-700 border border-[#94cb47]/30 text-white rounded-lg p-2 text-sm focus:outline-none">
+                          <option value="">—</option>
+                          {(tables || Array.from({ length: maxTables }, (_, i) => i + 1)).map(n => (
+                            <option key={n} value={n}>Mesa {n}</option>
+                          ))}
+                        </select>
+                      </div>
+                      {isBar && !modoRestaurante && (
+                        <div>
+                          <label className="text-slate-400 text-xs mb-0.5 block">Barra</label>
+                          <select value={selectedBarra || ''} onChange={(e) => { setSelectedBarra(e.target.value); setSelectedTable(null); }}
+                            className="w-full bg-slate-700 border border-[#94cb47]/30 text-white rounded-lg p-2 text-sm focus:outline-none">
+                            <option value="">—</option>
+                            {barras.map(b => <option key={b} value={b}>{b}</option>)}
+                          </select>
+                        </div>
+                      )}
+                    </div>
+                  )}
+          
+                  {/* Nombre */}
+                  <input type="text" value={clientName} onChange={(e) => setClientName(e.target.value)}
+                    placeholder="Nombre / Seña del cliente..."
+                    className="w-full bg-slate-700 border border-[#94cb47]/30 text-white rounded-lg p-2 text-sm focus:outline-none placeholder-slate-600" />
+                </div>
+          
+                {/* Paso 2 — Menú (solo si datos completos) */}
+                {datosCompletos ? (
+                  <>
+                    <MenuCenter menuTab={menuTab} setMenuTab={setMenuTab} menu={menu} licores={licores}
+                      addToCart={addToCart} onModalChange={onModalChange} isBar={isBar}
+                      modoRestaurante={modoRestaurante} onToggleModoRestaurante={onToggleModoRestaurante}
+                      modoRestHabilitado={modoRestHabilitado}
+                      expandedCat={expandedCat} setExpandedCat={setExpandedCat}
+                      expandedLicorCat={expandedLicorCat} setExpandedLicorCat={setExpandedLicorCat} />
+          
+                    {/* Items existentes en cuenta */}
+                    {selectedAcc && (selectedAcc.items || []).length > 0 && (
+                      <div className="rounded-xl border border-slate-600/50 overflow-hidden">
+                        <div className="bg-slate-700/40 px-3 py-1.5 flex justify-between items-center">
+                          <span className="text-slate-400 text-xs font-bold uppercase tracking-wide">En la cuenta</span>
+                          <span className="text-[#94cb47] text-xs font-bold">₡{accTotal.toLocaleString()}</span>
+                        </div>
+                        <div className="divide-y divide-slate-700/40">
+                          {(selectedAcc.items || []).map((item, i) => (
+                            <div key={i} className="flex justify-between items-center px-3 py-2">
+                              <span className="text-white text-xs">{item.quantity}x {item.name}</span>
+                              <span className="text-slate-400 text-xs">₡{(item.price * item.quantity).toLocaleString()}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+          
+                    {/* Items nuevos en comanda */}
+                    {cartItems.length > 0 && (
+                      <div className="rounded-xl border border-[#94cb47]/30 overflow-hidden">
+                        <div className="bg-[#94cb47]/10 px-3 py-1.5 flex justify-between items-center">
+                          <span className="text-[#94cb47] text-xs font-bold uppercase tracking-wide">
+                            {selectedAcc ? 'Agregando' : 'Comanda'}
+                          </span>
+                          <span className="text-[#94cb47] text-xs font-bold">₡{cartTotal.toLocaleString()}</span>
+                        </div>
+                        <div className="divide-y divide-slate-700/40">
+                          {cartItems.map(item => (
+                            <div key={item.id} className="px-3 py-2">
+                              <div className="flex justify-between items-center">
+                                <span className="text-white text-sm font-bold flex-1 pr-2">{item.name}</span>
+                                <span className="text-[#94cb47] text-sm font-bold">₡{(item.price * item.quantity).toLocaleString()}</span>
+                                {!isOthersMesera && (
+                                  <button onClick={() => removeFromCart(item.id)} className="text-red-400 hover:text-red-300 ml-2">
+                                    <Trash2 size={13} />
+                                  </button>
+                                )}
+                              </div>
+                              {!isOthersMesera && (
+                                <div className="flex items-center gap-2 mt-1">
+                                  <button onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                    className="w-7 h-7 flex items-center justify-center bg-slate-700 hover:bg-slate-600 rounded-lg border border-slate-600 transition">
+                                    <Minus size={12} className="text-slate-300" />
+                                  </button>
+                                  <span className="flex-1 text-center text-white font-bold text-sm">{item.quantity}</span>
+                                  <button onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                    className="w-7 h-7 flex items-center justify-center bg-slate-700 hover:bg-slate-600 rounded-lg border border-slate-600 transition">
+                                    <Plus size={12} className="text-slate-300" />
+                                  </button>
+                                </div>
+                              )}
+                              <input type="text" placeholder="Notas..."
+                                value={item.notes || ''}
+                                onChange={(e) => updateNotes(item.id, e.target.value.slice(0, 80))} maxLength={80}
+                                className="w-full mt-1 bg-slate-900/50 border border-[#94cb47]/20 text-white text-xs rounded p-1 focus:outline-none focus:border-[#94cb47] placeholder-slate-600" />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+          
+                    {/* Total y botones */}
+                    {(cartItems.length > 0 || selectedAcc) && (
+                      <div className="space-y-2">
+                        <div className="bg-[#94cb47]/20 rounded-lg px-3 py-2 border border-[#94cb47]/40">
+                          {selectedAcc && cartItems.length > 0 ? (
+                            <div className="space-y-0.5">
+                              <div className="flex justify-between text-xs text-slate-400">
+                                <span>En cuenta</span><span>₡{accTotal.toLocaleString()}</span>
+                              </div>
+                              <div className="flex justify-between text-xs text-slate-400">
+                                <span>Nuevo</span><span>₡{cartTotal.toLocaleString()}</span>
+                              </div>
+                              <div className="flex justify-between items-center border-t border-[#94cb47]/30 pt-1 mt-1">
+                                <span className="text-slate-300 text-xs">Total cuenta</span>
+                                <span className="text-lg font-bold text-[#94cb47]">₡{combinedTotal.toLocaleString()}</span>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="flex items-center justify-between">
+                              <span className="text-slate-300 text-xs">Total</span>
+                              <span className="text-lg font-bold text-[#94cb47]">₡{(selectedAcc ? accTotal : cartTotal).toLocaleString()}</span>
+                            </div>
+                          )}
+                        </div>
+          
+                        {cartItems.length > 0 && (
+                          <button onClick={completeOrder} disabled={loading}
+                            className={`w-full font-bold py-2.5 rounded-xl transition text-sm ${loading ? 'bg-slate-600 text-slate-400 cursor-not-allowed' : 'bg-[#94cb47] hover:bg-[#7ab035] text-black'}`}>
+                            {loading ? 'Guardando...' : selectedAcc ? 'Agregar a cuenta' : 'Guardar Cuenta'}
+                          </button>
+                        )}
+          
+                        {isBar && !modoRestaurante && onDirectPay && !selectedAccount && cartItems.length > 0 && (
+                          <button onClick={onDirectPay}
+                            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl transition text-sm">
+                            Cobro Directo
+                          </button>
+                        )}
+          
+                        {selectedAccount && cartItems.length > 1 && onSplit && (
+                          <button onClick={() => { const acc = openAccounts.find(a => a.id === selectedAccount || a._id === selectedAccount); if (acc) setSplitOrder(acc); }}
+                            className="w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-2.5 rounded-xl transition text-sm">
+                            Separar Cuenta
+                          </button>
+                        )}
+                      </div>
+                    )}
+          
+                    {/* Pendientes aprobación */}
+                    {openAccounts.filter(a => a.status === 'pending_approval' && a.mesera === currentUser).map(acc => (
+                      <div key={acc.id || acc._id} className="text-xs text-amber-400 bg-amber-900/20 border border-amber-500/30 rounded-lg px-3 py-1.5">
+                        Esperando aprobación: {acc.clientName || acc.locationLabel}
+                      </div>
+                    ))}
+          
+                    {/* Rechazadas */}
+                    {openAccounts.filter(a => a.status === 'rejected' && a.mesera === currentUser).map(acc => (
+                      <div key={acc.id || acc._id} className="text-xs text-red-400 bg-red-900/20 border border-red-500/30 rounded-lg px-3 py-2">
+                        <div className="mb-1">Rechazada: {acc.clientName || acc.locationLabel}</div>
+                        {acc.rejectedReason && <div className="text-red-300 mb-1.5">Motivo: {acc.rejectedReason}</div>}
+                        <div className="flex gap-2">
+                          <button onClick={() => onPayRejected && onPayRejected(acc)}
+                            className="flex-1 bg-[#94cb47] hover:bg-[#7ab035] text-black font-bold py-1 rounded text-xs transition">
+                            Cobrar directo
+                          </button>
+                          <button onClick={() => onDeleteRejected && onDeleteRejected(acc)}
+                            className="flex-1 bg-red-900/60 hover:bg-red-900 text-red-300 font-bold py-1 rounded text-xs transition">
+                            Borrar
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </>
+                ) : (
+                  <div className="text-center py-8 text-slate-600">
+                    <Utensils size={32} className="mx-auto mb-3 opacity-30" />
+                    <p className="text-sm">Completa los datos para agregar productos</p>
+                  </div>
+                )}
+              </div>
+          )}
+          {mobileTab === 'cuentas' && (
+          <div className="p-3 space-y-2">
+                  {grupos.length === 0 ? (
+                    <div className="text-center py-8 text-slate-600">
+                      <ClipboardList size={32} className="mx-auto mb-3 opacity-30" />
+                      <p className="text-sm">No hay cuentas abiertas</p>
+                    </div>
+                  ) : grupos.map(acc => {
+                    const ubicacion = acc.barra ? acc.barra : (acc.table !== null && acc.table !== undefined) ? `Mesa ${acc.table}` : 'Sin mesa';
+                    const color = COLORES_MESERA[acc.mesera] || '#64748b';
+                    const isSelected = selectedAccount === acc.id || selectedAccount === acc._id;
+                    return (
+                      <button key={acc.id || acc._id}
+                        onClick={() => setConfirmAccount(acc)}
+                        className={`w-full text-left px-3 py-3 rounded-xl border border-slate-600/50 transition ${isSelected ? 'bg-[#94cb47]/10' : 'bg-slate-800/60 hover:bg-slate-700/60'}`}
+                        style={{borderLeftWidth: '4px', borderLeftColor: color}}>
+                        <div className="flex justify-between items-center">
+                          <span className="font-bold text-white text-sm">{ubicacion}</span>
+                          <span className="text-[#94cb47] font-bold text-sm">₡{(acc.total || 0).toLocaleString()}</span>
+                        </div>
+                        <div className="text-slate-400 text-xs mt-0.5">{acc.clientName || '—'} · {acc.mesera}</div>
+                      </button>
+                    );
+                  })}
+                </div>
+          )}
         </div>
 
         {/* Bottom nav */}
