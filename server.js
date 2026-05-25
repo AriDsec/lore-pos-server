@@ -83,7 +83,10 @@ app.post('/api/auth/login', async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-app.use('/api', generalLimiter);
+app.use('/api', (req, res, next) => {
+  if (req.path === '/auth/login') return next(); // login sin rate limit
+  return generalLimiter(req, res, next);
+});
 app.use(cors());
 app.use(express.json());
 
