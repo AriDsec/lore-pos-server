@@ -1,13 +1,19 @@
 import { useState, useEffect } from "react";
-import { Utensils } from 'lucide-react';
+import { Utensils, ClipboardList, Plus, Minus, Trash2 } from 'lucide-react';
 import { Header } from './ui.jsx';
 import { MenuPanel, OtrosPanel } from './menu.jsx';
 import { SplitModal } from './modals.jsx';
 import { ShoppingCart } from './Cart.jsx';
 
-function MenuCenter({ menuTab, setMenuTab, menu, licores, addToCart, onModalChange, isBar, modoRestaurante, onToggleModoRestaurante, modoRestHabilitado, expandedCat, setExpandedCat, expandedLicorCat, setExpandedLicorCat }) {
-  return (
+// ── Colores por mesera ──
+const COLORES_MESERA = {
+  'Mari': '#60a5fa', 'Mile': '#c084fc', 'Lin': '#fb923c',
+  'Temp Bar': '#f472b6', 'Guido Bar': '#facc15'
+};
 
+function MenuCenter({ menuTab, setMenuTab, menu, licores, addToCart, onModalChange, isBar,
+  modoRestaurante, onToggleModoRestaurante, modoRestHabilitado, expandedCat, setExpandedCat, expandedLicorCat, setExpandedLicorCat }) {
+  return (
     <div className="space-y-3">
       <div className="flex gap-1.5">
         {[
@@ -29,7 +35,6 @@ function MenuCenter({ menuTab, setMenuTab, menu, licores, addToCart, onModalChan
       </div>
       {menuTab === 'productos' && <MenuPanel menu={menu} licores={licores} onSelectItem={addToCart} onModalChange={onModalChange} expandedCat={expandedCat} setExpandedCat={setExpandedCat} expandedLicorCat={expandedLicorCat} setExpandedLicorCat={setExpandedLicorCat} />}
       {menuTab === 'otros'     && <OtrosPanel onAddToCart={addToCart} onModalChange={onModalChange} />}
-      {/* Toggle modo restaurante — solo visible para meseras de bar */}
       {isBar && onToggleModoRestaurante && modoRestHabilitado && (
         <button
           onClick={onToggleModoRestaurante}
@@ -39,11 +44,11 @@ function MenuCenter({ menuTab, setMenuTab, menu, licores, addToCart, onModalChan
               : 'bg-slate-800/60 border-slate-700'
           }`}
         >
-          <span className={`text-sm font-semibold ${modoRestaurante ? 'text-[#94cb47]' : 'text-slate-500'}`}>
+          <span className={`text-sm font-semibold ${modoRestaurante ? 'text-[#94cb47]' : 'text-slate-400'}`}>
             {modoRestaurante ? 'Modo Restaurante activo' : 'Atender mesa de restaurante'}
           </span>
           <div className={`w-10 h-5 rounded-full transition-colors relative flex-shrink-0 ${modoRestaurante ? 'bg-[#94cb47]' : 'bg-slate-600'}`}>
-            <div className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-all ${modoRestaurante ? 'left-5' : 'left-0.5'}`} />
+            <div className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${modoRestaurante ? 'translate-x-5' : 'translate-x-0.5'}`}></div>
           </div>
         </button>
       )}
@@ -65,20 +70,21 @@ export function MeseraScreen({
   onPayRejected, onDeleteRejected,
   mesaConflict, setMesaConflict, onAddToExisting,
 }) {
-  const [mobileTab, setMobileTab] = useState('menu');
+  const [mobileTab, setMobileTab] = useState('comanda');
   const [isLandscape, setIsLandscape] = useState(
     () => window.matchMedia('(orientation: landscape)').matches
   );
+  const [confirmAccount, setConfirmAccount] = useState(null); // cuenta a confirmar abrir
+  const [menuTab, setMenuTab] = useState('productos');
+  const [expandedCat, setExpandedCat] = useState(null);
+  const [expandedLicorCat, setExpandedLicorCat] = useState(null);
 
   useEffect(() => {
     const check = () => setIsLandscape(window.matchMedia('(orientation: landscape)').matches);
     const mq = window.matchMedia('(orientation: landscape)');
     mq.addEventListener('change', check);
     window.addEventListener('resize', check);
-    return () => {
-      mq.removeEventListener('change', check);
-      window.removeEventListener('resize', check);
-    };
+    return () => { mq.removeEventListener('change', check); window.removeEventListener('resize', check); };
   }, []);
 
   const cartProps = {
@@ -103,73 +109,325 @@ export function MeseraScreen({
     onToggleModoRestaurante,
   };
 
-  // Panel central con secciones y buscador global
-  const [menuTab, setMenuTab] = useState('productos');
-  const [expandedCat, setExpandedCat] = useState(null);
-  const [expandedLicorCat, setExpandedLicorCat] = useState(null);
+  // Datos de la cuenta seleccionada
+  const selectedAcc = selectedAccount
+    ? openAccounts.find(a => a.id === selectedAccount || a._id === selectedAccount)
+    : null;
+  const accTotal = selectedAcc ? (selectedAcc.total || 0) : 0;
+  const cartTotal = cartItems.reduce((s, i) => s + i.price * i.quantity, 0);
+  const combinedTotal = accTotal + cartTotal;
+  const isOthersMesera = selectedAcc && selectedAcc.mesera && currentUser && selectedAcc.mesera !== currentUser;
 
+  // El menú se habilita cuando hay mesa/barra o nombre llenado
+  const datosCompletos = (
+    orderType === 'takeout'
+      ? !!clientName.trim()
+      : (selectedTable !== null && selectedTable !== undefined) || !!selectedBarra
+  ) && !!orderType;
+
+  // ── Comanda portrait ──
+  const ComandaPanel = () => (
+    <div className="space-y-3 p-3">
+
+      {/* Indicador 10% */}
+      {aplicaServicio && (
+        <div className="bg-[#94cb47]/10 border border-[#94cb47]/30 rounded-lg px-3 py-1.5">
+          <span className="text-[#94cb47] text-xs font-bold">Servicio 10% activo</span>
+        </div>
+      )}
+
+      {/* Paso 1 — Datos de la cuenta */}
+      <div className="bg-slate-800/60 border border-slate-700 rounded-xl p-3 space-y-2">
+        <div className="text-slate-400 text-xs font-bold uppercase tracking-wide mb-1">Datos de la cuenta</div>
+
+        {/* Tipo */}
+        {!selectedAcc && (
+          <div>
+            <label className="text-slate-400 text-xs mb-0.5 block">Tipo</label>
+            <select value={orderType || ''} onChange={(e) => setOrderType(e.target.value)}
+              className="w-full bg-slate-700 border border-[#94cb47]/30 text-white rounded-lg p-2 text-sm focus:outline-none">
+              <option value="">Seleccionar...</option>
+              <option value="dine-in">Local</option>
+              <option value="takeout">Llevar</option>
+            </select>
+          </div>
+        )}
+
+        {/* Mesa + Barra */}
+        {(orderType === 'dine-in' || selectedAcc) && (
+          <div className={(isBar && !modoRestaurante) ? "grid grid-cols-2 gap-2" : "grid grid-cols-1"}>
+            <div>
+              <label className="text-slate-400 text-xs mb-0.5 block">Mesa</label>
+              <select value={selectedTable !== null && selectedTable !== undefined ? selectedTable : ''}
+                onChange={(e) => { setSelectedTable(e.target.value !== '' ? Number(e.target.value) : null); setSelectedBarra(null); }}
+                className="w-full bg-slate-700 border border-[#94cb47]/30 text-white rounded-lg p-2 text-sm focus:outline-none">
+                <option value="">—</option>
+                {(tables || Array.from({ length: maxTables }, (_, i) => i + 1)).map(n => (
+                  <option key={n} value={n}>Mesa {n}</option>
+                ))}
+              </select>
+            </div>
+            {isBar && !modoRestaurante && (
+              <div>
+                <label className="text-slate-400 text-xs mb-0.5 block">Barra</label>
+                <select value={selectedBarra || ''} onChange={(e) => { setSelectedBarra(e.target.value); setSelectedTable(null); }}
+                  className="w-full bg-slate-700 border border-[#94cb47]/30 text-white rounded-lg p-2 text-sm focus:outline-none">
+                  <option value="">—</option>
+                  {barras.map(b => <option key={b} value={b}>{b}</option>)}
+                </select>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Nombre */}
+        <input type="text" value={clientName} onChange={(e) => setClientName(e.target.value)}
+          placeholder="Nombre / Seña del cliente..."
+          className="w-full bg-slate-700 border border-[#94cb47]/30 text-white rounded-lg p-2 text-sm focus:outline-none placeholder-slate-600" />
+      </div>
+
+      {/* Paso 2 — Menú (solo si datos completos) */}
+      {datosCompletos ? (
+        <>
+          <MenuCenter menuTab={menuTab} setMenuTab={setMenuTab} menu={menu} licores={licores}
+            addToCart={addToCart} onModalChange={onModalChange} isBar={isBar}
+            modoRestaurante={modoRestaurante} onToggleModoRestaurante={onToggleModoRestaurante}
+            modoRestHabilitado={modoRestHabilitado}
+            expandedCat={expandedCat} setExpandedCat={setExpandedCat}
+            expandedLicorCat={expandedLicorCat} setExpandedLicorCat={setExpandedLicorCat} />
+
+          {/* Items existentes en cuenta */}
+          {selectedAcc && (selectedAcc.items || []).length > 0 && (
+            <div className="rounded-xl border border-slate-600/50 overflow-hidden">
+              <div className="bg-slate-700/40 px-3 py-1.5 flex justify-between items-center">
+                <span className="text-slate-400 text-xs font-bold uppercase tracking-wide">En la cuenta</span>
+                <span className="text-[#94cb47] text-xs font-bold">₡{accTotal.toLocaleString()}</span>
+              </div>
+              <div className="divide-y divide-slate-700/40">
+                {(selectedAcc.items || []).map((item, i) => (
+                  <div key={i} className="flex justify-between items-center px-3 py-2">
+                    <span className="text-white text-xs">{item.quantity}x {item.name}</span>
+                    <span className="text-slate-400 text-xs">₡{(item.price * item.quantity).toLocaleString()}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Items nuevos en comanda */}
+          {cartItems.length > 0 && (
+            <div className="rounded-xl border border-[#94cb47]/30 overflow-hidden">
+              <div className="bg-[#94cb47]/10 px-3 py-1.5 flex justify-between items-center">
+                <span className="text-[#94cb47] text-xs font-bold uppercase tracking-wide">
+                  {selectedAcc ? 'Agregando' : 'Comanda'}
+                </span>
+                <span className="text-[#94cb47] text-xs font-bold">₡{cartTotal.toLocaleString()}</span>
+              </div>
+              <div className="divide-y divide-slate-700/40">
+                {cartItems.map(item => (
+                  <div key={item.id} className="px-3 py-2">
+                    <div className="flex justify-between items-center">
+                      <span className="text-white text-sm font-bold flex-1 pr-2">{item.name}</span>
+                      <span className="text-[#94cb47] text-sm font-bold">₡{(item.price * item.quantity).toLocaleString()}</span>
+                      {!isOthersMesera && (
+                        <button onClick={() => removeFromCart(item.id)} className="text-red-400 hover:text-red-300 ml-2">
+                          <Trash2 size={13} />
+                        </button>
+                      )}
+                    </div>
+                    {!isOthersMesera && (
+                      <div className="flex items-center gap-2 mt-1">
+                        <button onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                          className="w-7 h-7 flex items-center justify-center bg-slate-700 hover:bg-slate-600 rounded-lg border border-slate-600 transition">
+                          <Minus size={12} className="text-slate-300" />
+                        </button>
+                        <span className="flex-1 text-center text-white font-bold text-sm">{item.quantity}</span>
+                        <button onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                          className="w-7 h-7 flex items-center justify-center bg-slate-700 hover:bg-slate-600 rounded-lg border border-slate-600 transition">
+                          <Plus size={12} className="text-slate-300" />
+                        </button>
+                      </div>
+                    )}
+                    <input type="text" placeholder="Notas..."
+                      value={item.notes || ''}
+                      onChange={(e) => updateNotes(item.id, e.target.value.slice(0, 80))} maxLength={80}
+                      className="w-full mt-1 bg-slate-900/50 border border-[#94cb47]/20 text-white text-xs rounded p-1 focus:outline-none focus:border-[#94cb47] placeholder-slate-600" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Total y botones */}
+          {(cartItems.length > 0 || selectedAcc) && (
+            <div className="space-y-2">
+              <div className="bg-[#94cb47]/20 rounded-lg px-3 py-2 border border-[#94cb47]/40">
+                {selectedAcc && cartItems.length > 0 ? (
+                  <div className="space-y-0.5">
+                    <div className="flex justify-between text-xs text-slate-400">
+                      <span>En cuenta</span><span>₡{accTotal.toLocaleString()}</span>
+                    </div>
+                    <div className="flex justify-between text-xs text-slate-400">
+                      <span>Nuevo</span><span>₡{cartTotal.toLocaleString()}</span>
+                    </div>
+                    <div className="flex justify-between items-center border-t border-[#94cb47]/30 pt-1 mt-1">
+                      <span className="text-slate-300 text-xs">Total cuenta</span>
+                      <span className="text-lg font-bold text-[#94cb47]">₡{combinedTotal.toLocaleString()}</span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-between">
+                    <span className="text-slate-300 text-xs">Total</span>
+                    <span className="text-lg font-bold text-[#94cb47]">₡{(selectedAcc ? accTotal : cartTotal).toLocaleString()}</span>
+                  </div>
+                )}
+              </div>
+
+              {cartItems.length > 0 && (
+                <button onClick={completeOrder} disabled={loading}
+                  className={`w-full font-bold py-2.5 rounded-xl transition text-sm ${loading ? 'bg-slate-600 text-slate-400 cursor-not-allowed' : 'bg-[#94cb47] hover:bg-[#7ab035] text-black'}`}>
+                  {loading ? 'Guardando...' : selectedAcc ? 'Agregar a cuenta' : 'Guardar Cuenta'}
+                </button>
+              )}
+
+              {isBar && !modoRestaurante && onDirectPay && !selectedAccount && cartItems.length > 0 && (
+                <button onClick={onDirectPay}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl transition text-sm">
+                  Cobro Directo
+                </button>
+              )}
+
+              {selectedAccount && cartItems.length > 1 && onSplit && (
+                <button onClick={() => { const acc = openAccounts.find(a => a.id === selectedAccount || a._id === selectedAccount); if (acc) setSplitOrder(acc); }}
+                  className="w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-2.5 rounded-xl transition text-sm">
+                  Separar Cuenta
+                </button>
+              )}
+            </div>
+          )}
+
+          {/* Pendientes aprobación */}
+          {openAccounts.filter(a => a.status === 'pending_approval' && a.mesera === currentUser).map(acc => (
+            <div key={acc.id || acc._id} className="text-xs text-amber-400 bg-amber-900/20 border border-amber-500/30 rounded-lg px-3 py-1.5">
+              Esperando aprobación: {acc.clientName || acc.locationLabel}
+            </div>
+          ))}
+
+          {/* Rechazadas */}
+          {openAccounts.filter(a => a.status === 'rejected' && a.mesera === currentUser).map(acc => (
+            <div key={acc.id || acc._id} className="text-xs text-red-400 bg-red-900/20 border border-red-500/30 rounded-lg px-3 py-2">
+              <div className="mb-1">Rechazada: {acc.clientName || acc.locationLabel}</div>
+              {acc.rejectedReason && <div className="text-red-300 mb-1.5">Motivo: {acc.rejectedReason}</div>}
+              <div className="flex gap-2">
+                <button onClick={() => onPayRejected && onPayRejected(acc)}
+                  className="flex-1 bg-[#94cb47] hover:bg-[#7ab035] text-black font-bold py-1 rounded text-xs transition">
+                  Cobrar directo
+                </button>
+                <button onClick={() => onDeleteRejected && onDeleteRejected(acc)}
+                  className="flex-1 bg-red-900/60 hover:bg-red-900 text-red-300 font-bold py-1 rounded text-xs transition">
+                  Borrar
+                </button>
+              </div>
+            </div>
+          ))}
+        </>
+      ) : (
+        <div className="text-center py-8 text-slate-600">
+          <Utensils size={32} className="mx-auto mb-3 opacity-30" />
+          <p className="text-sm">Completa los datos para agregar productos</p>
+        </div>
+      )}
+    </div>
+  );
+
+  // ── Cuentas portrait ──
+  const CuentasPanel = () => {
+    const cuentas = openAccounts.filter(a => a.status !== 'pending_payment' && a.status !== 'pending_approval' && a.status !== 'rejected');
+    const mesas = cuentas.filter(a => !a.barra).sort((a, b) => (a.table ?? 99) - (b.table ?? 99));
+    const barrasL = cuentas.filter(a => !!a.barra).sort((a, b) => (a.barra || '').localeCompare(b.barra || ''));
+    const grupos = [...mesas, ...barrasL];
+
+    return (
+      <div className="p-3 space-y-2">
+        {grupos.length === 0 ? (
+          <div className="text-center py-8 text-slate-600">
+            <ClipboardList size={32} className="mx-auto mb-3 opacity-30" />
+            <p className="text-sm">No hay cuentas abiertas</p>
+          </div>
+        ) : grupos.map(acc => {
+          const ubicacion = acc.barra ? acc.barra : (acc.table !== null && acc.table !== undefined) ? `Mesa ${acc.table}` : 'Sin mesa';
+          const color = COLORES_MESERA[acc.mesera] || '#64748b';
+          const isSelected = selectedAccount === acc.id || selectedAccount === acc._id;
+          return (
+            <button key={acc.id || acc._id}
+              onClick={() => setConfirmAccount(acc)}
+              className={`w-full text-left px-3 py-3 rounded-xl border border-slate-600/50 transition ${isSelected ? 'bg-[#94cb47]/10' : 'bg-slate-800/60 hover:bg-slate-700/60'}`}
+              style={{borderLeftWidth: '4px', borderLeftColor: color}}>
+              <div className="flex justify-between items-center">
+                <span className="font-bold text-white text-sm">{ubicacion}</span>
+                <span className="text-[#94cb47] font-bold text-sm">₡{(acc.total || 0).toLocaleString()}</span>
+              </div>
+              <div className="text-slate-400 text-xs mt-0.5">{acc.clientName || '—'} · {acc.mesera}</div>
+            </button>
+          );
+        })}
+      </div>
+    );
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-slate-900 to-black flex flex-col">
       <Header mesera={currentUser} zona={zona} onLogout={onLogout} />
 
-      {/* Indicador servicio sábado */}
-      {aplicaServicio && (
-        <div className="bg-[#94cb47]/10 border-b border-[#94cb47]/30 px-4 py-1.5 flex items-center gap-2">
-          <span className="text-[#94cb47] text-xs font-bold">Servicio 10% activo — aplica en mesas</span>
-        </div>
-      )}
-
-      {/* Banner pedidos listos — no mostrar en Tablet Restaurante, esa persona es la misma que usa cocina */}
+      {/* Banner pedidos listos */}
       {currentUser !== 'Tablet Restaurante' && (() => {
         const readyOrders = kitchenOrders.filter(o => o.status === 'ready');
         if (readyOrders.length === 0) return null;
-        const mesas = readyOrders.map(o => o.barra || ((o.table && o.table > 0) ? `Mesa ${o.table}` : '')).filter(Boolean).join(' · ');
+        const mesas = readyOrders.map(o => o.barra || ((o.table && o.table > 0) ? `Mesa ${o.table}` : 'Mesa 0')).join(', ');
         return (
           <div className="bg-[#94cb47] overflow-hidden">
-            <div className="flex items-center gap-2 px-4 py-2.5 md:py-4">
-              <span className="text-black font-black text-sm md:text-xl animate-pulse">🔔</span>
-              <span className="text-black font-black text-sm md:text-xl flex-1">
-                {readyOrders.length} pedido{readyOrders.length > 1 ? 's' : ''} listo{readyOrders.length > 1 ? 's' : ''}
+            <div className="flex items-center gap-2 px-4 py-2.5">
+              <span className="text-black font-black text-sm animate-pulse">Listo:</span>
+              <span className="text-black font-black text-sm flex-1">
+                {readyOrders.length} pedido{readyOrders.length > 1 ? 's' : ''} — {mesas}
               </span>
-            </div>
-            <div className="bg-black/20 px-4 pb-2.5 md:pb-4">
-              <span className="text-black/80 font-bold text-xs md:text-base">{mesas}</span>
             </div>
           </div>
         );
       })()}
 
-      {/* ── Landscape: flex — menú flexible / carrito ancho fijo ── */}
-      <div className={`${isLandscape ? "flex" : "hidden"} gap-4 p-4 w-full overflow-hidden`} style={{height: "calc(100vh - 64px)"}}>
+      {/* ── Landscape ── */}
+      <div className={`${isLandscape ? "flex" : "hidden"} gap-4 p-4 w-full overflow-hidden flex-1`}>
         <div className="flex-1 overflow-y-auto">
-          <MenuCenter menuTab={menuTab} setMenuTab={setMenuTab} menu={menu} licores={licores} addToCart={addToCart} onModalChange={onModalChange} isBar={isBar} modoRestaurante={modoRestaurante} onToggleModoRestaurante={onToggleModoRestaurante} modoRestHabilitado={modoRestHabilitado} expandedCat={expandedCat} setExpandedCat={setExpandedCat} expandedLicorCat={expandedLicorCat} setExpandedLicorCat={setExpandedLicorCat} />
+          <MenuCenter menuTab={menuTab} setMenuTab={setMenuTab} menu={menu} licores={licores}
+            addToCart={addToCart} onModalChange={onModalChange} isBar={isBar}
+            modoRestaurante={modoRestaurante} onToggleModoRestaurante={onToggleModoRestaurante}
+            modoRestHabilitado={modoRestHabilitado}
+            expandedCat={expandedCat} setExpandedCat={setExpandedCat}
+            expandedLicorCat={expandedLicorCat} setExpandedLicorCat={setExpandedLicorCat} />
         </div>
-        <div style={{width: "min(520px, 40vw)", flexShrink: 0, height: "100%", display: "flex", flexDirection: "column", gap: "10px"}}>
+        <div style={{width: "min(520px, 40vw)", flexShrink: 0, height: "100%", display: "flex", flexDirection: "column"}}>
           <div style={{flex: 1, overflowY: "auto", minHeight: 0}}>
             <ShoppingCart {...cartProps} mobileVisible="landscape" />
           </div>
-          {/* Pedidos listos debajo del carrito en landscape */}
           {(() => {
             const ready = kitchenOrders.filter(o => o.status === 'ready');
             if (ready.length === 0) return null;
             return (
-              <div className="bg-[#94cb47] rounded-xl overflow-hidden flex-shrink-0 shadow-lg">
-                <div className="flex items-center gap-2 px-4 py-2.5 md:py-3">
-                  <span className="text-black font-black text-sm md:text-lg animate-pulse">🔔</span>
-                  <span className="text-black font-black text-sm md:text-lg flex-1">
-                    {ready.length} pedido{ready.length > 1 ? 's' : ''} listo{ready.length > 1 ? 's' : ''}
+              <div className="bg-[#94cb47] rounded-xl overflow-hidden flex-shrink-0 shadow-2xl mt-3">
+                <div className="flex items-center gap-2 px-4 py-2.5">
+                  <span className="text-black font-black text-sm animate-pulse">Listo:</span>
+                  <span className="text-black font-black text-sm flex-1">
+                    {ready.length} pedido{ready.length > 1 ? 's' : ''}
                   </span>
                 </div>
                 <div className="bg-black/20 px-4 pb-3 space-y-1.5">
                   {ready.map((o, i) => (
                     <div key={i} className="flex items-center gap-2">
-                      <span className="text-black font-bold text-sm md:text-base">
+                      <span className="text-black font-bold text-sm">
                         {o.barra || ((o.table && o.table > 0) ? `Mesa ${o.table}` : '')}
                       </span>
-                      {o.clientName && (
-                        <span className="text-black/70 text-sm md:text-base">— {o.clientName}</span>
-                      )}
+                      {o.clientName && <span className="text-black/70 text-sm">— {o.clientName}</span>}
                     </div>
                   ))}
                 </div>
@@ -179,80 +437,63 @@ export function MeseraScreen({
         </div>
       </div>
 
-      {/* ── Portrait: tabs ── */}
+      {/* ── Portrait ── */}
       <div className={`${isLandscape ? "hidden" : "flex"} flex-col flex-1 overflow-hidden`}>
-        <div className="flex-1 overflow-y-auto p-3">
-          {mobileTab === 'menu' && (
-            <div className="space-y-4">
-              {/* Mini tabs portrait: Productos / Otros */}
-              <div className="flex gap-1.5">
-                {[
-                  { id: 'productos', label: 'Productos' },
-                  { id: 'otros',     label: 'Otros' },
-                ].map(t => (
-                  <button
-                    key={t.id}
-                    onClick={() => setMenuTab(t.id)}
-                    className={`flex-1 py-2 rounded-lg font-bold text-xs transition ${
-                      menuTab === t.id
-                        ? 'bg-[#94cb47] text-black'
-                        : 'bg-slate-800 text-slate-400 hover:bg-slate-700 border border-slate-700'
-                    }`}
-                  >
-                    {t.label}
-                  </button>
-                ))}
-              </div>
-              {menuTab === 'productos' && <MenuPanel menu={menu} licores={licores} onSelectItem={addToCart} onModalChange={onModalChange} expandedCat={expandedCat} setExpandedCat={setExpandedCat} expandedLicorCat={expandedLicorCat} setExpandedLicorCat={setExpandedLicorCat} />}
-              {menuTab === 'otros'     && <OtrosPanel onAddToCart={addToCart} onModalChange={onModalChange} />}
-              {isBar && onToggleModoRestaurante && modoRestHabilitado && (
-        <button
-          onClick={onToggleModoRestaurante}
-          className={`w-full flex items-center justify-between px-4 py-3 rounded-xl border transition ${
-            modoRestaurante ? 'bg-[#94cb47]/15 border-[#94cb47]/50' : 'bg-slate-800/60 border-slate-700'
-          }`}
-        >
-          <span className={`text-sm font-semibold ${modoRestaurante ? 'text-[#94cb47]' : 'text-slate-500'}`}>
-            {modoRestaurante ? 'Modo Restaurante activo' : 'Atender mesa de restaurante'}
-          </span>
-          <div className={`w-10 h-5 rounded-full transition-colors relative flex-shrink-0 ${modoRestaurante ? 'bg-[#94cb47]' : 'bg-slate-600'}`}>
-            <div className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-all ${modoRestaurante ? 'left-5' : 'left-0.5'}`} />
-          </div>
-        </button>
-      )}
-            </div>
-          )}
-          {mobileTab === 'carrito' && (
-            <ShoppingCart {...cartProps} mobileVisible={true} />
-          )}
+        <div className="flex-1 overflow-y-auto">
+          {mobileTab === 'comanda' && <ComandaPanel />}
+          {mobileTab === 'cuentas' && <CuentasPanel />}
         </div>
 
         {/* Bottom nav */}
         <div className="flex border-t border-[#94cb47]/30 bg-slate-900">
           <button
-            onClick={() => setMobileTab('menu')}
-            className={`flex-1 flex flex-col items-center py-3 gap-1 transition ${mobileTab === 'menu' ? 'text-[#94cb47]' : 'text-slate-500'}`}
-          >
+            onClick={() => setMobileTab('comanda')}
+            className={`flex-1 flex flex-col items-center py-3 gap-1 transition ${mobileTab === 'comanda' ? 'text-[#94cb47]' : 'text-slate-500'}`}>
             <Utensils size={20} />
-            <span className="text-xs font-bold">Menú</span>
+            <span className="text-xs font-bold">Comanda</span>
           </button>
           <button
-            onClick={() => setMobileTab('carrito')}
-            className={`flex-1 flex flex-col items-center py-3 gap-1 transition relative ${mobileTab === 'carrito' ? 'text-[#94cb47]' : 'text-slate-500'}`}
-          >
-            {cartItems.length > 0 && (
-              <span className="absolute top-2 right-1/4 bg-[#94cb47] text-black text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
-                {cartItems.length}
+            onClick={() => setMobileTab('cuentas')}
+            className={`flex-1 flex flex-col items-center py-3 gap-1 transition relative ${mobileTab === 'cuentas' ? 'text-[#94cb47]' : 'text-slate-500'}`}>
+            {openAccounts.filter(a => a.status === 'open').length > 0 && (
+              <span className="absolute top-2 right-1/4 bg-[#94cb47] text-black text-xs font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                {openAccounts.filter(a => a.status === 'open').length}
               </span>
             )}
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/>
-              <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/>
-            </svg>
-            <span className="text-xs font-bold">Carrito</span>
+            <ClipboardList size={20} />
+            <span className="text-xs font-bold">Cuentas</span>
           </button>
         </div>
       </div>
+
+      {/* Modal confirmar abrir cuenta */}
+      {confirmAccount && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-6 w-full max-w-sm shadow-2xl">
+            <h2 className="text-[#94cb47] font-bold text-lg mb-1">Abrir cuenta</h2>
+            <p className="text-slate-400 text-sm mb-4">
+              {confirmAccount.barra ? confirmAccount.barra : `Mesa ${confirmAccount.table}`} — {confirmAccount.clientName}
+            </p>
+            <div className="space-y-2">
+              <button
+                onClick={() => {
+                  onSelectAccount(confirmAccount.id || confirmAccount._id);
+                  setConfirmAccount(null);
+                  setMobileTab('comanda');
+                }}
+                className="w-full bg-[#94cb47] hover:bg-[#7ab035] text-black font-bold py-2.5 rounded-xl transition">
+                Abrir y agregar
+              </button>
+              <button
+                onClick={() => setConfirmAccount(null)}
+                className="w-full text-slate-500 hover:text-slate-300 text-sm py-2 transition">
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {splitOrder && (
         <SplitModal account={splitOrder} onConfirm={onSplit} onClose={() => setSplitOrder(null)} />
       )}
@@ -260,39 +501,28 @@ export function MeseraScreen({
       {/* Modal conflicto de mesa */}
       {mesaConflict && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/40 p-6 shadow-2xl w-full max-w-sm">
+          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-[#94cb47]/30 p-6 w-full max-w-sm shadow-2xl">
             <div className="text-center mb-5">
-              <div className="text-4xl mb-2">⚠️</div>
               <h2 className="text-[#94cb47] font-bold text-xl">Mesa ocupada</h2>
               <p className="text-slate-400 text-sm mt-2">
-                {mesaConflict.existingAcc.barra || `Mesa ${mesaConflict.existingAcc.table}`} ya tiene una cuenta abierta
+                {mesaConflict.existingAcc.barra || `Mesa ${mesaConflict.existingAcc.table}`} — {mesaConflict.existingAcc.clientName}
               </p>
-              <div className="bg-slate-700/60 rounded-xl p-3 mt-3 text-left">
-                <div className="text-white font-bold text-sm">{mesaConflict.existingAcc.clientName || 'Sin nombre'}</div>
-                <div className="text-slate-400 text-xs mt-0.5">👤 {mesaConflict.existingAcc.mesera} · ₡{(mesaConflict.existingAcc.total || 0).toLocaleString()}</div>
-              </div>
             </div>
             <p className="text-slate-300 text-sm text-center mb-4">¿Qué deseas hacer?</p>
             <div className="space-y-2">
               <button
-                onClick={() => {
-                  onAddToExisting && onAddToExisting(mesaConflict.existingAcc._id || mesaConflict.existingAcc.id);
-                  setMesaConflict(null);
-                }}
-                className="w-full bg-[#94cb47] hover:bg-[#7ab035] text-black font-bold py-3 rounded-xl transition"
-              >
-                ✏️ Agregar a la cuenta existente
+                onClick={() => { onAddToExisting && onAddToExisting(mesaConflict.existingAcc._id || mesaConflict.existingAcc.id); setMesaConflict(null); }}
+                className="w-full bg-[#94cb47] hover:bg-[#7ab035] text-black font-bold py-2.5 rounded-xl transition text-sm">
+                Agregar a la cuenta existente
               </button>
               <button
                 onClick={() => mesaConflict.onConfirm(true)}
-                className="w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 rounded-xl transition border border-slate-500"
-              >
-                👤 Nueva cuenta (persona diferente)
+                className="w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-2.5 rounded-xl transition text-sm">
+                Nueva cuenta (persona diferente)
               </button>
               <button
                 onClick={() => setMesaConflict(null)}
-                className="w-full text-slate-500 hover:text-slate-300 text-sm py-2 transition"
-              >
+                className="w-full text-slate-500 hover:text-slate-300 text-sm py-2 transition">
                 Cancelar
               </button>
             </div>
