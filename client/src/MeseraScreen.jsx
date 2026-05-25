@@ -157,35 +157,190 @@ export function MeseraScreen({
 
       {/* ── Landscape ── */}
       <div className={`${isLandscape ? "flex" : "hidden"} gap-4 p-4 w-full overflow-hidden flex-1`}>
-        <div className="flex-1 overflow-y-auto">
-          <MenuCenter menuTab={menuTab} setMenuTab={setMenuTab} menu={menu} licores={licores}
-            addToCart={addToCart} onModalChange={onModalChange} isBar={isBar}
-            modoRestaurante={modoRestaurante} onToggleModoRestaurante={onToggleModoRestaurante}
-            modoRestHabilitado={modoRestHabilitado}
-            expandedCat={expandedCat} setExpandedCat={setExpandedCat}
-            expandedLicorCat={expandedLicorCat} setExpandedLicorCat={setExpandedLicorCat} />
-        </div>
-        <div style={{width: "min(520px, 40vw)", flexShrink: 0, height: "100%", display: "flex", flexDirection: "column"}}>
-          <div style={{flex: 1, overflowY: "auto", minHeight: 0}}>
-            <ShoppingCart {...cartProps} mobileVisible="landscape" />
+
+        {/* Izquierda: formulario + menú */}
+        <div className="flex-1 overflow-y-auto space-y-3">
+          {/* Indicador 10% */}
+          {aplicaServicio && (
+            <div className="bg-[#94cb47]/10 border border-[#94cb47]/30 rounded-lg px-3 py-1.5">
+              <span className="text-[#94cb47] text-xs font-bold">Servicio 10% activo</span>
+            </div>
+          )}
+
+          {/* Datos */}
+          <div className="bg-slate-800/60 border border-slate-700 rounded-xl p-3 space-y-2">
+            <div className="text-slate-400 text-xs font-bold uppercase tracking-wide mb-1">Datos de la cuenta</div>
+            {!selectedAcc && (
+              <div className="grid grid-cols-2 gap-2">
+                <button onClick={() => setOrderType('dine-in')}
+                  className={`py-2 rounded-xl font-bold text-sm border transition ${orderType === 'dine-in' ? 'bg-[#94cb47] text-black border-[#94cb47]' : 'bg-slate-700 text-slate-300 border-slate-600 hover:border-slate-500'}`}>
+                  Local
+                </button>
+                <button onClick={() => setOrderType('takeout')}
+                  className={`py-2 rounded-xl font-bold text-sm border transition ${orderType === 'takeout' ? 'bg-[#94cb47] text-black border-[#94cb47]' : 'bg-slate-700 text-slate-300 border-slate-600 hover:border-slate-500'}`}>
+                  Llevar
+                </button>
+              </div>
+            )}
+            {(orderType === 'dine-in' || selectedAcc) && (
+              <button onClick={() => setShowMesaModal(true)}
+                className={`w-full py-2 px-3 rounded-xl font-bold text-sm border transition text-left ${
+                  (selectedTable !== null && selectedTable !== undefined) || selectedBarra
+                    ? 'bg-[#94cb47]/10 border-[#94cb47] text-[#94cb47]'
+                    : 'bg-slate-700 border-slate-600 text-slate-400 hover:border-slate-500'
+                }`}>
+                {selectedBarra ? selectedBarra : (selectedTable !== null && selectedTable !== undefined) ? `Mesa ${selectedTable}` : 'Seleccionar mesa o barra...'}
+              </button>
+            )}
+            <input type="text" value={clientName} onChange={(e) => setClientName(e.target.value)}
+              placeholder="Nombre / Seña del cliente..."
+              className="w-full bg-slate-700 border border-[#94cb47]/30 text-white rounded-lg p-2 text-sm focus:outline-none placeholder-slate-600" />
           </div>
+
+          {/* Menú */}
+          {datosCompletos && (
+            <MenuCenter menuTab={menuTab} setMenuTab={setMenuTab} menu={menu} licores={licores}
+              addToCart={addToCart} onModalChange={onModalChange} isBar={isBar}
+              modoRestaurante={modoRestaurante} onToggleModoRestaurante={onToggleModoRestaurante}
+              modoRestHabilitado={modoRestHabilitado}
+              expandedCat={expandedCat} setExpandedCat={setExpandedCat}
+              expandedLicorCat={expandedLicorCat} setExpandedLicorCat={setExpandedLicorCat} />
+          )}
+          {!datosCompletos && (
+            <div className="text-center py-8 text-slate-600">
+              <Utensils size={28} className="mx-auto mb-2 opacity-30" />
+              <p className="text-sm">Completa los datos para agregar productos</p>
+            </div>
+          )}
+        </div>
+
+        {/* Derecha: items + total + botones */}
+        <div style={{width: "min(400px, 38vw)", flexShrink: 0}} className="flex flex-col gap-3 overflow-y-auto">
+
+          {/* Items en cuenta */}
+          {selectedAcc && (selectedAcc.items || []).length > 0 && (
+            <div className="rounded-xl border border-slate-600/50 overflow-hidden">
+              <div className="bg-slate-700/40 px-3 py-1.5 flex justify-between items-center">
+                <span className="text-slate-400 text-xs font-bold uppercase tracking-wide">En la cuenta</span>
+                <span className="text-[#94cb47] text-xs font-bold">₡{accTotal.toLocaleString()}</span>
+              </div>
+              <div className="divide-y divide-slate-700/40">
+                {(selectedAcc.items || []).map((item, i) => (
+                  <div key={i} className="flex justify-between items-center px-3 py-2">
+                    <span className="text-white text-sm">{item.quantity}x {item.name}</span>
+                    <span className="text-slate-400 text-sm">₡{(item.price * item.quantity).toLocaleString()}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Items nuevos */}
+          {cartItems.length > 0 ? (
+            <div className="rounded-xl border border-[#94cb47]/30 overflow-hidden">
+              <div className="bg-[#94cb47]/10 px-3 py-1.5 flex justify-between items-center">
+                <span className="text-[#94cb47] text-xs font-bold uppercase tracking-wide">{selectedAcc ? 'Agregando' : 'Comanda'}</span>
+                <span className="text-[#94cb47] text-xs font-bold">₡{cartTotal.toLocaleString()}</span>
+              </div>
+              <div className="divide-y divide-slate-700/40">
+                {cartItems.map(item => (
+                  <div key={item.id} className="px-3 py-2">
+                    <div className="flex justify-between items-center">
+                      <span className="text-white text-sm font-bold flex-1 pr-2">{item.name}</span>
+                      <span className="text-[#94cb47] text-sm font-bold">₡{(item.price * item.quantity).toLocaleString()}</span>
+                      {!isOthersMesera && (
+                        <button onClick={() => removeFromCart(item.id)} className="text-red-400 hover:text-red-300 ml-2">
+                          <Trash2 size={13} />
+                        </button>
+                      )}
+                    </div>
+                    {!isOthersMesera && (
+                      <div className="flex items-center gap-2 mt-1">
+                        <button onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                          className="w-7 h-7 flex items-center justify-center bg-slate-700 hover:bg-slate-600 rounded-lg border border-slate-600 transition">
+                          <Minus size={12} className="text-slate-300" />
+                        </button>
+                        <span className="flex-1 text-center text-white font-bold text-sm">{item.quantity}</span>
+                        <button onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                          className="w-7 h-7 flex items-center justify-center bg-slate-700 hover:bg-slate-600 rounded-lg border border-slate-600 transition">
+                          <Plus size={12} className="text-slate-300" />
+                        </button>
+                      </div>
+                    )}
+                    <input type="text" placeholder="Notas..."
+                      value={item.notes || ''}
+                      onChange={(e) => updateNotes(item.id, e.target.value.slice(0, 80))} maxLength={80}
+                      className="w-full mt-1 bg-slate-900/50 border border-[#94cb47]/20 text-white text-xs rounded p-1 focus:outline-none focus:border-[#94cb47] placeholder-slate-600" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="text-center py-6 text-slate-600">
+              <Utensils size={24} className="mx-auto mb-2 opacity-50" />
+              <p className="text-xs">{selectedAcc ? 'Agrega items nuevos' : 'Carrito vacío'}</p>
+            </div>
+          )}
+
+          {/* Total y botones */}
+          {(cartItems.length > 0 || selectedAcc) && (
+            <div className="space-y-2">
+              <div className="bg-[#94cb47]/20 rounded-lg px-3 py-2 border border-[#94cb47]/40">
+                {selectedAcc && cartItems.length > 0 ? (
+                  <div className="space-y-0.5">
+                    <div className="flex justify-between text-xs text-slate-400">
+                      <span>En cuenta</span><span>₡{accTotal.toLocaleString()}</span>
+                    </div>
+                    <div className="flex justify-between text-xs text-slate-400">
+                      <span>Nuevo</span><span>₡{cartTotal.toLocaleString()}</span>
+                    </div>
+                    <div className="flex justify-between items-center border-t border-[#94cb47]/30 pt-1 mt-1">
+                      <span className="text-slate-300 text-xs">Total cuenta</span>
+                      <span className="text-lg font-bold text-[#94cb47]">₡{combinedTotal.toLocaleString()}</span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-between">
+                    <span className="text-slate-300 text-xs">Total</span>
+                    <span className="text-lg font-bold text-[#94cb47]">₡{(selectedAcc ? accTotal : cartTotal).toLocaleString()}</span>
+                  </div>
+                )}
+              </div>
+              {cartItems.length > 0 && (
+                <button onClick={completeOrder} disabled={loading}
+                  className={`w-full font-bold py-2.5 rounded-xl transition text-sm ${loading ? 'bg-slate-600 text-slate-400 cursor-not-allowed' : 'bg-[#94cb47] hover:bg-[#7ab035] text-black'}`}>
+                  {loading ? 'Guardando...' : selectedAcc ? 'Agregar a cuenta' : 'Guardar Cuenta'}
+                </button>
+              )}
+              {isBar && !modoRestaurante && onDirectPay && !selectedAccount && cartItems.length > 0 && (
+                <button onClick={onDirectPay}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl transition text-sm">
+                  Cobro Directo
+                </button>
+              )}
+              {selectedAccount && cartItems.length > 1 && onSplit && (
+                <button onClick={() => { const acc = openAccounts.find(a => a.id === selectedAccount || a._id === selectedAccount); if (acc) setSplitOrder(acc); }}
+                  className="w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-2.5 rounded-xl transition text-sm">
+                  Separar Cuenta
+                </button>
+              )}
+            </div>
+          )}
+
+          {/* Pedidos listos en landscape */}
           {(() => {
             const ready = kitchenOrders.filter(o => o.status === 'ready');
             if (ready.length === 0) return null;
             return (
-              <div className="bg-[#94cb47] rounded-xl overflow-hidden flex-shrink-0 shadow-2xl mt-3">
+              <div className="bg-[#94cb47] rounded-xl overflow-hidden flex-shrink-0 shadow-2xl">
                 <div className="flex items-center gap-2 px-4 py-2.5">
                   <span className="text-black font-black text-sm animate-pulse">Listo:</span>
-                  <span className="text-black font-black text-sm flex-1">
-                    {ready.length} pedido{ready.length > 1 ? 's' : ''}
-                  </span>
+                  <span className="text-black font-black text-sm flex-1">{ready.length} pedido{ready.length > 1 ? 's' : ''}</span>
                 </div>
-                <div className="bg-black/20 px-4 pb-3 space-y-1.5">
+                <div className="bg-black/20 px-4 pb-3 space-y-1">
                   {ready.map((o, i) => (
                     <div key={i} className="flex items-center gap-2">
-                      <span className="text-black font-bold text-sm">
-                        {o.barra || ((o.table && o.table > 0) ? `Mesa ${o.table}` : '')}
-                      </span>
+                      <span className="text-black font-bold text-sm">{o.barra || ((o.table && o.table > 0) ? `Mesa ${o.table}` : '')}</span>
                       {o.clientName && <span className="text-black/70 text-sm">— {o.clientName}</span>}
                     </div>
                   ))}
