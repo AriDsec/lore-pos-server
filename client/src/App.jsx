@@ -408,7 +408,8 @@ export default function RestaurantePOS() {
   const handleSelectAccount = (accountId) => {
     if (!accountId) {
       setSelectedAccount(null);
-      sessionStorage.removeItem('lore_cart'); setCartItems([]); setSelectedTable(null); setSelectedBarra(null); setClientName(''); setModoRestaurante(false); setOrderType(null);
+      sessionStorage.removeItem('lore_cart'); setCartItems([]);
+      // En el nuevo flujo de comanda, no limpiar mesa/nombre/tipo al deseleccionar cuenta
       return;
     }
     const acc = openAccounts.find(a => (a._id === accountId || a.id === accountId));
