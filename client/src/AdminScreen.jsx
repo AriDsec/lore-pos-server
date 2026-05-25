@@ -2,7 +2,6 @@ import { Header, payBadge, Spinner } from './ui.jsx';
 import * as api from './api.js';
 import { ItemsModal } from './modals.jsx';
 import { useState, useEffect } from 'react';
-import * as api from './api.js';
 
 // Item de comida = food O adicional de cocina (otro con kitchen)
 const isFood = (i) => i.category === 'food' || (i.category === 'otro' && i.kitchen);
