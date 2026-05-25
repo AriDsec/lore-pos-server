@@ -136,6 +136,22 @@ const configSchema = new mongoose.Schema({
 });
 const Config = mongoose.model('Config', configSchema);
 
+const dailyReportSchema = new mongoose.Schema({
+  fecha:    { type: String, required: true }, // 'YYYY-MM-DD'
+  zona:     { type: String, required: true }, // 'bar' | 'restaurante'
+  totalVendido:    { type: Number, default: 0 },
+  cuentasCobradas: { type: Number, default: 0 },
+  porMetodo: {
+    efectivo: { type: Number, default: 0 },
+    sinpe:    { type: Number, default: 0 },
+    tarjeta:  { type: Number, default: 0 },
+    mixto:    { type: Number, default: 0 },
+  },
+  porMesera: { type: mongoose.Schema.Types.Mixed, default: {} },
+  creadoEn: { type: Date, default: Date.now },
+});
+const DailyReport = mongoose.model('DailyReport', dailyReportSchema);
+
 // ============ API ROUTES ============
 app.get('/api/accounts/:zone/open', async (req, res) => {
   try {
@@ -299,8 +315,33 @@ app.put('/api/accounts/:id/pending', async (req, res) => {
   } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
+// ── Helper: generar reporte diario desde cuentas pagadas ──
+async function generarReporte(zona) {
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const cuentas = await Account.find({ zone: zona, status: 'paid', closedAt: { $gte: today } });
+  const fecha = today.toISOString().split('T')[0];
+  const porMetodo = { efectivo: 0, sinpe: 0, tarjeta: 0, mixto: 0 };
+  const porMesera = {};
+  let totalVendido = 0;
+  cuentas.forEach(c => {
+    totalVendido += c.total || 0;
+    const m = c.paymentMethod || 'efectivo';
+    const key = ['sinpe','tarjeta','mixto'].includes(m) ? m : 'efectivo';
+    porMetodo[key] = (porMetodo[key] || 0) + (c.total || 0);
+    if (c.mesera) porMesera[c.mesera] = (porMesera[c.mesera] || 0) + (c.total || 0);
+  });
+  if (cuentas.length > 0) {
+    await DailyReport.findOneAndUpdate(
+      { fecha, zona },
+      { fecha, zona, totalVendido, cuentasCobradas: cuentas.length, porMetodo, porMesera, creadoEn: new Date() },
+      { upsert: true }
+    );
+  }
+}
+
 app.delete('/api/admin/clear-bar', adminLimiter, async (req, res) => {
   try {
+    await generarReporte('bar');
     const today = new Date(); today.setHours(0, 0, 0, 0);
     const accounts = await Account.deleteMany({ zone: 'bar', $or: [{ status: 'paid', closedAt: { $gte: today } }, { status: 'rejected', createdAt: { $gte: today } }] });
     const kitchen = await KitchenOrder.deleteMany({ zone: 'bar', createdAt: { $gte: today } });
@@ -310,6 +351,7 @@ app.delete('/api/admin/clear-bar', adminLimiter, async (req, res) => {
 
 app.delete('/api/admin/clear-restaurante', adminLimiter, async (req, res) => {
   try {
+    await generarReporte('restaurante');
     const today = new Date(); today.setHours(0, 0, 0, 0);
     const accounts = await Account.deleteMany({ zone: 'restaurante', $or: [{ status: 'paid', closedAt: { $gte: today } }, { status: 'rejected', createdAt: { $gte: today } }] });
     const kitchen = await KitchenOrder.deleteMany({ zone: 'restaurante', createdAt: { $gte: today } });
@@ -358,6 +400,27 @@ app.post('/api/config/:key', adminLimiter, async (req, res) => {
       { upsert: true, new: true }
     );
     res.json(doc);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// ── Reportes históricos ──
+app.get('/api/reports/history', async (req, res) => {
+  try {
+    const reports = await DailyReport.find().sort({ fecha: -1 }).limit(90);
+    res.json(reports);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// ── Limpieza de datos viejos (más de 30 días) — solo paid/rejected, nunca pending ──
+app.delete('/api/admin/clean-old', adminLimiter, async (req, res) => {
+  try {
+    const treintaDias = new Date();
+    treintaDias.setDate(treintaDias.getDate() - 30);
+    const result = await Account.deleteMany({
+      status: { $in: ['paid', 'rejected'] },
+      createdAt: { $lt: treintaDias }
+    });
+    res.json({ deleted: result.deletedCount });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
