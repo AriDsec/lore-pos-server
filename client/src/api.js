@@ -90,6 +90,15 @@ export const clearRestaurante = () => fetch(`${BASE}/admin/clear-restaurante`, {
 export const deleteAccount = (id) =>
   fetch(`${BASE}/accounts/${id}`, { method: 'DELETE' }).then(handleResponse);
 
+export const getMeserasPerfiles = () =>
+  fetch(`${BASE}/config/meseras_perfiles`).then(r => r.ok ? r.json() : null).catch(() => null);
+
+export const getReportsHistory = () =>
+  fetch(`${BASE}/reports/history`).then(r => r.ok ? r.json() : []).catch(() => []);
+
+export const cleanOldData = () =>
+  fetch(`${BASE}/admin/clean-old`, { method: 'DELETE' }).then(r => r.ok ? r.json() : null).catch(() => null);
+
 export const getMeserasActivas = () =>
   fetch(`${BASE}/config/meseras_activas`).then(r => r.ok ? r.json() : null).catch(() => null);
 
