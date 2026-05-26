@@ -568,7 +568,11 @@ export function PinLoginScreen({ isLandscape, syncError, loading, onLogin }) {
   }, []);
 
   const loginHandleDigit = async (d) => {
-    if (loginPin.length >= 4 || attempting || loginBloqueado) return;
+    // Re-verificar lockout en tiempo real antes de procesar
+    const lockData = JSON.parse(localStorage.getItem('lore_lockout') || '{}');
+    const bloqueadoAhora = lockData.until && Date.now() < lockData.until;
+    if (bloqueadoAhora) { setLoginBloqueado(true); return; }
+    if (loginPin.length >= 4 || attempting) return;
     const loginNext = loginPin + d;
     setPin(loginNext);
     setLoginError(false);
