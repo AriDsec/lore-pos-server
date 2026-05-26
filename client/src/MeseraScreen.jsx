@@ -660,17 +660,17 @@ export function MeseraScreen({
               <h2 className="text-[#94cb47] font-bold text-lg">Seleccionar ubicación</h2>
               <button onClick={() => setShowMesaModal(false)} className="text-slate-400 hover:text-white text-sm">Cerrar</button>
             </div>
-            {/* Plano del salón */}
+            {/* Mesas */}
             <div className="mb-4">
-              <div className="text-slate-400 text-xs font-bold uppercase tracking-wide mb-2">Salón</div>
-              {(() => {
-                const MesaBtn = ({ n }) => {
+              <div className="text-slate-400 text-xs font-bold uppercase tracking-wide mb-2">Mesas</div>
+              <div className="grid grid-cols-4 gap-2">
+                {(tables || Array.from({ length: maxTables + 1 }, (_, i) => i)).map(n => {
                   const existingAcc = openAccounts.find(a => a.status === 'open' && a.type !== 'direct' && String(a.table) === String(n));
                   const tieneC = !!existingAcc;
                   const mesaColor = tieneC ? (COLORES_MESERA[existingAcc.mesera] || '#f59e0b') : null;
                   const isSelected = selectedTable === n && !selectedBarra;
                   return (
-                    <button
+                    <button key={n}
                       onClick={() => {
                         const existing = existingAcc;
                         if (existing && !selectedAccount) {
@@ -685,38 +685,14 @@ export function MeseraScreen({
                           setShowMesaModal(false);
                         }
                       }}
-                      className={`w-full py-2.5 rounded-xl font-bold text-sm border transition relative ${isSelected ? 'bg-[#94cb47] text-black border-[#94cb47]' : 'bg-slate-700 text-slate-300 border-slate-600'}`}
+                      className={`py-3 rounded-xl font-bold text-sm border transition relative ${isSelected ? 'bg-[#94cb47] text-black border-[#94cb47]' : 'bg-slate-700 text-slate-300 border-slate-600'}`}
                       style={!isSelected && tieneC ? {borderColor: mesaColor, color: mesaColor} : {}}>
                       {n}
                       {tieneC && <span className="absolute top-1 right-1 w-2 h-2 rounded-full" style={{backgroundColor: mesaColor}}></span>}
                     </button>
                   );
-                };
-                return (
-                  <div className="space-y-2">
-                    {/* Pared del fondo — mesas 9 a 0 */}
-                    <div className="bg-slate-900/50 rounded-lg p-1.5">
-                      <div className="text-slate-600 text-xs text-center mb-1">─ pared ─</div>
-                      <div className="grid grid-cols-10 gap-1">
-                        {[9,8,7,6,5,4,3,2,1,0].map(n => <MesaBtn key={n} n={n} />)}
-                      </div>
-                    </div>
-
-                    {/* Salón de baile */}
-                    <div className="text-slate-700 text-xs text-center py-2 italic">salón de baile</div>
-
-                    {/* Frente — mesas 10, 11, 12 + referencia baños */}
-                    <div className="flex gap-2 items-end">
-                      <div className="grid grid-cols-3 gap-1 flex-1">
-                        {[10,11,12].map(n => <MesaBtn key={n} n={n} />)}
-                      </div>
-                      <div className="bg-slate-800 border border-slate-700 rounded-lg px-2 py-1 text-slate-600 text-xs text-center flex-shrink-0">
-                        baños
-                      </div>
-                    </div>
-                  </div>
-                );
-              })()}
+                })}
+              </div>
             </div>
             {/* Barras */}
             {isBar && !modoRestaurante && (
