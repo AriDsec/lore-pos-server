@@ -734,7 +734,7 @@ export function MeseraScreen({
                 Abrir y agregar
               </button>
               <button
-                onClick={() => setConfirmAccount(null)}
+                onClick={() => { setConfirmAccount(null); setSelectedTable(null); }}
                 className="w-full text-slate-500 hover:text-slate-300 text-sm py-2 transition">
                 Cancelar
               </button>
