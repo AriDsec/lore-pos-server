@@ -8,6 +8,7 @@ import { MeseraScreen } from './MeseraScreen.jsx';
 import { KitchenScreen } from './KitchenScreen.jsx';
 import { CajaScreen } from './CajaScreen.jsx';
 import { AdminScreen } from './AdminScreen.jsx';
+
 // LORE POS v2.1
 export default function RestaurantePOS() {
   const savedSession = (() => { try { return JSON.parse(sessionStorage.getItem('lore_session')); } catch { return null; } })();
@@ -21,8 +22,10 @@ export default function RestaurantePOS() {
   const [adminUser, setAdminUser]       = useState(savedAdmin || null);
   const [toasts, setToasts]             = useState([]);
   const modalOpenRef = useRef(false); // pausa el sync cuando hay modal abierto
+
   const prevKitchenIds = useRef(new Set()); // para detectar pedidos nuevos en cocina
   const prevReadyIds   = useRef(new Set()); // para detectar pedidos listos para meseras
+
   // Servicio 10% — estado reactivo, persiste en servidor + localStorage como fallback
   const [servicioActivoGlobal, setServicioActivoGlobal] = useState(() => {
     const now = new Date();
@@ -32,6 +35,7 @@ export default function RestaurantePOS() {
     // También cubre el cierre: si es domingo antes de las 4am, aún cuenta como sábado
     return (day === 6 && hour >= 16) || (day === 0 && hour < 4);
   });
+
   // Contar pedidos pendientes en cocina cuando se muestra el selector
   useEffect(() => {
     if (!showSelector) return;
@@ -42,6 +46,7 @@ export default function RestaurantePOS() {
       })
       .catch(() => {});
   }, [showSelector]);
+
   // Al iniciar, sincronizar — sábado siempre activo, cualquier otro día siempre desactivo
   useEffect(() => {
     const now = new Date();
@@ -57,6 +62,7 @@ export default function RestaurantePOS() {
       setModoRestHabilitado(val);
       localStorage.setItem('lore_modo_rest', String(val));
     }).catch(() => {});
+
     if (!esSabado) {
       api.getConfig('servicio_activo').then(({ value }) => {
         // No sábado: solo activar si admin lo forzó manualmente (value===true guardado hoy)
@@ -64,12 +70,14 @@ export default function RestaurantePOS() {
       }).catch(() => {});
     }
   }, []);
+
   const showToast = (message, type = 'success') => {
     const id = Date.now();
     setToasts(prev => [...prev, { id, message, type }]);
     const duration = type === 'error' ? 5000 : type === 'warning' ? 4500 : 4000;
     setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), duration);
   };
+
   const [cartItems, setCartItems] = useState(() => {
     try {
       const saved = sessionStorage.getItem('lore_cart');
@@ -80,11 +88,13 @@ export default function RestaurantePOS() {
   const [selectedBarra, setSelectedBarra] = useState(null);
   const [clientName, setClientName]       = useState('');
   const [orderType, setOrderType]         = useState(null);
+
   const [openAccounts, setOpenAccounts]   = useState([]);
   const [paidOrders, setPaidOrders]       = useState([]);
   const [kitchenOrders, setKitchenOrders] = useState([]);
   const [kitchenPendingCount, setKitchenPendingCount] = useState(0);
   const [selectedAccount, setSelectedAccount] = useState(null);
+
   // Persistir carrito en sessionStorage — sobrevive recarga de página pero no cierre del browser
   useEffect(() => {
     try {
@@ -100,14 +110,13 @@ export default function RestaurantePOS() {
     const saved = localStorage.getItem('lore_modo_rest');
     return saved === 'true';
   });
+
   const [billOrder, setBillOrder]           = useState(null);
   const [viewItemsOrder, setViewItemsOrder] = useState(null);
   const [splitOrder, setSplitOrder]         = useState(null);
-  // Mantener modalOpenRef actualizado para que el interval del sync lo vea correctamente
-  useEffect(() => {
-    modalOpenRef.current = !!splitOrder || !!billOrder || !!viewItemsOrder;
-  }, [splitOrder, billOrder, viewItemsOrder]);
+
   const [mesaConflict, setMesaConflict]     = useState(null); // {existingAcc, onConfirm}
+
   const [isLandscape, setIsLandscape] = useState(
     () => window.matchMedia('(orientation: landscape)').matches
   );
@@ -118,6 +127,28 @@ export default function RestaurantePOS() {
     window.addEventListener('resize', check);
     return () => { mq.removeEventListener('change', check); window.removeEventListener('resize', check); };
   }, []);
+
+  // Mantener modalOpenRef actualizado para que el interval del sync lo vea correctamente
+  useEffect(() => {
+    modalOpenRef.current = !!splitOrder || !!billOrder || !!viewItemsOrder;
+  }, [splitOrder, billOrder, viewItemsOrder]);
+
+  // Verificar cada minuto si el sábado terminó — solo actualiza si cambió
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const now = new Date();
+      const day = now.getDay();
+      const hour = now.getHours();
+      const esSabado = (day === 6 && hour >= 16) || (day === 0 && hour < 4);
+      setServicioActivoGlobal(prev => {
+        if (prev === esSabado) return prev; // sin cambio, sin re-render
+        localStorage.setItem('lore_servicio', String(esSabado));
+        return esSabado;
+      });
+    }, 60000);
+    return () => clearInterval(interval);
+  }, []);
+
   const loadData = useCallback(async (zone, role, silent = false) => {
     if (!silent) setLoading(true);
     setSyncError(null);
@@ -148,6 +179,7 @@ export default function RestaurantePOS() {
           // Detectar pedidos nuevos (solo actualizar refs — el sonido de nuevo pedido es solo para cocina)
           const allIds = new Set(kitchen.map(o => o.id));
           prevKitchenIds.current = allIds;
+
           // Detectar pedidos recién marcados como listos (sonido diferente)
           const readyNow = kitchen.filter(o => o.status === 'ready');
           const newReady = readyNow.filter(o => !prevReadyIds.current.has(o.id));
@@ -172,6 +204,7 @@ export default function RestaurantePOS() {
       setLoading(false);
     }
   }, []);
+
   useEffect(() => {
     if (!currentUser || !userRole) return;
     const interval_ms = (userRole === 'mesera' || userRole === 'cocina' || userRole === 'caja') ? 5000 : 15000;
@@ -189,10 +222,11 @@ export default function RestaurantePOS() {
     }, interval_ms);
     return () => clearInterval(interval);
   }, [currentUser, userRole, currentZone, loadData]);
+
   // Recalcular precios del carrito cuando cambia mesa/barra (servicio 10%)
   useEffect(() => {
-    if (cartItems.length === 0 || currentZone !== 'bar' || !servicioActivoGlobal || modoRestaurante) return;
-    const esmesa = (selectedTable !== null && selectedTable !== undefined) && !selectedBarra;
+    if (cartItems.length === 0 || currentZone !== 'bar' || modoRestaurante) return;
+    const esmesa = servicioActivoGlobal && (selectedTable !== null && selectedTable !== undefined) && !selectedBarra;
     setCartItems(prev => prev.map(item => {
       // Solo recalcular items con conServicio explícitamente definido (boolean)
       // Items sin conServicio (cuentas antiguas) NO se tocan para evitar doble 10%
@@ -207,6 +241,7 @@ export default function RestaurantePOS() {
       return { ...item, price: newPrice, conServicio: esmesa };
     }));
   }, [selectedTable, selectedBarra]); // eslint-disable-line
+
   // Si la cuenta seleccionada fue cobrada por otra persona, limpiar selección
   useEffect(() => {
     if (!selectedAccount || openAccounts.length === 0) return;
@@ -218,12 +253,14 @@ export default function RestaurantePOS() {
       showToast('La cuenta fue cobrada por otra persona', 'warning');
     }
   }, [openAccounts, selectedAccount]);
+
   // Auto-cargar datos si hay sesión guardada
   useEffect(() => {
     if (savedSession?.user && savedSession?.role && savedSession?.zone) {
       loadData(savedSession.zone, savedSession.role);
     }
   }, []); // eslint-disable-line
+
   // Reintento automático cuando hay error de conexión
   useEffect(() => {
     if (!syncError || !currentUser) return;
@@ -232,13 +269,16 @@ export default function RestaurantePOS() {
     }, 10000);
     return () => clearTimeout(retry);
   }, [syncError, currentUser, currentZone, userRole, loadData]);
+
   const handleLogin = async (name, role, zone) => {
     setCurrentUser(name); setUserRole(role); setCurrentZone(zone);
     sessionStorage.setItem('lore_session', JSON.stringify({ user: name, role, zone }));
     await loadData(zone, role);
   };
+
   const handleLogout = () => {
     sessionStorage.removeItem('lore_session');
+    api.clearToken();
     setLoading(false); // resetear loading para evitar pantalla negra
     const wasAdmin = adminUser !== null;
     setCurrentUser(null); setUserRole(null); setCurrentZone(null);
@@ -256,6 +296,7 @@ export default function RestaurantePOS() {
       localStorage.removeItem('lore_admin');
     }
   };
+
   // ── PIN lockout — 5 intentos fallidos = bloqueo de 10 minutos ──
   const checkLockout = () => {
     const data = JSON.parse(localStorage.getItem('lore_lockout') || '{}');
@@ -264,6 +305,7 @@ export default function RestaurantePOS() {
     localStorage.removeItem('lore_lockout');
     return false;
   };
+
   const registerFailedAttempt = () => {
     const data = JSON.parse(localStorage.getItem('lore_lockout') || '{}');
     // Si el último intento fue hace más de 30 minutos, resetear el contador
@@ -281,13 +323,15 @@ export default function RestaurantePOS() {
     }
     return attempts >= 5;
   };
+
   const clearLockout = () => localStorage.removeItem('lore_lockout');
+
   const loginWithPin = async (pin) => {
-    const entry = Object.entries(PINES).find(([, v]) => v.pin === pin);
-    // Verificar PIN primero — si es correcto, limpiar lockout y continuar sin importar intentos
-    if (!entry) {
-      // PIN incorrecto — verificar lockout y registrar intento
-      if (checkLockout()) return 'bloqueado';
+    if (checkLockout()) return 'bloqueado';
+
+    const result = await api.loginWithPinServer(pin);
+
+    if (!result) {
       const locked = registerFailedAttempt();
       if (locked) {
         const data = JSON.parse(localStorage.getItem('lore_lockout') || '{}');
@@ -296,36 +340,37 @@ export default function RestaurantePOS() {
       }
       return false;
     }
-    const [name, { role }] = entry;
+
+    const { name, role, zone } = result;
+    clearLockout();
+
     if (role === 'admin') {
       setAdminUser(name);
       setShowSelector(true);
       localStorage.setItem('lore_admin', name);
       api.logAccess(name, pin, 'login');
-      clearLockout();
       return true;
     }
-    // Verificar si la mesera está activa
+
     if (role === 'mesera' || role === 'caja') {
       const config = await api.getMeserasActivas();
-      if (config && config.value) {
-        const activas = config.value;
-        if (activas[name] === false) {
-          return 'desactivada';
-        }
+      if (config && config.value && config.value[name] === false) {
+        return 'desactivada';
       }
     }
-    const [, { zone }] = entry;
+
     api.logAccess(name, pin, 'login');
     await handleLogin(name, role, zone);
     return true;
   };
+
   // Entradas del selector que no tienen PIN propio (solo accesibles via admin)
   const SELECTOR_EXTRAS = {
     'Tablet Restaurante': { role: 'mesera', zone: 'restaurante' },
     'Cocina':             { role: 'cocina', zone: 'restaurante' },
     'Guido Bar':          { role: 'mesera', zone: 'bar' },
   };
+
   // Timeout de sesión — 8 horas, aviso 10 min antes (debe ir después de handleLogout)
   useEffect(() => {
     if (!currentUser || userRole === 'admin') return;
@@ -345,6 +390,7 @@ export default function RestaurantePOS() {
     }, OCHO_HORAS);
     return () => { clearTimeout(avisoTimer); clearTimeout(logoutTimer); };
   }, [currentUser, userRole]); // eslint-disable-line
+
   const handleSelectorLogin = async (name) => {
     // '__admin__' significa entrar al Panel Admin con el usuario admin actual
     if (name === '__admin__') {
@@ -355,14 +401,19 @@ export default function RestaurantePOS() {
     }
     const user = PINES[name] || SELECTOR_EXTRAS[name];
     if (!user) return;
+    // Limpiar token anterior y obtener nuevo token para este usuario
+    api.clearToken();
+    const tokenResult = await api.getSelectorToken(name);
     api.logAccess(adminUser, '', 'select', name);
     await handleLogin(name, user.role, user.zone);
     setShowSelector(false);
   };
+
   const handleSelectAccount = (accountId) => {
     if (!accountId) {
       setSelectedAccount(null);
-      sessionStorage.removeItem('lore_cart'); setCartItems([]); setSelectedTable(null); setSelectedBarra(null); setClientName(''); setModoRestaurante(false); setOrderType(null);
+      sessionStorage.removeItem('lore_cart'); setCartItems([]);
+      // En el nuevo flujo de comanda, no limpiar mesa/nombre/tipo al deseleccionar cuenta
       return;
     }
     const acc = openAccounts.find(a => (a._id === accountId || a.id === accountId));
@@ -374,9 +425,11 @@ export default function RestaurantePOS() {
     setClientName(acc.clientName || '');
     setOrderType(acc.type || 'dine-in');
   };
+
   // Servicio 10% solo aplica en mesas (no en barras — ahí el cliente se sirve solo)
   const aplicaServicio = servicioActivoGlobal && currentZone === 'bar' && !modoRestaurante && (selectedTable !== null && selectedTable !== undefined) && !selectedBarra;
   const conServicio = (precio) => aplicaServicio ? Math.round(precio * 1.10) : precio;
+
   const addToCart = (item, withPotatoes = false) => {
     // withPotatoes: false = normal, true = con papas (+500), 'alt' = alternativa (yuca/pure)
     const isAlt    = withPotatoes === 'alt';
@@ -407,13 +460,16 @@ export default function RestaurantePOS() {
       const bd = { [currentUser]: 1 };
       return [...prev, { ...item, id: baseId, price, name: displayName, quantity: 1, notes: '', addedBy: currentUser, breakdown: bd, conServicio: aplicaServicio }];
     });
+    showToast(displayName, 'success');
   };
+
   const removeFromCart = (id) => setCartItems(prev => prev.filter(i => i.id !== id));
   const updateQuantity = (id, qty) => {
     if (qty <= 0) removeFromCart(id);
     else setCartItems(prev => prev.map(i => i.id === id ? { ...i, quantity: qty } : i));
   };
   const updateNotes = (id, notes) => setCartItems(prev => prev.map(i => i.id === id ? { ...i, notes } : i));
+
   const completeOrder = async () => {
     const effectiveZone = (currentZone === 'bar' && modoRestaurante) ? 'restaurante' : currentZone;
     if (loading) return;
@@ -472,9 +528,11 @@ export default function RestaurantePOS() {
         if (updatedAcc) {
           setOpenAccounts(prev => prev.map(a => (a.id === accId || a._id === accId) ? { ...a, ...updatedAcc } : a));
         }
+
         // Todo lo que está en el carrito al editar es NUEVO para cocina
         // El carrito ya solo tiene items nuevos (no los existentes de la cuenta)
         const itemsParaCocina = foodItems.map(item => ({ ...item, esNuevo: true }));
+
         if (itemsParaCocina.length > 0) {
           await api.createKitchenOrder({
             id: `k-${Date.now()}`, zone: effectiveZone, mesera: currentUser,
@@ -494,6 +552,7 @@ export default function RestaurantePOS() {
           a.status === 'open' && a.type !== 'direct' &&
           String(a.table) === String(selectedTable)
         ) : null;
+
         if (cuentaExistente && !mesaConflict) {
           // Hay cuenta en esa mesa — preguntar al usuario
           setLoading(false);
@@ -524,6 +583,7 @@ export default function RestaurantePOS() {
           });
           return;
         }
+
         const exentoAprobacion = ['Guido Bar', 'Tablet Restaurante'].includes(currentUser);
         const accountStatus = (effectiveZone === 'bar' && userRole === 'mesera' && !exentoAprobacion) ? 'pending_approval' : 'open';
         await api.createAccount({ id: `acc-${currentZone}-${currentUser}-${Date.now()}`, zone: effectiveZone, mesera: currentUser, items: [...cartItems], total, type: orderType, table: (selectedTable !== null && selectedTable !== undefined) ? Number(selectedTable) : null, barra: (currentZone === 'bar' && !modoRestaurante) ? selectedBarra : null, clientName, foodItems, drinkItems: cartItems.filter(i => ['alcoholic','beverage','soda','batido'].includes(i.category)), locationLabel: selectedBarra ? selectedBarra : ((selectedTable !== null && selectedTable !== undefined) ? `Mesa ${selectedTable}` : orderType === 'takeout' ? 'Para llevar' : 'Sin mesa'), status: accountStatus, createdAt: new Date() });
@@ -541,6 +601,7 @@ export default function RestaurantePOS() {
       setLoading(false);
     }
   };
+
   const handleDirectPay = async () => {
     if (loading) return;
     if (cartItems.length === 0) { showToast('El carrito está vacío', 'warning'); return; }
@@ -574,6 +635,7 @@ export default function RestaurantePOS() {
       setLoading(false);
     }
   };
+
   const payAccount = async (account, paymentMethod = 'efectivo') => {
     // Verificar que la cuenta sigue abierta antes de cobrar
     const stillOpen = openAccounts.find(a => (a._id === account._id || a.id === account.id) && a.status === 'open');
@@ -604,6 +666,7 @@ export default function RestaurantePOS() {
       setLoading(false);
     }
   };
+
   const handleMarkPending = async (account) => {
     setLoading(true);
     try {
@@ -618,6 +681,7 @@ export default function RestaurantePOS() {
       setLoading(false);
     }
   };
+
   const handleDeleteAccount = async (account) => {
     setLoading(true);
     try {
@@ -648,6 +712,7 @@ export default function RestaurantePOS() {
       setLoading(false);
     }
   };
+
   const handleSplitAccount = async (account, newItems, remaining) => {
     setLoading(true);
     try {
@@ -683,6 +748,7 @@ export default function RestaurantePOS() {
       setLoading(false);
     }
   };
+
   const markOrderReady = async (orderId) => {
     const order = kitchenOrders.find(o => o.id === orderId);
     if (!order || order.status === 'ready') return;
@@ -691,6 +757,7 @@ export default function RestaurantePOS() {
       setKitchenOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: 'ready' } : o));
     } catch (err) { showToast('Error: ' + err.message, 'error'); }
   };
+
   const markOrderDelivered = async (orderId) => {
     const order = kitchenOrders.find(o => o.id === orderId);
     if (!order) return;
@@ -699,16 +766,23 @@ export default function RestaurantePOS() {
       setKitchenOrders(prev => prev.filter(o => o.id !== orderId));
     } catch (err) { showToast('Error: ' + err.message, 'error'); }
   };
+
   const barAccounts      = openAccounts.filter(a => a.zone === 'bar');
   const restAccounts     = openAccounts.filter(a => a.zone === 'restaurante');
   const barPaid          = paidOrders.filter(a => a.zone === 'bar');
   const restPaid         = paidOrders.filter(a => a.zone === 'restaurante');
+  // Meseras solo ven sus propias cuentas normales (no cobros directos de otras)
+  // Meseras ven todas las cuentas normales de su zona
+  // Tablet Restaurante ve todas las cuentas de restaurante — incluyendo las creadas por meseras en modo restaurante
   const zoneOpenAccounts = (currentZone === 'bar' ? barAccounts : restAccounts)
     .filter(a => a.type !== 'direct');
+
   const handlePayRejected = async (account) => {
+    // Cobrar directo una cuenta rechazada — borrar la rejected y crear cobro directo
     setLoading(true);
     try {
       await api.deleteAccount(account.id || account._id);
+      // Crear cuenta tipo direct con los mismos items
       const total = (account.items || []).reduce((s, i) => s + i.price * i.quantity, 0);
       await api.createAccount({
         id: `acc-direct-${Date.now()}`, zone: account.zone, mesera: account.mesera,
@@ -726,9 +800,12 @@ export default function RestaurantePOS() {
     } catch (err) { showToast('Error: ' + err.message, 'error'); }
     finally { setLoading(false); }
   };
+
   const handleDeleteRejected = async (account) => {
+    // Reuse handleDeleteAccount which already handles kitchen orders cross-zone
     await handleDeleteAccount(account);
   };
+
   const handleApproveAccount = async (account) => {
     setLoading(true);
     try {
@@ -751,6 +828,7 @@ export default function RestaurantePOS() {
     } catch (err) { showToast('Error: ' + err.message, 'error'); }
     finally { setLoading(false); }
   };
+
   const handleRejectAccount = async (account, reason) => {
     setLoading(true);
     try {
@@ -761,6 +839,7 @@ export default function RestaurantePOS() {
     } catch (err) { showToast('Error: ' + err.message, 'error'); }
     finally { setLoading(false); }
   };
+
   // ── LOGIN ─────────────────────────────────────
   if (!currentUser) {
     if (showSelector) {
@@ -782,6 +861,7 @@ export default function RestaurantePOS() {
       onShowSelector={() => setShowSelector(true)}
     />;
   }
+
   // Guard contra renders intermedios durante logout
   if (!currentUser || !userRole || !currentZone) {
     return (
@@ -794,6 +874,9 @@ export default function RestaurantePOS() {
       </>
     );
   }
+
+
+
   if (userRole === 'mesera') {
     return (
       <>
@@ -806,7 +889,6 @@ export default function RestaurantePOS() {
           maxTables={modoRestaurante ? 5 : (currentZone === 'bar' ? 12 : 5)}
           tables={modoRestaurante ? null : (currentZone === 'bar' ? [0,1,2,3,4,5,6,7,8,9,10,11,12] : null)}
           modoRestaurante={modoRestaurante}
-          modoRestHabilitado={modoRestHabilitado}
           onToggleModoRestaurante={() => {
             setModoRestaurante(v => !v);
             setSelectedTable(null);
@@ -833,6 +915,7 @@ export default function RestaurantePOS() {
           aplicaServicio={aplicaServicio} loading={loading}
           mesaConflict={mesaConflict} setMesaConflict={setMesaConflict}
           onAddToExisting={(accountId) => {
+            // Solo selecciona la cuenta — NO reemplaza el carrito
             setSelectedAccount(accountId);
             const acc = openAccounts.find(a => (a._id === accountId || a.id === accountId));
             if (acc) {
@@ -845,14 +928,18 @@ export default function RestaurantePOS() {
       </>
     );
   }
+
   if (userRole === 'cocina') {
     return <><Toast toasts={toasts} offline={!!syncError} /><KitchenScreen kitchenOrders={kitchenOrders} loading={loading} onLogout={handleLogout} onReady={markOrderReady} onDelivered={markOrderDelivered} /></>;
   }
+
   if (userRole === 'caja' && currentZone === 'bar') {
     return <><Toast toasts={toasts} offline={!!syncError} /><CajaScreen zona="bar" zonaNombre="Bar" accounts={barAccounts} paid={barPaid} loading={loading} billOrder={billOrder} setBillOrder={setBillOrder} viewItemsOrder={viewItemsOrder} setViewItemsOrder={setViewItemsOrder} splitOrder={splitOrder} setSplitOrder={setSplitOrder} onSplit={handleSplitAccount} onLogout={handleLogout} onPay={payAccount} onDelete={handleDeleteAccount} onMarkPending={handleMarkPending} onApprove={handleApproveAccount} onReject={handleRejectAccount} /></>;
   }
+
   if (userRole === 'caja' && currentZone === 'restaurante') {
     return <><Toast toasts={toasts} offline={!!syncError} /><CajaScreen zona="restaurante" zonaNombre="Restaurante" accounts={restAccounts} paid={restPaid} loading={loading} billOrder={billOrder} setBillOrder={setBillOrder} viewItemsOrder={viewItemsOrder} setViewItemsOrder={setViewItemsOrder} splitOrder={splitOrder} setSplitOrder={setSplitOrder} onSplit={handleSplitAccount} onLogout={handleLogout} onPay={payAccount} onDelete={handleDeleteAccount} onMarkPending={handleMarkPending} /></>;
   }
+
   return <><Toast toasts={toasts} offline={!!syncError} /><AdminScreen barPaid={barPaid} restPaid={restPaid} loading={loading} onLogout={handleLogout} setPaidOrders={setPaidOrders} showToast={showToast} adminUser={adminUser} /></>;
 }
