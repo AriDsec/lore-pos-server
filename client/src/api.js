@@ -30,6 +30,18 @@ export const loginWithPinServer = async (pin) => {
 
 export const clearToken = () => sessionStorage.removeItem('lore_token');
 
+export const getSelectorToken = async (name) => {
+  const res = await fetch(`${BASE}/auth/selector-token`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name }),
+  });
+  if (!res.ok) return null;
+  const data = await res.json();
+  if (data.token) sessionStorage.setItem('lore_token', data.token);
+  return data;
+};
+
 const handleResponse = async (res) => {
   if (!res.ok) {
     const err = await res.json().catch(() => ({ error: 'Error desconocido' }));
