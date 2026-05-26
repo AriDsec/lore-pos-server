@@ -394,6 +394,8 @@ export default function RestaurantePOS() {
   const handleSelectorLogin = async (name) => {
     // '__admin__' significa entrar al Panel Admin con el usuario admin actual
     if (name === '__admin__') {
+      api.clearToken();
+      await api.getSelectorToken(adminUser);
       api.logAccess(adminUser, '', 'select', 'Panel Admin');
       await handleLogin(adminUser, 'admin', 'admin');
       setShowSelector(false);
