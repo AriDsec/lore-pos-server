@@ -193,7 +193,6 @@ const DailyReport = mongoose.model('DailyReport', dailyReportSchema);
 app.post('/api/auth/selector-token', async (req, res) => {
   try {
     const { name } = req.body;
-    console.log('SELECTOR TOKEN - name:', name, 'body:', JSON.stringify(req.body));
     if (!name) return res.status(400).json({ error: 'Nombre requerido' });
     const entry = PINES_SERVER[name];
     if (!entry) return res.status(404).json({ error: 'Usuario no encontrado' });
@@ -207,11 +206,9 @@ app.post('/api/auth/selector-token', async (req, res) => {
 app.post('/api/auth/login', async (req, res) => {
   try {
     const { pin } = req.body;
-    console.log('LOGIN REQUEST - pin recibido:', pin ? 'si' : 'no');
     if (!pin) return res.status(400).json({ error: 'PIN requerido' });
 
     const perfilesConfig = await Config.findOne({ key: 'meseras_perfiles' });
-    console.log('perfiles encontrados:', perfilesConfig ? 'si' : 'no');
     const perfiles = perfilesConfig?.value || {};
 
     let nombre = null, role = null, zone = null;
@@ -232,8 +229,7 @@ app.post('/api/auth/login', async (req, res) => {
       }
     }
 
-    console.log('LOGIN ATTEMPT - nombre:', nombre, 'role:', role);
-    if (!nombre) { console.log('PIN no encontrado'); return res.status(401).json({ error: 'PIN incorrecto' }); }
+    if (!nombre) return res.status(401).json({ error: 'PIN incorrecto' });
 
     const token = jwt.sign({ name: nombre, role, zone }, JWT_SECRET, { expiresIn: '24h' });
     res.json({ token, name: nombre, role, zone });
