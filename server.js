@@ -231,6 +231,7 @@ app.post('/api/auth/login', async (req, res) => {
 app.post('/api/auth/selector-token', async (req, res) => {
   try {
     const { name } = req.body;
+    console.log('SELECTOR TOKEN - name:', name, 'body:', JSON.stringify(req.body));
     if (!name) return res.status(400).json({ error: 'Nombre requerido' });
     const entry = PINES_SERVER[name];
     if (!entry) return res.status(404).json({ error: 'Usuario no encontrado' });
