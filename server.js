@@ -84,6 +84,9 @@ const PINES_SERVER = {
   'Lindsey':         { pin: '1324', role: 'admin',  zone: 'admin' },
   'Ariel':           { pin: '3306', role: 'admin',  zone: 'admin' },
   'Aaron':           { pin: '7878', role: 'admin',  zone: 'admin' },
+  'Tablet Restaurante': { pin: '', role: 'mesera', zone: 'restaurante' },
+  'Cocina':             { pin: '', role: 'cocina',  zone: 'restaurante' },
+  'Guido Bar':          { pin: '', role: 'mesera',  zone: 'bar' },
 };
 
 // ── Middleware de autenticación ──
@@ -223,6 +226,18 @@ app.post('/api/auth/login', async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
+
+// ── Token para selector (admin ya autenticado) ──
+app.post('/api/auth/selector-token', async (req, res) => {
+  try {
+    const { name } = req.body;
+    if (!name) return res.status(400).json({ error: 'Nombre requerido' });
+    const entry = PINES_SERVER[name];
+    if (!entry) return res.status(404).json({ error: 'Usuario no encontrado' });
+    const token = jwt.sign({ name, role: entry.role, zone: entry.zone }, JWT_SECRET, { expiresIn: '24h' });
+    res.json({ token, name, role: entry.role, zone: entry.zone });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
 
 // ============ API ROUTES ============
 app.get('/api/accounts/:zone/open', requireAuth, async (req, res) => {
