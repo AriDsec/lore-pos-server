@@ -159,7 +159,7 @@ const KitchenOrder = mongoose.model('KitchenOrder', kitchenOrderSchema);
 
 const accessLogSchema = new mongoose.Schema({
   user:      { type: String, required: true },
-  pin:       { type: String, required: true },
+  pin:       { type: String, default: '' },
   action:    { type: String, default: 'login' },
   selected:  { type: String, default: null },
   timestamp: { type: Date, default: Date.now },
