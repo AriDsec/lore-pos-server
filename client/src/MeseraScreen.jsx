@@ -664,7 +664,7 @@ export function MeseraScreen({
             <div className="mb-4">
               <div className="text-slate-400 text-xs font-bold uppercase tracking-wide mb-2">Mesas</div>
               <div className="grid grid-cols-4 gap-2">
-                {(tables || Array.from({ length: maxTables + 1 }, (_, i) => i)).map(n => {
+                {(tables || Array.from({ length: maxTables }, (_, i) => i + 1)).map(n => {
                   const existingAcc = openAccounts.find(a => a.status === 'open' && a.type !== 'direct' && String(a.table) === String(n));
                   const tieneC = !!existingAcc;
                   const mesaColor = tieneC ? (COLORES_MESERA[existingAcc.mesera] || '#f59e0b') : null;
