@@ -52,43 +52,6 @@ const adminLimiter = rateLimit({
   message: { error: 'Demasiadas solicitudes administrativas, intenta más tarde.' },
 });
 
-// ── Endpoint de login — fuera del rate limiter general ──
-app.post('/api/auth/login', async (req, res) => {
-  try {
-    const { pin } = req.body;
-    console.log('LOGIN REQUEST - pin recibido:', pin ? 'si' : 'no');
-    if (!pin) return res.status(400).json({ error: 'PIN requerido' });
-
-    const perfilesConfig = await Config.findOne({ key: 'meseras_perfiles' });
-    console.log('perfiles encontrados:', perfilesConfig ? 'si' : 'no');
-    const perfiles = perfilesConfig?.value || {};
-
-    let nombre = null, role = null, zone = null;
-    for (const [slot, perfil] of Object.entries(perfiles)) {
-      if (perfil.pin === pin && PINES_SERVER[slot]) {
-        nombre = perfil.nombre || slot;
-        role = PINES_SERVER[slot].role;
-        zone = PINES_SERVER[slot].zone;
-        break;
-      }
-    }
-
-    if (!nombre) {
-      for (const [name, data] of Object.entries(PINES_SERVER)) {
-        if (data.pin === pin) {
-          nombre = name; role = data.role; zone = data.zone; break;
-        }
-      }
-    }
-
-    console.log('LOGIN ATTEMPT - nombre:', nombre, 'role:', role);
-    if (!nombre) { console.log('PIN no encontrado'); return res.status(401).json({ error: 'PIN incorrecto' }); }
-
-    const token = jwt.sign({ name: nombre, role, zone }, JWT_SECRET, { expiresIn: '24h' });
-    res.json({ token, name: nombre, role, zone });
-  } catch (err) { res.status(500).json({ error: err.message }); }
-});
-
 app.use('/api', (req, res, next) => {
   if (req.path === '/auth/login') return next(); // login sin rate limit
   return generalLimiter(req, res, next);
@@ -222,6 +185,44 @@ const dailyReportSchema = new mongoose.Schema({
   creadoEn: { type: Date, default: Date.now },
 });
 const DailyReport = mongoose.model('DailyReport', dailyReportSchema);
+
+// ── Endpoint de login — fuera del rate limiter general ──
+app.post('/api/auth/login', async (req, res) => {
+  try {
+    const { pin } = req.body;
+    console.log('LOGIN REQUEST - pin recibido:', pin ? 'si' : 'no');
+    if (!pin) return res.status(400).json({ error: 'PIN requerido' });
+
+    const perfilesConfig = await Config.findOne({ key: 'meseras_perfiles' });
+    console.log('perfiles encontrados:', perfilesConfig ? 'si' : 'no');
+    const perfiles = perfilesConfig?.value || {};
+
+    let nombre = null, role = null, zone = null;
+    for (const [slot, perfil] of Object.entries(perfiles)) {
+      if (perfil.pin === pin && PINES_SERVER[slot]) {
+        nombre = perfil.nombre || slot;
+        role = PINES_SERVER[slot].role;
+        zone = PINES_SERVER[slot].zone;
+        break;
+      }
+    }
+
+    if (!nombre) {
+      for (const [name, data] of Object.entries(PINES_SERVER)) {
+        if (data.pin === pin) {
+          nombre = name; role = data.role; zone = data.zone; break;
+        }
+      }
+    }
+
+    console.log('LOGIN ATTEMPT - nombre:', nombre, 'role:', role);
+    if (!nombre) { console.log('PIN no encontrado'); return res.status(401).json({ error: 'PIN incorrecto' }); }
+
+    const token = jwt.sign({ name: nombre, role, zone }, JWT_SECRET, { expiresIn: '24h' });
+    res.json({ token, name: nombre, role, zone });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
 
 // ============ API ROUTES ============
 app.get('/api/accounts/:zone/open', requireAuth, async (req, res) => {
