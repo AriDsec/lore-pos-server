@@ -189,6 +189,20 @@ const dailyReportSchema = new mongoose.Schema({
 });
 const DailyReport = mongoose.model('DailyReport', dailyReportSchema);
 
+// ── Token para selector (admin ya autenticado) ──
+app.post('/api/auth/selector-token', async (req, res) => {
+  try {
+    const { name } = req.body;
+    console.log('SELECTOR TOKEN - name:', name, 'body:', JSON.stringify(req.body));
+    if (!name) return res.status(400).json({ error: 'Nombre requerido' });
+    const entry = PINES_SERVER[name];
+    if (!entry) return res.status(404).json({ error: 'Usuario no encontrado' });
+    const token = jwt.sign({ name, role: entry.role, zone: entry.zone }, JWT_SECRET, { expiresIn: '24h' });
+    res.json({ token, name, role: entry.role, zone: entry.zone });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+
 // ── Endpoint de login — fuera del rate limiter general ──
 app.post('/api/auth/login', async (req, res) => {
   try {
@@ -226,19 +240,6 @@ app.post('/api/auth/login', async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-
-// ── Token para selector (admin ya autenticado) ──
-app.post('/api/auth/selector-token', async (req, res) => {
-  try {
-    const { name } = req.body;
-    console.log('SELECTOR TOKEN - name:', name, 'body:', JSON.stringify(req.body));
-    if (!name) return res.status(400).json({ error: 'Nombre requerido' });
-    const entry = PINES_SERVER[name];
-    if (!entry) return res.status(404).json({ error: 'Usuario no encontrado' });
-    const token = jwt.sign({ name, role: entry.role, zone: entry.zone }, JWT_SECRET, { expiresIn: '24h' });
-    res.json({ token, name, role: entry.role, zone: entry.zone });
-  } catch (err) { res.status(500).json({ error: err.message }); }
-});
 
 // ============ API ROUTES ============
 app.get('/api/accounts/:zone/open', requireAuth, async (req, res) => {
