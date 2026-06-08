@@ -83,7 +83,7 @@ export function AdminScreen({ barPaid, restPaid, loading, onLogout, setPaidOrder
     await api.setMeserasActivas(updated).catch(() => {});
   };
 
-  const meseras = ['Mari', 'Mile', 'Lin', 'Temp Bar'];
+  const meseras = ['Mari', 'Temporal 1', 'Temporal 2', 'Temporal 3'];
 
   const totalBarCobrado  = barPaid.reduce((s, o) => s + o.total, 0);
   const totalRestCobrado = restPaid.reduce((s, o) => s + o.total, 0);
@@ -636,7 +636,7 @@ ${countMethod(restPaid,'tarjeta_sinpe')>0?`<span style="background:#1e1b4b;color
               <div className="bg-[#94cb47]/10 rounded-xl p-4 border border-[#94cb47]/30 flex justify-between items-center">
                 <div>
                   <div className="text-[#94cb47] text-sm font-bold">Por mesera</div>
-                  <div className="text-xs text-slate-400">Mari, Mile, Lin{numMeseras === 4 ? ', Temp Bar' : ''}</div>
+                  <div className="text-xs text-slate-400">Mari, Temporal 1, Temporal 2{numMeseras === 4 ? ', Temporal 3' : ''}</div>
                 </div>
                 <div className="text-2xl font-bold text-[#94cb47]">₡{porMesera.toLocaleString()}</div>
               </div>
