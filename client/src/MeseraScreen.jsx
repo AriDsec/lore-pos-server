@@ -7,8 +7,8 @@ import { ShoppingCart } from './Cart.jsx';
 
 // ── Colores por mesera ──
 const COLORES_MESERA = {
-  'Mari': '#60a5fa', 'Mile': '#c084fc', 'Lin': '#fb923c',
-  'Temp Bar': '#f472b6', 'Guido Bar': '#facc15'
+  'Mari': '#60a5fa', 'Temporal 2': '#c084fc', 'Temporal 3': '#fb923c',
+  'Temporal 1': '#f472b6', 'Guido Bar': '#facc15'
 };
 
 function MenuCenter({ menuTab, setMenuTab, menu, licores, addToCart, onModalChange, isBar,
