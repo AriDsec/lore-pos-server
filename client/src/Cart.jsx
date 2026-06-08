@@ -49,7 +49,7 @@ export function ShoppingCart({
           <label className="text-slate-400 text-xs mb-1 block">Cuenta abierta</label>
           {/* Lista de cuentas abiertas */}
           {(() => {
-            const COLORES = { 'Mari': '#60a5fa', 'Mile': '#c084fc', 'Lin': '#fb923c', 'Temp Bar': '#f472b6', 'Guido Bar': '#facc15' };
+            const COLORES = { 'Mari': '#60a5fa', 'Temporal 2': '#c084fc', 'Temporal 3': '#fb923c', 'Temporal 1': '#f472b6', 'Guido Bar': '#facc15' };
             const cuentas = openAccounts.filter(a => a.status !== 'pending_payment' && a.status !== 'pending_approval' && a.status !== 'rejected');
             const mesas = cuentas.filter(a => !a.barra).sort((a, b) => (a.table ?? 99) - (b.table ?? 99));
             const barras = cuentas.filter(a => !!a.barra).sort((a, b) => (a.barra || '').localeCompare(b.barra || ''));
