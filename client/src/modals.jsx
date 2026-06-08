@@ -690,7 +690,7 @@ export function PinLoginScreen({ isLandscape, syncError, loading, onLogin }) {
 // ─────────────────────────────────────────────
 
 export function SelectorScreen({ isLandscape, syncError, loading, onSelect, onBack, adminUser, kitchenPendingCount = 0 }) {
-  const meseras = ['Mari', 'Mile', 'Lin', 'Temp Bar', 'Guido Bar'];
+  const meseras = ['Mari', 'Temporal 1', 'Temporal 2', 'Temporal 3', 'Guido Bar'];
 
   // Determine which menu to show based on who logged in
   const isBarAdmin = adminUser === 'Guido' || adminUser === 'Lindsey';
