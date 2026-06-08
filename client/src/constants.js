@@ -313,18 +313,18 @@ export const MENU = {
 // ─────────────────────────────────────────────
 export const PINES = {
   // ── Caja ──
-  'Caja Bar':           { pin: '1970', role: 'caja',   zone: 'bar' },
-  'Caja Restaurante':   { pin: '1969', role: 'caja',   zone: 'restaurante' },
+  'Caja Bar':           { role: 'caja',   zone: 'bar' },
+  'Caja Restaurante':   { role: 'caja',   zone: 'restaurante' },
   // ── Meseras Bar ──
-  'Mari':               { pin: '5456', role: 'mesera', zone: 'bar' },
-  'Temporal 2':         { pin: '8995', role: 'mesera', zone: 'bar' },
-  'Temporal 3':        { pin: '7777', role: 'mesera', zone: 'bar' },
-  'Temporal 1':         { pin: '1221', role: 'mesera', zone: 'bar' },
+  'Mari':               { role: 'mesera', zone: 'bar' },
+  'Temporal 2':         { role: 'mesera', zone: 'bar' },
+  'Temporal 3':         { role: 'mesera', zone: 'bar' },
+  'Temporal 1':         { role: 'mesera', zone: 'bar' },
   // ── Admins ──
-  'Guido':              { pin: '0000', role: 'admin',  zone: 'admin' },
-  'Lindsey':            { pin: '1324', role: 'admin',  zone: 'admin' },
-  'Ariel':              { pin: '3306', role: 'admin',  zone: 'admin' },
-  'Aaron':              { pin: '7878', role: 'admin',  zone: 'admin' },
+  'Guido':              { role: 'admin',  zone: 'admin' },
+  'Lindsey':            { role: 'admin',  zone: 'admin' },
+  'Ariel':              { role: 'admin',  zone: 'admin' },
+  'Aaron':              { role: 'admin',  zone: 'admin' },
 };
 
 export const meseras = ['Mari', 'Temporal 1', 'Temporal 2', 'Temporal 3', 'Guido Bar'];
