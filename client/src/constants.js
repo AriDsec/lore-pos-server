@@ -156,7 +156,7 @@ export const MENU = {
       { id: 'f_surtido_pequeno', name: 'Surtido Pequeño', price: 8400, category: 'food' },
     ],
     'Bocas': [
-      { id: 'f_carne_salsa', name: 'Carne en salsa', price: 3000, category: 'food' },
+      { id: 'f_carne_salsa', name: 'Carne en salsa', price: 2500, category: 'food' },
       { id: 'f_frijoles_pezuna', name: 'Frijoles con pezuña', price: 2200, category: 'food' },
       { id: 'f_chifrijo', name: 'Chifrijo', price: 3200, category: 'food' },
       { id: 'f_ceviche', name: 'Ceviche', price: 3000, category: 'food' },
