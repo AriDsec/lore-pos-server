@@ -149,7 +149,7 @@ export function MeseraScreen({
       {currentUser !== 'Tablet Restaurante' && (() => {
         const readyOrders = kitchenOrders.filter(o => o.status === 'ready');
         if (readyOrders.length === 0) return null;
-        const mesas = readyOrders.map(o => o.barra || ((o.table && o.table > 0) ? `Mesa ${o.table}` : 'Mesa 0')).join(', ');
+        const mesas = readyOrders.map(o => o.barra || (o.table > 0 ? `Mesa ${o.table}` : o.table === 0 ? 'Fuente' : '')).join(', ');
         return (
           <div className="bg-[#94cb47] overflow-hidden">
             <div className="flex items-center gap-2 px-4 py-2.5">
@@ -687,7 +687,7 @@ export function MeseraScreen({
                       }}
                       className={`py-3 rounded-xl font-bold text-sm border transition relative ${isSelected ? 'bg-[#94cb47] text-black border-[#94cb47]' : 'bg-slate-700 text-slate-300 border-slate-600'}`}
                       style={!isSelected && tieneC ? {borderColor: mesaColor, color: mesaColor} : {}}>
-                      {n}
+                      {n === 0 ? 'Fuente' : n}
                       {tieneC && <span className="absolute top-1 right-1 w-2 h-2 rounded-full" style={{backgroundColor: mesaColor}}></span>}
                     </button>
                   );
