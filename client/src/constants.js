@@ -156,7 +156,7 @@ export const MENU = {
       { id: 'f_surtido_pequeno', name: 'Surtido Pequeño', price: 8400, category: 'food' },
     ],
     'Bocas': [
-      { id: 'f_carne_salsa', name: 'Carne en salsa', price: 2500, category: 'food' },
+      { id: 'f_carne_salsa', name: 'Carne en salsa', price: 3000, category: 'food' },
       { id: 'f_frijoles_pezuna', name: 'Frijoles con pezuña', price: 2200, category: 'food' },
       { id: 'f_chifrijo', name: 'Chifrijo', price: 3200, category: 'food' },
       { id: 'f_ceviche', name: 'Ceviche', price: 3000, category: 'food' },
@@ -198,12 +198,7 @@ export const MENU = {
       { id: 'f_fajitas_res', name: 'Fajitas de res', price: 4000, category: 'food', canHavePapas: true },
       { id: 'f_costilla_bbq', name: 'Costilla BBQ', price: 4500, category: 'food', canHavePapas: true },
     ],
-    'Menú de niños': [
-      { id: 'f_deditos_pollo', name: 'Deditos de pollo', price: 2300, category: 'food' },
-      { id: 'f_deditos_pescado', name: 'Deditos de pescado', price: 2300, category: 'food' },
-      { id: 'f_papas_pequenas', name: 'Papas pequeñas', price: 1000, category: 'food' },
-      { id: 'f_nino_nachos', name: 'Niño nachos', price: 2300, category: 'food' },
-    ],
+
   },
   restaurante: {
     'Cervezas Nacionales': [
@@ -299,12 +294,7 @@ export const MENU = {
       { id: 'f_fajitas_res', name: 'Fajitas de res', price: 4000, category: 'food', canHavePapas: true },
       { id: 'f_costilla_bbq', name: 'Costilla BBQ', price: 4500, category: 'food', canHavePapas: true },
     ],
-    'Menú de niños': [
-      { id: 'f_deditos_pollo', name: 'Deditos de pollo', price: 2300, category: 'food' },
-      { id: 'f_deditos_pescado', name: 'Deditos de pescado', price: 2300, category: 'food' },
-      { id: 'f_papas_pequenas', name: 'Papas pequeñas', price: 1000, category: 'food' },
-      { id: 'f_nino_nachos', name: 'Niño nachos', price: 2300, category: 'food' },
-    ],
+
   },
 };
 
@@ -315,11 +305,11 @@ export const PINES = {
   // ── Caja ──
   'Caja Bar':           { role: 'caja',   zone: 'bar' },
   'Caja Restaurante':   { role: 'caja',   zone: 'restaurante' },
-  // ── Meseras Bar ──
-  'Mari':               { role: 'mesera', zone: 'bar' },
-  'Temporal 2':         { role: 'mesera', zone: 'bar' },
-  'Temporal 3':         { role: 'mesera', zone: 'bar' },
-  'Temporal 1':         { role: 'mesera', zone: 'bar' },
+  // ── Meseras Bar (IDs fijos — nombre y PIN en servidor) ──
+  'empleado_1':         { role: 'mesera', zone: 'bar' },
+  'empleado_2':         { role: 'mesera', zone: 'bar' },
+  'empleado_3':         { role: 'mesera', zone: 'bar' },
+  'empleado_4':         { role: 'mesera', zone: 'bar' },
   // ── Admins ──
   'Guido':              { role: 'admin',  zone: 'admin' },
   'Lindsey':            { role: 'admin',  zone: 'admin' },
@@ -327,5 +317,5 @@ export const PINES = {
   'Aaron':              { role: 'admin',  zone: 'admin' },
 };
 
-export const meseras = ['Mari', 'Temporal 1', 'Temporal 2', 'Temporal 3', 'Guido Bar'];
+export const meseras = ['empleado_1', 'empleado_2', 'empleado_3', 'empleado_4', 'Guido Bar'];
 export const barras  = ['Barra 1', 'Barra 2', 'Barra 3', 'Barra Grande'];
