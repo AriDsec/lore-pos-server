@@ -156,7 +156,7 @@ export const MENU = {
       { id: 'f_surtido_pequeno', name: 'Surtido Pequeño', price: 8400, category: 'food' },
     ],
     'Bocas': [
-      { id: 'f_carne_salsa', name: 'Carne en salsa', price: 3000, category: 'food' },
+      { id: 'f_carne_salsa', name: 'Carne en salsa', price: 2500, category: 'food' },
       { id: 'f_frijoles_pezuna', name: 'Frijoles con pezuña', price: 2200, category: 'food' },
       { id: 'f_chifrijo', name: 'Chifrijo', price: 3200, category: 'food' },
       { id: 'f_ceviche', name: 'Ceviche', price: 3000, category: 'food' },
@@ -198,7 +198,6 @@ export const MENU = {
       { id: 'f_fajitas_res', name: 'Fajitas de res', price: 4000, category: 'food', canHavePapas: true },
       { id: 'f_costilla_bbq', name: 'Costilla BBQ', price: 4500, category: 'food', canHavePapas: true },
     ],
-
   },
   restaurante: {
     'Cervezas Nacionales': [
@@ -294,7 +293,6 @@ export const MENU = {
       { id: 'f_fajitas_res', name: 'Fajitas de res', price: 4000, category: 'food', canHavePapas: true },
       { id: 'f_costilla_bbq', name: 'Costilla BBQ', price: 4500, category: 'food', canHavePapas: true },
     ],
-
   },
 };
 
